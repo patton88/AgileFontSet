@@ -87,5 +87,11 @@
     <Image Include="res\AgileFontSet.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\ICON_VS.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\ICON_HS.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

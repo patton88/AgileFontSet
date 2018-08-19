@@ -101,8 +101,8 @@ BEGIN
     CONTROL         "",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,196,112,8,10
     CONTROL         "",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,196,127,8,10
     CONTROL         "",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,196,142,8,10
-    CONTROL         "",IDC_SPIN_VS,"msctls_updown32",UDS_SETBUDDYINT | UDS_AUTOBUDDY | UDS_ARROWKEYS | WS_GROUP,209,196,11,14
-    CONTROL         "",IDC_SPIN_HS,"msctls_updown32",UDS_SETBUDDYINT | UDS_AUTOBUDDY | UDS_ARROWKEYS | WS_GROUP,209,179,11,14
+    CONTROL         "",IDC_SPIN_VS,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | WS_GROUP,209,196,11,14
+    CONTROL         "",IDC_SPIN_HS,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | WS_GROUP,209,179,11,14
     ICON            IDI_ICON_HS,IDC_ICON_HS2,233,179,14,14,SS_CENTERIMAGE | WS_GROUP
     ICON            IDI_ICON_VS,IDC_ICON_VS2,233,196,14,14,SS_CENTERIMAGE | WS_GROUP
     LTEXT           "图标水平间距：",IDC_STATIC_MESSAGE2,29,182,58,12,SS_CENTERIMAGE
@@ -231,8 +231,8 @@ BEGIN
     0, 0, 0, 0,
     0, 0, 0, 0,
     0, 0, 0, 0,
-    10, 10, 10, 10,
-    10, 10, 10, 10,
+    1, 1, 1, 1,
+    1, 1, 1, 1,
     0, 0, 0, 0,
     0, 0, 0, 0,
     0, 0, 0, 0,
@@ -253,31 +253,6 @@ END
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""atlres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -340,6 +315,31 @@ BEGIN
         BOTTOMMARGIN, 91
     END
 END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""atlres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\0"
+END
+
 #endif    // APSTUDIO_INVOKED
 
 
