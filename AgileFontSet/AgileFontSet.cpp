@@ -5,11 +5,14 @@
 
 #include "resource.h"
 
-#include "MainDlg.h"
+//#include "MainDlg.h"
+
+#include "AgileFontSet.h"
 
 CAppModule _Module;
+CString g_strVerInfo = L"—∏Ω›◊÷ÃÂ…Ë÷√≥Ã–Úv1.0 - ybmj@vip.163.com 20180825";
 
-int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*lpstrCmdLine*/, int /*nCmdShow*/)
+int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrCmdLine, int nCmdShow)
 {
 	HRESULT hRes = ::CoInitialize(NULL);
 	ATLASSERT(SUCCEEDED(hRes));
@@ -22,8 +25,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 	int nRet = 0;
 	// BLOCK: Run application
 	{
-		CMainDlg dlgMain;
-		nRet = (int)dlgMain.DoModal();
+		//CMainDlg dlgMain;
+		//nRet = (int)dlgMain.DoModal();
+		nRet = VS2013_Win32App_wWinMain(hInstance, hPrevInstance, lpstrCmdLine, nCmdShow);
 	}
 
 	_Module.Term();

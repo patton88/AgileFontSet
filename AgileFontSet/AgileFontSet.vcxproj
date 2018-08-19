@@ -199,7 +199,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AgileFontSet.cpp" />
+    <ClCompile Include="CButtonImpl.cpp" />
+    <ClCompile Include="CComboImpl.cpp" />
+    <ClCompile Include="CEditImpl.cpp" />
     <ClCompile Include="MainDlg.cpp" />
+    <ClCompile Include="PP0_PropertySheet.cpp" />
+    <ClCompile Include="PP1_FontSet.cpp" />
+    <ClCompile Include="PP2_Readme.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -208,7 +214,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AgileFontSet.h" />
+    <ClInclude Include="CButtonImpl.h" />
+    <ClInclude Include="CComboImpl.h" />
+    <ClInclude Include="CEditImpl.h" />
+    <ClInclude Include="CommonFun.h" />
     <ClInclude Include="MainDlg.h" />
+    <ClInclude Include="PP0_PropertySheet.h" />
+    <ClInclude Include="PP1_FontSet.h" />
+    <ClInclude Include="PP2_Readme.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
