@@ -96,6 +96,39 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	GetWinOsName(str);
 	::SetWindowTextW(GetDlgItem(IDC_STATIC_VERNO), str);
 
+
+	//noMeiryoUI235Dlg::OnInitDialog
+	//////////////////////////////////////////////////////////////////////////
+	FillMemory(&m_metrics, sizeof(NONCLIENTMETRICSW), 0x00);
+	FillMemory(&m_metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
+	FillMemory(&m_iconFont, sizeof(LOGFONTW), 0x00);
+	FillMemory(&m_iconFontAll, sizeof(LOGFONTW), 0x00);
+
+	//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
+	initializeLocale();
+
+	// 若没有指定命令行ini设置文件
+	if (m_strSettingFile.IsEmpty()) {
+		getActualFont();
+	}
+
+	//处理菜单的禁用启用
+	if (!use7Compat) {
+		// 在Windows 7或更早版本的情况下，无法更改字体大小的处理模式。
+		CheckMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_UNCHECKED);
+		EnableMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	}
+	CheckMenuItem(GetMenu(), IDM_UNIQ_THREAD, MF_BYCOMMAND | MF_CHECKED);
+
+	//显示Windows系统版本号
+	//CString str;
+	GetWinOsName(str);
+	::SetWindowTextW(GetDlgItem(IDC_STATIC_VERNO), str);
+
+	// 更新字体名称显示
+	theUpdateDisplay();
+
+
 	return FALSE;
 }
 
