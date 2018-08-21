@@ -124,26 +124,26 @@ int myStoi(CString str)
 //}
 
 //vecStrIS(vecStrIconSpacing)、vecIntIS(vecIntIconSpacing)
-int GetDataEx(vector<CString> &vecStrIS, vector<int> &vecIntIS, CString strFlag)
+int GetDataEx(vector<CString> &vecStrIS, vector<unsigned> &vecUnIS, CString strFlag)
 {
 	int nRet = 0;	//参数非法、或者转换失败
 
 	if (L"" == strFlag && L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"-v" == StrToLower(vecStrIS[1].Left(2)))
 	{
 		CString str0 = vecStrIS[0].Right(vecStrIS[0].GetLength() - 2);	//去除前面两个字符
-		vecIntIS[0] = myStoi(str0);
+		vecUnIS[0] = myStoi(str0);
 		//vecIconSpacing.push_back(_wtoi(str0.GetBuffer(str0.GetLength())));
 		//vecIconSpacing[0] = _wtoi((LPWSTR)(LPCWSTR)vecCmdLine[0]);			//转换失败
 		//str0.ReleaseBuffer();
 
 		CString str1 = vecStrIS[1].Right(vecStrIS[1].GetLength() - 2);	//去除前面两个字符
-		vecIntIS[1] = myStoi(str1);
+		vecUnIS[1] = myStoi(str1);
 		//vecIconSpacing.push_back(_wtoi(str1.GetBuffer(str1.GetLength())));
 		//vecIconSpacing[1] = _wtoi((LPWSTR)(LPCWSTR)vecCmdLine[1]);			//转换失败
 		//vecCmdLine[1].ReleaseBuffer();
 
 		// 若 str 不能转换成 int、或者结果不在 0-150之间，myStoi 将返回 -1
-		if (-1 != vecIntIS[0] && -1 != vecIntIS[1])
+		if (-1 != vecUnIS[0] && -1 != vecUnIS[1])
 		{
 			nRet = 1;
 		}	//转换成功
@@ -151,9 +151,9 @@ int GetDataEx(vector<CString> &vecStrIS, vector<int> &vecIntIS, CString strFlag)
 	else if (L"-h" == strFlag && L"-h" == StrToLower(vecStrIS[0].Left(2)))
 	{
 		CString str0 = vecStrIS[0].Right(vecStrIS[0].GetLength() - 2);	//去除前面两个字符
-		vecIntIS[0] = myStoi(str0);
+		vecUnIS[0] = myStoi(str0);
 		// 若 str 不能转换成 int、或者结果不在 0-150之间，myStoi 将返回 -1
-		if (-1 != vecIntIS[0])
+		if (-1 != vecUnIS[0])
 		{
 			nRet = 1;
 		}	//转换成功
@@ -161,9 +161,9 @@ int GetDataEx(vector<CString> &vecStrIS, vector<int> &vecIntIS, CString strFlag)
 	else if (L"-v" == strFlag && L"-v" == StrToLower(vecStrIS[1].Left(2)))
 	{
 		CString str1 = vecStrIS[1].Right(vecStrIS[1].GetLength() - 2);	//去除前面两个字符
-		vecIntIS[1] = myStoi(str1);
+		vecUnIS[1] = myStoi(str1);
 		// 若 str 不能转换成 int、或者结果不在 0-150之间，myStoi 将返回 -1
-		if (-1 != vecIntIS[1])
+		if (-1 != vecUnIS[1])
 		{
 			nRet = 1;
 		}	//转换成功
@@ -189,7 +189,7 @@ int APIENTRY VS2013_Win32App_wWinMain(
 
 	// 处理命令行参数
 	vector<CString> vecCmdLine;
-	vector<int> vecIntIS(2, -1);	//(vecIntIconSpacing)初始化了2个默认值为-1的元素。避免出错时误设置
+	vector<unsigned> vecUnIS(2, -1);	//(vecIntIconSpacing)初始化了2个默认值为-1的元素。避免出错时误设置
 	PP0_PropertySheet progsheet(g_strVerInfo.GetBuffer(0), 0);
 	g_strVerInfo.ReleaseBuffer();
 
@@ -283,27 +283,27 @@ int APIENTRY VS2013_Win32App_wWinMain(
 			//bRefresh = TRUE;	//前面定义时已付默认初值TRUE
 			if (1 == iSeg)		//L"-r"必须是独立参数
 			{
-				iState = progsheet.GetIconSpacing(vecIntIS);		//获取当前图标间距
+				iState = progsheet.m_pp1FontSet.GetIconSpacing(vecUnIS);		//获取当前图标间距
 			}
 		}
 		else if (L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"" == vecStrIS[1])
 		{	//只有L"-h"、[L"-n"]。此时vecIntIS[0]、vecIntIS[1]都为-1
-			progsheet.GetIconSpacing(vecIntIS);		//获取当前图标间距
-			iState = GetDataEx(vecStrIS, vecIntIS, L"-h");
+			progsheet.m_pp1FontSet.GetIconSpacing(vecUnIS);		//获取当前图标间距
+			iState = GetDataEx(vecStrIS, vecUnIS, L"-h");
 		}
 		else if (L"-v" == StrToLower(vecStrIS[1].Left(2)) && L"" == vecStrIS[0])
 		{	//只有L"-v"、[L"-n"]
-			progsheet.GetIconSpacing(vecIntIS);		//获取当前图标间距
-			iState = GetDataEx(vecStrIS, vecIntIS, L"-v");
+			progsheet.m_pp1FontSet.GetIconSpacing(vecUnIS);		//获取当前图标间距
+			iState = GetDataEx(vecStrIS, vecUnIS, L"-v");
 		}
 		else if (L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"-v" == StrToLower(vecStrIS[1].Left(2)))
 		{	//同时有L"-h"、L"-v"、[L"-n"]
-			iState = GetDataEx(vecStrIS, vecIntIS, L"");
+			iState = GetDataEx(vecStrIS, vecUnIS, L"");
 		}
 
 		if (1 == iState)
 		{	//应用设置，刷新桌面
-			progsheet.SetIconSpacing(vecIntIS[0], vecIntIS[1], L"-n" != StrToLower(vecStrIS[2].Left(2)));
+			progsheet.m_pp1FontSet.SetIconSpacing(vecUnIS[0], vecUnIS[1], L"-n" != StrToLower(vecStrIS[2].Left(2)));
 		}
 		else
 		{	//参数非法、或参数越界报错

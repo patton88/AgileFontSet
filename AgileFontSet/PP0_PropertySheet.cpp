@@ -219,21 +219,11 @@ void PP0_PropertySheet::OnShowWindow(BOOL bShowing, int nReason)
 }
 
 //保存当前页修改，不退出设置界面
-LRESULT PP0_PropertySheet::OnApply(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled)
+LRESULT PP0_PropertySheet::OnApply(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	int nActiveIndex = GetActiveIndex();
 
-	m_pp1FontSet.DoDataExchange(TRUE);		//缺省为TRUE，控件to成员变量
-
-
-	LOGFONTW iconFont = m_pp1FontSet.m_iconFontOld;
-	NONCLIENTMETRICSW metrics = m_pp1FontSet.m_metricsOld;
-
-	//应用字体设置，刷新桌面
-	m_pp1FontSet.theSetFont(&m_pp1FontSet.m_metrics, &m_pp1FontSet.m_iconFont);
-
-	//应用图标间距设置，刷新桌面
-	SetIconSpacing(m_pp1FontSet.m_spinHS.GetPos(), m_pp1FontSet.m_spinVS.GetPos(), TRUE);
+	m_pp1FontSet.OnSet(wNotifyCode, wID, hWndCtl, bHandled);
 
 	return true;
 
@@ -245,164 +235,16 @@ LRESULT PP0_PropertySheet::OnApplyAll(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 	//OnApply(wNotifyCode, wID, hWndCtl, bHandled);	// 应用设置
 	//this->PostMessageW(WM_CLOSE);					// 退出设置界面。用PostMessageW是允许进行后续扫尾处理
 
-	// 僼僅儞僩曄峏傪幚巤偡傞丅
-	m_pp1FontSet.theSetFont(&m_pp1FontSet.m_metricsAll, &m_pp1FontSet.m_iconFontAll);
+	//// 僼僅儞僩曄峏傪幚巤偡傞丅
+	//m_pp1FontSet.theSetFont(&m_pp1FontSet.m_metricsAll, &m_pp1FontSet.m_iconFontAll);
 
-	memcpy(&m_pp1FontSet.m_metrics, &m_pp1FontSet.m_metricsAll, sizeof(NONCLIENTMETRICSW));
-	memcpy(&m_pp1FontSet.m_iconFont, &m_pp1FontSet.m_iconFontAll, sizeof(LOGFONTW));
+	//memcpy(&m_pp1FontSet.m_metrics, &m_pp1FontSet.m_metricsAll, sizeof(NONCLIENTMETRICSW));
+	//memcpy(&m_pp1FontSet.m_iconFont, &m_pp1FontSet.m_iconFontAll, sizeof(LOGFONTW));
 
-	// 昞帵傪峏怴偡傞丅
-	m_pp1FontSet.theUpdateDisplay();
+	//// 昞帵傪峏怴偡傞丅
+	//m_pp1FontSet.theUpdateDisplay();
 
 	return true;
-}
-
-//应用设置，刷新桌面
-LRESULT PP0_PropertySheet::SetIconSpacing(int iHS, int iVS, BOOL bRefresh)
-{
-	int ret;
-
-	//调用WinAPI设置桌面图标间距
-	//NONCLIENTMETRICS ncm;
-	ICONMETRICSW im;
-
-	//typedef struct tagICONMETRICSW
-	//{
-	//	UINT    cbSize;
-	//	int     iHorzSpacing;
-	//	int     iVertSpacing;
-	//	int     iTitleWrap;
-	//	LOGFONTW lfFont;
-	//}   ICONMETRICSW, *PICONMETRICSW, *LPICONMETRICSW;
-
-	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
-	//ncm.cbSize = sizeof(NONCLIENTMETRICS);
-	im.cbSize = sizeof(ICONMETRICSW);
-
-	//BOOL WINAPI SystemParametersInfo(__in UINT uiAction,__in UINT uiParam, __inout  PVOID pvParam, __in UINT fWinIni)
-	//BOOL WINAPI SystemParametersInfo(
-	//	__in     UINT uiAction,
-	//	__in     UINT uiParam,
-	//	__inout  PVOID pvParam,
-	//	__in     UINT fWinIni
-	//);
-	//__in     UINT uiAction，指定要设置的参数。参考uAction常数表。
-	//__in     UINT uiParam，参考uAction常数表。
-	//__inout  PVOID pvParam，按引用调用的Integer、Long和数据结构。
-	//__in     UINT fWinIni这个参数规定了在设置系统参数的时候，是否应更新用户设置参数。
-
-
-	//读取当期ICONMETRICSW值
-	//SystemParametersInfo返回值Long，非零表示成功，零表示失败。会设置GetLastError
-	//ret返回1，非零表示成功
-	ret = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
-
-	im.iHorzSpacing = iHS + 32;
-	im.iVertSpacing = iVS + 32;
-
-	//以下5种情况，改图标间距刷新都有效
-	//二者一样：SPIF_SENDCHANGE       SPIF_SENDWININICHANGE
-	//ret返回1，非零表示成功
-
-	//BOOL WINAPI SystemParametersInfo(__in UINT uiAction,__in UINT uiParam, __inout PVOID pvParam, __in UINT fWinIni)
-	//uAction常数表——请参考SystemParametersInfo函数
-	//SPI_ICONHORIZONTALSPACING		如pvParam为NULL，则uiParam代表桌面图标新的水平间隔距离，以像素为单位
-	//SPI_ICONVERTICALSPACING		与SPI_ICONHORIZONTALSPACING相似，只不过指定图标的垂直间距
-
-
-	//这几种合也行，修改桌面图标间距后才能立即生效
-	//修改桌面图标间距
-	ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, iHS + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-	ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, iVS + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-
-	//刷新桌面，立即生效
-	if (bRefresh)
-	{
-		ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-	}
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, NULL);		//可以
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE);	//可以
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_SENDWININICHANGE);	//可以
-
-	//只有这种组合，修改桌面图标间距后才能立即生效
-	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-
-	//这样修改不成功
-	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, SPIF_SENDWININICHANGE);
-	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, SPIF_SENDWININICHANGE);
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-
-	//这样修改不成功
-	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, SPIF_UPDATEINIFILE);
-	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, SPIF_UPDATEINIFILE);
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-
-	//这样修改不成功
-	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, NULL);
-	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, NULL);
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-
-
-	//终于成功了，修改桌面图标间距，立即生效
-	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-
-	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);	//不行
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, 
-	//	SPI_ICONVERTICALSPACING | SPI_ICONHORIZONTALSPACING | SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);	//不行
-
-
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, SPIF_UPDATEINIFILE);
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, SPIF_SENDWININICHANGE);
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, NULL);
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, 0);
-
-	//RefreshReg(HKEY_CURRENT_USER, L"Control Panel\\Desktop\\WindowMetrics", L"IconSpacing", REG_SZ);
-	//RefreshReg(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer", L"GlobalAssocChangedCounter", REG_DWORD);
-	//im.iHorzSpacing += 1;
-	//im.iVertSpacing += 1;
-	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-
-	//SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS),	s_iconMetrics, SPIF_UPDATEINIFILE); // | SPIF_SENDCHANGE);
-	//SystemParametersInfo(SPI_SETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), s_fontMetrics, SPIF_UPDATEINIFILE); // | SPIF_SENDCHANGE);
-	//_endthreadex(0);
-
-	return TRUE;
-}
-
-//获取当前图标间距
-LRESULT PP0_PropertySheet::GetIconSpacing(vector<int>& vecIconSpacing)
-{
-	int nRet;
-
-	//调用WinAPI设置桌面图标间距
-	ICONMETRICSW im;
-
-	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
-	im.cbSize = sizeof(ICONMETRICSW);
-
-	//读取当期ICONMETRICSW值
-	//SystemParametersInfo返回值Long，非零表示成功，零表示失败。会设置GetLastError
-	//ret返回1，非零表示成功
-	nRet = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
-
-	vecIconSpacing[0] = im.iHorzSpacing - 32;	//Win7风格度量单位，需要-32
-	vecIconSpacing[1] = im.iVertSpacing - 32;	//Win7风格度量单位，需要-32
-
-	if (vecIconSpacing[0] >= 0 && vecIconSpacing[0] <= 150 &&	// 两个数字都位于0-150之间
-		vecIconSpacing[1] >= 0 && vecIconSpacing[1] <= 150)
-	{	//获取当前图标间距成功
-		nRet = 1;
-	}
-	else
-	{
-		nRet = 0;
-	}
-
-	return nRet;
 }
 
 //保存到文件

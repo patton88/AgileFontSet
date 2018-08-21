@@ -52,11 +52,6 @@ public:
 
 	LRESULT OnApply(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled);
 
-	//应用设置，刷新桌面
-	LRESULT SetIconSpacing(int iHS, int iVS, BOOL bRefresh);
-	//获取当前图标间距
-	LRESULT GetIconSpacing(vector<int>& vecIconSpacing);
-
 	LRESULT OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 	{
 		CSimpleDialog<IDD_ABOUTBOX, FALSE> dlg;

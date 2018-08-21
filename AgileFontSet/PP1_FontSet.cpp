@@ -72,8 +72,8 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	ICONMETRICSW im;
 	im.cbSize = sizeof(ICONMETRICSW);	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
 	int ret = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
-	m_iOldHS = im.iHorzSpacing - 32;
-	m_iOldVS = im.iVertSpacing - 32;
+	m_nOldHS = im.iHorzSpacing - 32;
+	m_nOldVS = im.iVertSpacing - 32;
 
 	//当设置CEdit控件随对话框自动缩放后，spin控件与CEdit关联的代码放在这里OnInitDialog()中过早，会引起控件错位
 	////Windows内建控件CSpinButtonCtrl的WTL封装类为：CUpDownCtrl
@@ -82,14 +82,14 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	////Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
 	//m_spinHS.SetBuddy(GetDlgItem(IDC_EDIT_HS));
 	//m_spinHS.SetRange(0, 150);
-	//m_spinHS.SetPos(m_iOldHS);
+	//m_spinHS.SetPos(m_nOldHS);
 	////MoveWindow(rect.top, rect.bottom, rect.Width(), rect.Height(), true);
 
 	//m_spinVS.Attach(GetDlgItem(IDC_SPIN_VS));
 	////Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
 	//m_spinVS.SetBuddy(GetDlgItem(IDC_EDIT_VS));
 	//m_spinVS.SetRange(0, 150);
-	//m_spinVS.SetPos(m_iOldVS);
+	//m_spinVS.SetPos(m_nOldVS);
 
 	//显示Windows系统版本号
 	CString str;
@@ -143,7 +143,7 @@ LRESULT PP1_FontSet::OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl)
 	if (m_spinHS.IsWindow() && m_spinVS.IsWindow())
 	{
 		HWND hwndParent = ::GetParent(m_hWnd);
-		if ((m_spinHS.GetPos() == m_iOldHS) && (m_spinVS.GetPos() == m_iOldVS))		//1	m_btnLoadDefaultCurrPage
+		if ((m_spinHS.GetPos() == m_nOldHS) && (m_spinVS.GetPos() == m_nOldVS))		//1	m_btnLoadDefaultCurrPage
 		{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), FALSE); }
 		else
 		{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), TRUE); }
@@ -168,11 +168,11 @@ LRESULT PP1_FontSet::OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl)
 			//MessageBoxW(L"请输入1到150之间的数值");
 			//MessageBoxW(g_lang.TranslateString(IDS_REC_UPDATES));
 			if(nID == IDC_EDIT_HS)
-				::SetWindowTextW(GetDlgItem(nID), (-1 == iHS) ? itos(m_iOldHS) : itos(iHS));
+				::SetWindowTextW(GetDlgItem(nID), (-1 == iHS) ? itos(m_nOldHS) : itos(iHS));
 			else
-				::SetWindowTextW(GetDlgItem(nID), (-1 == iVS) ? itos(m_iOldVS) : itos(iVS));
+				::SetWindowTextW(GetDlgItem(nID), (-1 == iVS) ? itos(m_nOldVS) : itos(iVS));
 
-			//::SetWindowTextW(GetDlgItem(nID), (nID == IDC_EDIT_HS) ? itos(m_iOldHS) : itos(m_iOldVS));
+			//::SetWindowTextW(GetDlgItem(nID), (nID == IDC_EDIT_HS) ? itos(m_nOldHS) : itos(m_nOldVS));
 			::SendMessageW(GetDlgItem(nID), WM_KEYDOWN, VK_END, 0);
 		}
 		else		//保存最新合法数值
@@ -239,7 +239,7 @@ LRESULT PP1_FontSet::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 		//Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
 		m_spinHS.SetBuddy(GetDlgItem(IDC_EDIT_HS));
 		m_spinHS.SetRange(0, 150);
-		m_spinHS.SetPos(m_iOldHS);
+		m_spinHS.SetPos(m_nOldHS);
 		//MoveWindow(rect.top, rect.bottom, rect.Width(), rect.Height(), true);
 	}
 	if (!m_spinVS.IsWindow())
@@ -248,13 +248,13 @@ LRESULT PP1_FontSet::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 		//Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
 		m_spinVS.SetBuddy(GetDlgItem(IDC_EDIT_VS));
 		m_spinVS.SetRange(0, 150);
-		m_spinVS.SetPos(m_iOldVS);
+		m_spinVS.SetPos(m_nOldVS);
 	}
 
 	HWND hwndParent = ::GetParent(m_hWnd);
 	//::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_DEFAULT_ALL), TRUE);	//0 m_btnLoadDefaultAll;		
 	//::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_RELOAD_SET_FROM_FILE), TRUE);	//2	m_btnReloadSetFromFile;	
-	//if ((m_spinHS.GetPos() == m_iOldHS) && (m_spinVS.GetPos() == m_iOldVS))		//1	m_btnLoadDefaultCurrPage
+	//if ((m_spinHS.GetPos() == m_nOldHS) && (m_spinVS.GetPos() == m_nOldVS))		//1	m_btnLoadDefaultCurrPage
 	//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), FALSE); }
 	//else
 	//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), TRUE); }
@@ -622,7 +622,47 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 {
 	// TODO: Add validation code 
 	//EndDialog(wID);
-	theSetFont(&m_metrics, &m_iconFont);
+	//theSetFont(&m_metrics, &m_iconFont);
+
+	DoDataExchange(TRUE);		//缺省为TRUE，控件to成员变量
+
+	if (iCheckAllfont)
+	{
+		theSetFont(&m_metricsAll, &m_iconFontAll);
+
+		memcpy(&m_metrics, &m_metricsAll, sizeof(NONCLIENTMETRICSW));
+		memcpy(&m_iconFont, &m_iconFontAll, sizeof(LOGFONTW));
+
+		theUpdateDisplay();
+	}
+	else if (iCheckTitle || iCheckIcon || iCheckMenu || iCheckMessage || iCheckPalette || iCheckTip)
+	{
+		LOGFONTW iconFont = m_iconFontOld;
+		NONCLIENTMETRICSW metrics = m_metricsOld;
+		if (iCheckTitle) metrics.lfCaptionFont = m_metrics.lfCaptionFont;
+		if (iCheckIcon) iconFont = m_iconFont;
+		if (iCheckMenu) metrics.lfMenuFont = m_metrics.lfMenuFont;
+		if (iCheckMessage) metrics.lfMessageFont = m_metrics.lfMessageFont;
+		if (iCheckPalette) metrics.lfSmCaptionFont = m_metrics.lfSmCaptionFont;
+		if (iCheckTip) metrics.lfStatusFont = m_metrics.lfStatusFont;
+
+		//应用字体设置，刷新桌面
+		theSetFont(&metrics, &iconFont);
+	}
+
+	//应用图标间距设置，刷新桌面
+	if (iCheckHS || iCheckVS)
+	{
+		if (iCheckHS) {
+			unsigned nHS = m_spinHS.GetPos();
+			if (nHS >= 0 && nHS <= 150) m_nOldHS = nHS;
+		}
+		if (iCheckVS) {
+			unsigned nVS = m_spinVS.GetPos();
+			if (nVS >= 0 && nVS <= 150) m_nOldVS = nVS;
+		}
+		SetIconSpacing(m_nOldHS, m_nOldVS);
+	}
 
 	return 0;
 }
@@ -1779,4 +1819,152 @@ int PP1_FontSet::readFontCharset(BYTE& buffer, CString file, CString key)
 	buffer = size;
 
 	return size;
+}
+
+//应用设置，刷新桌面
+LRESULT PP1_FontSet::SetIconSpacing(unsigned iHS, unsigned iVS, BOOL bRefresh)
+{
+	int ret;
+
+	//调用WinAPI设置桌面图标间距
+	//NONCLIENTMETRICS ncm;
+	ICONMETRICSW im;
+
+	//typedef struct tagICONMETRICSW
+	//{
+	//	UINT    cbSize;
+	//	int     iHorzSpacing;
+	//	int     iVertSpacing;
+	//	int     iTitleWrap;
+	//	LOGFONTW lfFont;
+	//}   ICONMETRICSW, *PICONMETRICSW, *LPICONMETRICSW;
+
+	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
+	//ncm.cbSize = sizeof(NONCLIENTMETRICS);
+	im.cbSize = sizeof(ICONMETRICSW);
+
+	//BOOL WINAPI SystemParametersInfo(__in UINT uiAction,__in UINT uiParam, __inout  PVOID pvParam, __in UINT fWinIni)
+	//BOOL WINAPI SystemParametersInfo(
+	//	__in     UINT uiAction,
+	//	__in     UINT uiParam,
+	//	__inout  PVOID pvParam,
+	//	__in     UINT fWinIni
+	//);
+	//__in     UINT uiAction，指定要设置的参数。参考uAction常数表。
+	//__in     UINT uiParam，参考uAction常数表。
+	//__inout  PVOID pvParam，按引用调用的Integer、Long和数据结构。
+	//__in     UINT fWinIni这个参数规定了在设置系统参数的时候，是否应更新用户设置参数。
+
+
+	//读取当期ICONMETRICSW值
+	//SystemParametersInfo返回值Long，非零表示成功，零表示失败。会设置GetLastError
+	//ret返回1，非零表示成功
+	ret = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
+
+	im.iHorzSpacing = iHS + 32;
+	im.iVertSpacing = iVS + 32;
+
+	//以下5种情况，改图标间距刷新都有效
+	//二者一样：SPIF_SENDCHANGE       SPIF_SENDWININICHANGE
+	//ret返回1，非零表示成功
+
+	//BOOL WINAPI SystemParametersInfo(__in UINT uiAction,__in UINT uiParam, __inout PVOID pvParam, __in UINT fWinIni)
+	//uAction常数表——请参考SystemParametersInfo函数
+	//SPI_ICONHORIZONTALSPACING		如pvParam为NULL，则uiParam代表桌面图标新的水平间隔距离，以像素为单位
+	//SPI_ICONVERTICALSPACING		与SPI_ICONHORIZONTALSPACING相似，只不过指定图标的垂直间距
+
+
+	//这几种合也行，修改桌面图标间距后才能立即生效
+	//修改桌面图标间距
+	ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, iHS + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+	ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, iVS + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+
+	//刷新桌面，立即生效
+	if (bRefresh)
+	{
+		ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+	}
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, NULL);		//可以
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE);	//可以
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_SENDWININICHANGE);	//可以
+
+	//只有这种组合，修改桌面图标间距后才能立即生效
+	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+
+	//这样修改不成功
+	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, SPIF_SENDWININICHANGE);
+	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, SPIF_SENDWININICHANGE);
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+
+	//这样修改不成功
+	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, SPIF_UPDATEINIFILE);
+	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, SPIF_UPDATEINIFILE);
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+
+	//这样修改不成功
+	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, NULL);
+	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, NULL);
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+
+
+	//终于成功了，修改桌面图标间距，立即生效
+	//ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, vecIconSpacing[0] + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, vecIconSpacing[1] + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+
+	//ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);	//不行
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, 
+	//	SPI_ICONVERTICALSPACING | SPI_ICONHORIZONTALSPACING | SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);	//不行
+
+
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, SPIF_UPDATEINIFILE);
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, SPIF_SENDWININICHANGE);
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, NULL);
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, 0);
+
+	//RefreshReg(HKEY_CURRENT_USER, L"Control Panel\\Desktop\\WindowMetrics", L"IconSpacing", REG_SZ);
+	//RefreshReg(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\explorer", L"GlobalAssocChangedCounter", REG_DWORD);
+	//im.iHorzSpacing += 1;
+	//im.iVertSpacing += 1;
+	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+
+	//SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICS),	s_iconMetrics, SPIF_UPDATEINIFILE); // | SPIF_SENDCHANGE);
+	//SystemParametersInfo(SPI_SETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), s_fontMetrics, SPIF_UPDATEINIFILE); // | SPIF_SENDCHANGE);
+	//_endthreadex(0);
+
+	return TRUE;
+}
+
+//获取当前图标间距
+LRESULT PP1_FontSet::GetIconSpacing(vector<unsigned>& vecIS)
+{
+	int nRet;
+
+	//调用WinAPI设置桌面图标间距
+	ICONMETRICSW im;
+
+	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
+	im.cbSize = sizeof(ICONMETRICSW);
+
+	//读取当期ICONMETRICSW值
+	//SystemParametersInfo返回值Long，非零表示成功，零表示失败。会设置GetLastError
+	//ret返回1，非零表示成功
+	nRet = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
+
+	vecIS[0] = im.iHorzSpacing - 32;	//Win7风格度量单位，需要-32
+	vecIS[1] = im.iVertSpacing - 32;	//Win7风格度量单位，需要-32
+
+	if (vecIS[0] >= 0 && vecIS[0] <= 150 &&	// 两个数字都位于0-150之间
+		vecIS[1] >= 0 && vecIS[1] <= 150)
+	{	//获取当前图标间距成功
+		nRet = 1;
+	}
+	else
+	{
+		nRet = 0;
+	}
+
+	return nRet;
 }

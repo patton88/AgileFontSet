@@ -169,8 +169,8 @@ public:
 	CUpDownCtrl m_spin1;
 	CEditImpl m_edit1;
 
-	int m_iOldHS;
-	int m_iOldVS;
+	unsigned m_nOldHS;
+	unsigned m_nOldVS;
 
 	//添加自noMeiryoUI235
 	LRESULT OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -232,6 +232,11 @@ public:
 	int mySetFontItem(LOGFONTW& font, CString& strFaceName, LONG& lHeight, BYTE& bCharSet);
 	int ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontName, HFONT& hFont, CEditImpl& edit);
 
+	//应用设置，刷新桌面
+	LRESULT SetIconSpacing(unsigned iHS, unsigned iVS, BOOL bRefresh = TRUE);
+	//获取当前图标间距
+	LRESULT GetIconSpacing(vector<unsigned>& vecIS);
+
 	enum fontType {
 		allFont,
 		titleFont,
@@ -240,12 +245,6 @@ public:
 		messageFont,
 		paletteFont,
 		tipFont
-	};
-
-	struct TagIS					//桌面图标间距结构体
-	{
-		unsigned nHS;			//桌面图标水平间距
-		unsigned nVS;			//桌面图标垂直间距
 	};
 
 	struct TagFont
