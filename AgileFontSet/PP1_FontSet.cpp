@@ -366,12 +366,14 @@ void PP1_FontSet::getActualFont(void)
 		sizeof(NONCLIENTMETRICSW),
 		&m_metrics,
 		0);
+	m_metricsOld = m_metrics;	//保存一份到m_metricsOld
 
 	// 获取图标的字体信息。
 	SystemParametersInfo(SPI_GETICONTITLELOGFONT,
 		sizeof(LOGFONTW),
 		&m_iconFont,
 		0);
+	m_iconFontOld = m_iconFont;	//保存一份到m_metricsOld
 
 	//保存当前字体信息。参考OnSet8的读取顺序
 	// 保存当前字体名称

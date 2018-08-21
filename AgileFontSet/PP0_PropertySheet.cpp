@@ -225,6 +225,10 @@ LRESULT PP0_PropertySheet::OnApply(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCt
 
 	m_pp1FontSet.DoDataExchange(TRUE);		//缺省为TRUE，控件to成员变量
 
+
+	LOGFONTW iconFont = m_pp1FontSet.m_iconFontOld;
+	NONCLIENTMETRICSW metrics = m_pp1FontSet.m_metricsOld;
+
 	//应用字体设置，刷新桌面
 	m_pp1FontSet.theSetFont(&m_pp1FontSet.m_metrics, &m_pp1FontSet.m_iconFont);
 

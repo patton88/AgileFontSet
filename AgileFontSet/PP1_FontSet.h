@@ -114,12 +114,16 @@ public:
 	BEGIN_DDX_MAP(PP1_FontSet)
 		//DDX_CHECK(IDC_CHECK_REFRESH, m_iRefresh)		// DDX_CHECK只能与int类型变量交换数据
 
-		//DDX_TEXT(IDC_EDIT_AllSetText, m_strChrome)
-		//DDX_CONTROL(IDC_EDIT_AllSetText, m_editChrome)
-		//DDX_INT(IDC_EDIT_HS, m_iHS)
-		//DDX_INT(IDC_EDIT_VS, m_iVS)
-		//DDX_CONTROL(IDC_SPIN_HS, m_spinHS)
-		//DDX_CONTROL(IDC_SPIN_VS, m_spinVS)
+		DDX_CHECK(IDC_CHECK_ALLFONT, iCheckAllfont)
+		DDX_CHECK(IDC_CHECK_TITLE, iCheckTitle)
+		DDX_CHECK(IDC_CHECK_ICON, iCheckIcon)
+		DDX_CHECK(IDC_CHECK_MENU, iCheckMenu)
+		DDX_CHECK(IDC_CHECK_MESSAGE, iCheckMessage)
+		DDX_CHECK(IDC_CHECK_PALETTE, iCheckPalette)
+		DDX_CHECK(IDC_CHECK_TIP, iCheckTip)
+		DDX_CHECK(IDC_CHECK_HS, iCheckHS)
+		DDX_CHECK(IDC_CHECK_VS, iCheckVS)
+
 		DDX_CONTROL(IDC_EDIT_ALLFONT, m_editAllFont)
 		DDX_CONTROL(IDC_EDIT_TITLE, m_editTitleFont)
 		DDX_CONTROL(IDC_EDIT_ICON, m_editIconFont)
@@ -232,10 +236,10 @@ public:
 		allFont,
 		titleFont,
 		iconFont,
-		paletteFont,
-		tipFont,
+		menuFont,
 		messageFont,
-		menuFont
+		paletteFont,
+		tipFont
 	};
 
 	struct TagIS					//桌面图标间距结构体
@@ -255,6 +259,17 @@ public:
 	TagFont tagFontWin10;
 
 	map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
+	
+	//DDX 9个Check按钮的状态
+	int iCheckAllfont = 0;
+	int iCheckTitle = 0;
+	int iCheckIcon = 0;
+	int iCheckMenu = 0;
+	int iCheckMessage = 0;
+	int iCheckPalette = 0;
+	int iCheckTip = 0;
+	int iCheckHS = 0;
+	int iCheckVS = 0;
 
 	CString m_strAllFontName;
 	CString m_strTitleFontName;
@@ -266,8 +281,8 @@ public:
 
 	CString m_strSettingFile;
 
-	NONCLIENTMETRICSW m_metrics;
-	LOGFONTW m_iconFont;
+	NONCLIENTMETRICSW m_metrics, m_metricsOld;
+	LOGFONTW m_iconFont, m_iconFontOld;
 
 	NONCLIENTMETRICSW m_metricsAll;
 	LOGFONTW m_iconFontAll;
