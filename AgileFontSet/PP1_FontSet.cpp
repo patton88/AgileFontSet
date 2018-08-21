@@ -272,6 +272,32 @@ LRESULT PP1_FontSet::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 	return 0;
 }
 
+LRESULT PP1_FontSet::OnCheckAllFont(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	DoDataExchange(TRUE);		//缺省为TRUE，控件to成员变量
+
+	if (m_iCheckAllfont)
+	{
+		m_chkTitle.EnableWindow(FALSE);
+		m_chkIcon.EnableWindow(FALSE);
+		m_chkMenu.EnableWindow(FALSE);
+		m_chkMessage.EnableWindow(FALSE);
+		m_chkPalette.EnableWindow(FALSE);
+		m_chkTip.EnableWindow(FALSE);
+	}
+	else
+	{
+		m_chkTitle.EnableWindow(TRUE);
+		m_chkIcon.EnableWindow(TRUE);
+		m_chkMenu.EnableWindow(TRUE);
+		m_chkMessage.EnableWindow(TRUE);
+		m_chkPalette.EnableWindow(TRUE);
+		m_chkTip.EnableWindow(TRUE);
+	}
+
+	return 0;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // noMeiryoUI235Dlg.cpp
 
@@ -626,7 +652,7 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 
 	DoDataExchange(TRUE);		//缺省为TRUE，控件to成员变量
 
-	if (iCheckAllfont)
+	if (m_iCheckAllfont)
 	{
 		theSetFont(&m_metricsAll, &m_iconFontAll);
 
@@ -635,29 +661,29 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 
 		theUpdateDisplay();
 	}
-	else if (iCheckTitle || iCheckIcon || iCheckMenu || iCheckMessage || iCheckPalette || iCheckTip)
+	else if (m_iCheckTitle || m_iCheckIcon || m_iCheckMenu || m_iCheckMessage || m_iCheckPalette || m_iCheckTip)
 	{
 		LOGFONTW iconFont = m_iconFontOld;
 		NONCLIENTMETRICSW metrics = m_metricsOld;
-		if (iCheckTitle) metrics.lfCaptionFont = m_metrics.lfCaptionFont;
-		if (iCheckIcon) iconFont = m_iconFont;
-		if (iCheckMenu) metrics.lfMenuFont = m_metrics.lfMenuFont;
-		if (iCheckMessage) metrics.lfMessageFont = m_metrics.lfMessageFont;
-		if (iCheckPalette) metrics.lfSmCaptionFont = m_metrics.lfSmCaptionFont;
-		if (iCheckTip) metrics.lfStatusFont = m_metrics.lfStatusFont;
+		if (m_iCheckTitle) metrics.lfCaptionFont = m_metrics.lfCaptionFont;
+		if (m_iCheckIcon) iconFont = m_iconFont;
+		if (m_iCheckMenu) metrics.lfMenuFont = m_metrics.lfMenuFont;
+		if (m_iCheckMessage) metrics.lfMessageFont = m_metrics.lfMessageFont;
+		if (m_iCheckPalette) metrics.lfSmCaptionFont = m_metrics.lfSmCaptionFont;
+		if (m_iCheckTip) metrics.lfStatusFont = m_metrics.lfStatusFont;
 
 		//应用字体设置，刷新桌面
 		theSetFont(&metrics, &iconFont);
 	}
 
 	//应用图标间距设置，刷新桌面
-	if (iCheckHS || iCheckVS)
+	if (m_iCheckHS || m_iCheckVS)
 	{
-		if (iCheckHS) {
+		if (m_iCheckHS) {
 			unsigned nHS = m_spinHS.GetPos();
 			if (nHS >= 0 && nHS <= 150) m_nOldHS = nHS;
 		}
-		if (iCheckVS) {
+		if (m_iCheckVS) {
 			unsigned nVS = m_spinVS.GetPos();
 			if (nVS >= 0 && nVS <= 150) m_nOldVS = nVS;
 		}

@@ -6,6 +6,7 @@
 
 #include "resource.h"
 #include "CEditImpl.h"
+#include "CButtonImpl.h"
 #include <vector>
 #include <map>
 #include <utility>
@@ -34,6 +35,8 @@ public:
 		MESSAGE_HANDLER(WM_SETPAGEFOCUS17, OnSetPageFocus)//必须响应此消息才能调用OnSetPageFocus()禁用启用按钮
 
 		COMMAND_ID_HANDLER(IDM_COMPAT7, OnCompat7)
+
+		COMMAND_ID_HANDLER(IDC_CHECK_ALLFONT, OnCheckAllFont)
 
 		//解决在未启用Theme的机器上只读CEdit控件的背景为灰色的问题，测试有效
 		//MESSAGE_HANDLER(WM_CTLCOLOREDIT, OnCtlColorEdit)			//普通的CEdit
@@ -114,15 +117,25 @@ public:
 	BEGIN_DDX_MAP(PP1_FontSet)
 		//DDX_CHECK(IDC_CHECK_REFRESH, m_iRefresh)		// DDX_CHECK只能与int类型变量交换数据
 
-		DDX_CHECK(IDC_CHECK_ALLFONT, iCheckAllfont)
-		DDX_CHECK(IDC_CHECK_TITLE, iCheckTitle)
-		DDX_CHECK(IDC_CHECK_ICON, iCheckIcon)
-		DDX_CHECK(IDC_CHECK_MENU, iCheckMenu)
-		DDX_CHECK(IDC_CHECK_MESSAGE, iCheckMessage)
-		DDX_CHECK(IDC_CHECK_PALETTE, iCheckPalette)
-		DDX_CHECK(IDC_CHECK_TIP, iCheckTip)
-		DDX_CHECK(IDC_CHECK_HS, iCheckHS)
-		DDX_CHECK(IDC_CHECK_VS, iCheckVS)
+		DDX_CONTROL(IDC_CHECK_ALLFONT, m_chkAllfont)
+		DDX_CONTROL(IDC_CHECK_TITLE, m_chkTitle)
+		DDX_CONTROL(IDC_CHECK_ICON, m_chkIcon)
+		DDX_CONTROL(IDC_CHECK_MENU, m_chkMenu)
+		DDX_CONTROL(IDC_CHECK_MESSAGE, m_chkMessage)
+		DDX_CONTROL(IDC_CHECK_PALETTE, m_chkPalette)
+		DDX_CONTROL(IDC_CHECK_TIP, m_chkTip)
+		DDX_CONTROL(IDC_CHECK_HS, m_chkHS)
+		DDX_CONTROL(IDC_CHECK_VS, m_chkVS)
+
+		DDX_CHECK(IDC_CHECK_ALLFONT, m_iCheckAllfont)
+		DDX_CHECK(IDC_CHECK_TITLE, m_iCheckTitle)
+		DDX_CHECK(IDC_CHECK_ICON, m_iCheckIcon)
+		DDX_CHECK(IDC_CHECK_MENU, m_iCheckMenu)
+		DDX_CHECK(IDC_CHECK_MESSAGE, m_iCheckMessage)
+		DDX_CHECK(IDC_CHECK_PALETTE, m_iCheckPalette)
+		DDX_CHECK(IDC_CHECK_TIP, m_iCheckTip)
+		DDX_CHECK(IDC_CHECK_HS, m_iCheckHS)
+		DDX_CHECK(IDC_CHECK_VS, m_iCheckVS)
 
 		DDX_CONTROL(IDC_EDIT_ALLFONT, m_editAllFont)
 		DDX_CONTROL(IDC_EDIT_TITLE, m_editTitleFont)
@@ -153,6 +166,7 @@ public:
 
 	//LONG OnSetPageFocus(UINT wParam, LONG lParam);
 	LRESULT OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnCheckAllFont(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 	// DDX variables
 	CString m_strChrome;
@@ -260,15 +274,26 @@ public:
 	map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
 	
 	//DDX 9个Check按钮的状态
-	int iCheckAllfont = 0;
-	int iCheckTitle = 0;
-	int iCheckIcon = 0;
-	int iCheckMenu = 0;
-	int iCheckMessage = 0;
-	int iCheckPalette = 0;
-	int iCheckTip = 0;
-	int iCheckHS = 0;
-	int iCheckVS = 0;
+	int m_iCheckAllfont = 0;
+	int m_iCheckTitle = 0;
+	int m_iCheckIcon = 0;
+	int m_iCheckMenu = 0;
+	int m_iCheckMessage = 0;
+	int m_iCheckPalette = 0;
+	int m_iCheckTip = 0;
+	int m_iCheckHS = 0;
+	int m_iCheckVS = 0;
+
+	//DDX 9个Check按钮控件变量。用CButton不行
+	CButtonImpl m_chkAllfont;
+	CButtonImpl m_chkTitle;
+	CButtonImpl m_chkIcon;
+	CButtonImpl m_chkMenu;
+	CButtonImpl m_chkMessage;
+	CButtonImpl m_chkPalette;
+	CButtonImpl m_chkTip;
+	CButtonImpl m_chkHS;
+	CButtonImpl m_chkVS;
 
 	CString m_strAllFontName;
 	CString m_strTitleFontName;
