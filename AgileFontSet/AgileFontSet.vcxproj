@@ -234,6 +234,9 @@
     <Image Include="res\ICON_HS.ico" />
     <Image Include="res\ICON_VS.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="res\noMeiryoUI235.exe.manifest" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

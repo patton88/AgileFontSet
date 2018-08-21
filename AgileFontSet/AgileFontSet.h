@@ -1,12 +1,14 @@
 // AgileFontSet.h
 
 #include "stdafx.h"
-#include "CommonFun.h"
+//#include "CommonFun.h"		//PP1_FontSet.cpp中已经包含，这里再包含就是重复包含。只能以extern外部引用
 #include "PP0_PropertySheet.h"
 
 //CString仅用了(LPCWSTR)不需要ReleaseBuffer()，用了(LPTSTR)或(wchar_t*)或(char*)后才需要ReleaseBuffer()
 //但作为一种良好编程习惯，以后凡必须用CString-GetBuffer、LPTSTR、LPSTR、或LPWSTR的地方，用完后都立即ReleaseBuffer()
 extern CString g_strVerInfo;
+extern CString StrToLower(const CString& str);
+extern int CStringSplitN(vector<CString>& vecResult, const CString& str, CString strSep);	//返回字段数
 
 bool SetIconSpacing0()
 {

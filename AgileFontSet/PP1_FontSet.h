@@ -6,6 +6,10 @@
 
 #include "resource.h"
 #include "CEditImpl.h"
+#include <vector>
+#include <map>
+#include <utility>
+using std::vector; using std::map; using std::pair; using std::make_pair;
 
 class PP1_FontSet :
 	public CPropertyPageImpl<PP1_FontSet>,
@@ -28,6 +32,20 @@ public:
 	BEGIN_MSG_MAP(PP1_FontSet)
 		MSG_WM_INITDIALOG(OnInitDialog)
 		MESSAGE_HANDLER(WM_SETPAGEFOCUS17, OnSetPageFocus)//必须响应此消息才能调用OnSetPageFocus()禁用启用按钮
+
+		COMMAND_ID_HANDLER(IDM_COMPAT7, OnCompat7)
+
+		//解决在未启用Theme的机器上只读CEdit控件的背景为灰色的问题，测试有效
+		//MESSAGE_HANDLER(WM_CTLCOLOREDIT, OnCtlColorEdit)			//普通的CEdit
+		MESSAGE_HANDLER(WM_CTLCOLORSTATIC, OnCtlColorEditOnly)		//只读状态的CEdit
+
+		//处理字体选择按键事件
+		//COMMAND_RANGE_CODE_HANDLER_EX(idFirst, idLast, code, func)
+		//处理ID范围内的控件的特定的通知。
+		COMMAND_RANGE_CODE_HANDLER_EX(IDB_SEL_ALLFONT, IDB_SEL_TIP, BN_CLICKED, OnSelFont)
+		//监测文本获得焦点
+		COMMAND_RANGE_CODE_HANDLER_EX(IDC_EDIT_ALLFONT, IDC_EDIT_TIP, EN_SETFOCUS, OnEnSetfoucsEdit)
+
 		CHAIN_MSG_MAP(CPropertyPageImpl<PP1_FontSet>)
 		CHAIN_MSG_MAP(CDialogResize<PP1_FontSet>)
 	END_MSG_MAP()
@@ -41,36 +59,41 @@ public:
 		//DLGRESIZE_CONTROL(IDC_TREE, DLSZ_SIZE_X)
 		//DLGRESIZE_CONTROL(IDC_RELATIONSHIP_TREE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
 
+		//DLGRESIZE_CONTROL(IDC_STATIC_PRECONFIT, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		//DLGRESIZE_CONTROL(IDC_STATIC_ALLFONT, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+		//DLGRESIZE_CONTROL(IDC_STATIC_TITLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		//DLGRESIZE_CONTROL(IDC_STATIC_ICON, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		//DLGRESIZE_CONTROL(IDC_STATIC_MENU, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		//DLGRESIZE_CONTROL(IDC_STATIC_MESSAGE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		//DLGRESIZE_CONTROL(IDC_STATIC_PALETTE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		//DLGRESIZE_CONTROL(IDC_STATIC_TIP, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		//DLGRESIZE_CONTROL(IDC_STATIC_ICON_HS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		//DLGRESIZE_CONTROL(IDC_STATIC_ICON_VS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+
 		DLGRESIZE_CONTROL(IDC_STATIC_VERNO, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+
 		DLGRESIZE_CONTROL(IDC_GROUP_ICONSPACING_SET, DLSZ_SIZE_X | DLSZ_SIZE_Y)
 		DLGRESIZE_CONTROL(IDC_GROUP_FONTSET, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_ALLFONT, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-		DLGRESIZE_CONTROL(IDC_EDIT_ALLFONT, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDB_SEL_ALLFONT, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_TITLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDC_EDIT_TITLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDB_SEL_TITLE, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_ICON, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDC_EDIT_ICON, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDB_SEL_ICON, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_MENU, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDC_EDIT_MENU, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDB_SEL_MENU, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_MESSAGE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDC_EDIT_MESSAGE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDB_SEL_MESSAGE, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_PALETTE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDC_EDIT_PALETTE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDB_SEL_PALETTE, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_TIP, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDC_EDIT_TIP, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDB_SEL_TIP, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_ICON_HS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDC_EDIT_HS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_ICON_VS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		DLGRESIZE_CONTROL(IDC_EDIT_VS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+
 		DLGRESIZE_CONTROL(IDC_COMBO_PRECONFIT, DLSZ_SIZE_X | DLSZ_SIZE_Y)
-		//DLGRESIZE_CONTROL(IDC_STATIC_PRECONFIT, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+
+		DLGRESIZE_CONTROL(IDC_EDIT_ALLFONT, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		DLGRESIZE_CONTROL(IDC_EDIT_TITLE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		DLGRESIZE_CONTROL(IDC_EDIT_ICON, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		DLGRESIZE_CONTROL(IDC_EDIT_MENU, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		DLGRESIZE_CONTROL(IDC_EDIT_MESSAGE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		DLGRESIZE_CONTROL(IDC_EDIT_PALETTE, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		DLGRESIZE_CONTROL(IDC_EDIT_TIP, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		DLGRESIZE_CONTROL(IDC_EDIT_HS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+		DLGRESIZE_CONTROL(IDC_EDIT_VS, DLSZ_SIZE_X | DLSZ_SIZE_Y)
+
+		DLGRESIZE_CONTROL(IDB_SEL_ALLFONT, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+		DLGRESIZE_CONTROL(IDB_SEL_TITLE, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+		DLGRESIZE_CONTROL(IDB_SEL_ICON, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+		DLGRESIZE_CONTROL(IDB_SEL_MENU, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+		DLGRESIZE_CONTROL(IDB_SEL_MESSAGE, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+		DLGRESIZE_CONTROL(IDB_SEL_PALETTE, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+		DLGRESIZE_CONTROL(IDB_SEL_TIP, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 
 		DLGRESIZE_CONTROL(IDC_CHECK_ALLFONT, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 		DLGRESIZE_CONTROL(IDC_CHECK_TITLE, DLSZ_MOVE_X | DLSZ_MOVE_Y)
@@ -79,12 +102,11 @@ public:
 		DLGRESIZE_CONTROL(IDC_CHECK_MESSAGE, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 		DLGRESIZE_CONTROL(IDC_CHECK_PALETTE, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 		DLGRESIZE_CONTROL(IDC_CHECK_TIP, DLSZ_MOVE_X | DLSZ_MOVE_Y)
+
 		DLGRESIZE_CONTROL(IDC_CHECK_HS, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 		DLGRESIZE_CONTROL(IDC_CHECK_VS, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-
-		DLGRESIZE_CONTROL(IDC_SPIN_VS, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 		DLGRESIZE_CONTROL(IDC_SPIN_HS, DLSZ_MOVE_X | DLSZ_MOVE_Y)
-
+		DLGRESIZE_CONTROL(IDC_SPIN_VS, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 		DLGRESIZE_CONTROL(IDC_ICON_HS, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 		DLGRESIZE_CONTROL(IDC_ICON_VS, DLSZ_MOVE_X | DLSZ_MOVE_Y)
 	END_DLGRESIZE_MAP()
@@ -98,6 +120,21 @@ public:
 		//DDX_INT(IDC_EDIT_VS, m_iVS)
 		//DDX_CONTROL(IDC_SPIN_HS, m_spinHS)
 		//DDX_CONTROL(IDC_SPIN_VS, m_spinVS)
+		DDX_CONTROL(IDC_EDIT_ALLFONT, m_editAllFont)
+		DDX_CONTROL(IDC_EDIT_TITLE, m_editTitleFont)
+		DDX_CONTROL(IDC_EDIT_ICON, m_editIconFont)
+		DDX_CONTROL(IDC_EDIT_MENU, m_editMenuFont)
+		DDX_CONTROL(IDC_EDIT_MESSAGE, m_editMessageFont)
+		DDX_CONTROL(IDC_EDIT_PALETTE, m_editPaletteFont)
+		DDX_CONTROL(IDC_EDIT_TIP, m_editTipFont)
+
+		DDX_TEXT(IDC_EDIT_ALLFONT, m_strAllFontName)
+		DDX_TEXT(IDC_EDIT_TITLE, m_strTitleFontName)
+		DDX_TEXT(IDC_EDIT_ICON, m_strIconFontName)
+		DDX_TEXT(IDC_EDIT_MENU, m_strMenuFontName)
+		DDX_TEXT(IDC_EDIT_MESSAGE, m_strMessageFontName)
+		DDX_TEXT(IDC_EDIT_PALETTE, m_strPaletteFontName)
+		DDX_TEXT(IDC_EDIT_TIP, m_strTipFontName)
 	END_DDX_MAP()
 
 	// Message handlers
@@ -108,7 +145,7 @@ public:
 	LRESULT OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl);
 
 	//监测文本获得焦点
-	LRESULT OnEnSetfoucsEdit(UINT uNotifyCode, int nID, CWindow wndCtl);
+	//LRESULT OnEnSetfoucsEdit(UINT uNotifyCode, int nID, CWindow wndCtl);
 
 	//LONG OnSetPageFocus(UINT wParam, LONG lParam);
 	LRESULT OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -130,4 +167,136 @@ public:
 
 	int m_iOldHS;
 	int m_iOldVS;
+
+	//添加自noMeiryoUI235
+	LRESULT OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSetExit(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSetAll(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSelFont(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/);
+	//LRESULT OnSelFont(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	//func((UINT)HIWORD(wParam), (int)LOWORD(wParam), (HWND)lParam);
+	LRESULT OnSave(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnLoad(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnAbout(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnHelpTopic(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSet8(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSet10(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSetCurrent(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnCompat7(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnUniqThread(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+
+	//修改只读CEdit的颜色
+	LRESULT OnCtlColorEditOnly(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+
+	//成功解决当CEdit获得焦点时去掉全选，光标定位到起点或终点
+	//监测文本获得焦点。响应成功
+	LRESULT OnEnSetfoucsEdit(UINT uNotifyCode, int nID, CWindow wndCtl);
+
+	void getActualFont(void);
+	void theUpdateDisplay(void);
+	int getFontPointInt(LOGFONTW *font, HWND hWnd);
+	double getFontPoint(LOGFONTW *font, HWND hWnd);
+	HFONT createFont(LOGFONTW *font);
+	BOOL IsCtrl(HWND hWnd, CString str);
+	void theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFont);
+	BOOL startSaveFont(CString filename);
+	BOOL saveFont(CString filename, CString section, LOGFONT* font);
+	BOOL loadFont(CString filename, CString section, LOGFONT* font);
+	BOOL loadFontInfo(CString filename);
+	int getDPI(void);
+	int getFontSize(int iFontHight);
+
+	//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
+	void initializeLocale(void);
+	//加载资源项目
+	void readResourceItem(CString file, CString key, CString fallback);
+	//开始加载资源。
+	void readResourceFile(CString file);
+	//加载Windows 8的字体预设资源
+	int readFontResource8(CString file);
+	//加载Windows 10的字体预设资源
+	int readFontResource10(CString file);
+	//加载资源（用于字体名称）。
+	int readFontFace(CString &buffer, CString file, CString key);
+	//加载资源（字体大小）。
+	int readFontSize(LONG& buffer, CString file, CString key);
+	//加载资源（用于字体字符集）。
+	int readFontCharset(BYTE& buffer, CString file, CString key);
+	//字体容器、字体选择容器初始化。tag是结构体struct缩写的前缀
+	void initTagFont(void);
+	void initSelFont(void);
+	int mySetFontItem(LOGFONTW& font, CString& strFaceName, LONG& lHeight, BYTE& bCharSet);
+	int ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontName, HFONT& hFont, CEditImpl& edit);
+
+	enum fontType {
+		allFont,
+		titleFont,
+		iconFont,
+		paletteFont,
+		tipFont,
+		messageFont,
+		menuFont
+	};
+
+	struct TagIS					//桌面图标间距结构体
+	{
+		unsigned nHS;			//桌面图标水平间距
+		unsigned nVS;			//桌面图标垂直间距
+	};
+
+	struct TagFont
+	{
+		vector<pair<CString, CString>> vecFaces;
+		vector<pair<CString, LONG>> vecSizes;
+		vector<pair<CString, BYTE>> vecCharset;
+	};
+	TagFont tagFontCur;
+	TagFont tagFontWin8;
+	TagFont tagFontWin10;
+
+	map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
+
+	CString m_strAllFontName;
+	CString m_strTitleFontName;
+	CString m_strIconFontName;
+	CString m_strPaletteFontName;
+	CString m_strTipFontName;
+	CString m_strMessageFontName;
+	CString m_strMenuFontName;
+
+	CString m_strSettingFile;
+
+	NONCLIENTMETRICSW m_metrics;
+	LOGFONTW m_iconFont;
+
+	NONCLIENTMETRICSW m_metricsAll;
+	LOGFONTW m_iconFontAll;
+
+	HFONT m_fontAll;
+	HFONT m_fontTitle;
+	HFONT m_fontIcon;
+	HFONT m_fontPalette;
+	HFONT m_fontTip;		//提示，暗示，Tip，Tooltip，Hint
+	HFONT m_fontMessage;
+	HFONT m_fontMenu;
+
+	CEditImpl m_editAllFont;
+	CEditImpl m_editTitleFont;
+	CEditImpl m_editIconFont;
+	CEditImpl m_editPaletteFont;
+	CEditImpl m_editTipFont;		//提示，暗示，Tip，Tooltip，Hint
+	CEditImpl m_editMessageFont;
+	CEditImpl m_editMenuFont;
+
+	bool use7Compat = true;
+	bool hasCurPreset = true;
+	bool has8Preset = true;
+	bool has10Preset = true;
+	/**您是否使用Windows 8的字体大小计算公式？ */
+	bool WIN8_SIZE = true;
+	/**语言资源 */
+	vector<CString> langResource;
+
+	//必须放在TagFont定义之后
+	int mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFont& tagFont);
 };
