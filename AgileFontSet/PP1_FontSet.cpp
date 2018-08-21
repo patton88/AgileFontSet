@@ -405,26 +405,26 @@ void PP1_FontSet::getActualFont(void)
 	// 保存当前字体名称
 	tagFontCur.vecFaces[0].second = m_metrics.lfCaptionFont.lfFaceName;
 	tagFontCur.vecFaces[1].second = m_iconFont.lfFaceName;
-	tagFontCur.vecFaces[2].second = m_metrics.lfSmCaptionFont.lfFaceName;
-	tagFontCur.vecFaces[3].second = m_metrics.lfStatusFont.lfFaceName;
-	tagFontCur.vecFaces[4].second = m_metrics.lfMessageFont.lfFaceName;
-	tagFontCur.vecFaces[5].second = m_metrics.lfMenuFont.lfFaceName;
+	tagFontCur.vecFaces[2].second = m_metrics.lfMenuFont.lfFaceName;
+	tagFontCur.vecFaces[3].second = m_metrics.lfMessageFont.lfFaceName;
+	tagFontCur.vecFaces[4].second = m_metrics.lfSmCaptionFont.lfFaceName;
+	tagFontCur.vecFaces[5].second = m_metrics.lfStatusFont.lfFaceName;
 
 	// 保存当前字体大小。从字体高度H到字体大小S需要进行换算
 	tagFontCur.vecSizes[0].second = getFontSize(m_metrics.lfCaptionFont.lfHeight);
 	tagFontCur.vecSizes[1].second = getFontSize(m_iconFont.lfHeight);
-	tagFontCur.vecSizes[2].second = getFontSize(m_metrics.lfSmCaptionFont.lfHeight);
-	tagFontCur.vecSizes[3].second = getFontSize(m_metrics.lfStatusFont.lfHeight);
-	tagFontCur.vecSizes[4].second = getFontSize(m_metrics.lfMessageFont.lfHeight);
-	tagFontCur.vecSizes[5].second = getFontSize(m_metrics.lfMenuFont.lfHeight);
+	tagFontCur.vecSizes[2].second = getFontSize(m_metrics.lfMenuFont.lfHeight);
+	tagFontCur.vecSizes[3].second = getFontSize(m_metrics.lfMessageFont.lfHeight);
+	tagFontCur.vecSizes[4].second = getFontSize(m_metrics.lfSmCaptionFont.lfHeight);
+	tagFontCur.vecSizes[5].second = getFontSize(m_metrics.lfStatusFont.lfHeight);
 
 	// 保存当前字体字符集
 	tagFontCur.vecCharset[0].second = m_metrics.lfCaptionFont.lfCharSet;
 	tagFontCur.vecCharset[1].second = m_iconFont.lfCharSet;
-	tagFontCur.vecCharset[2].second = m_metrics.lfSmCaptionFont.lfCharSet;
-	tagFontCur.vecCharset[3].second = m_metrics.lfStatusFont.lfCharSet;
-	tagFontCur.vecCharset[4].second = m_metrics.lfMessageFont.lfCharSet;
-	tagFontCur.vecCharset[5].second = m_metrics.lfMenuFont.lfCharSet;
+	tagFontCur.vecCharset[2].second = m_metrics.lfMenuFont.lfCharSet;
+	tagFontCur.vecCharset[3].second = m_metrics.lfMessageFont.lfCharSet;
+	tagFontCur.vecCharset[4].second = m_metrics.lfSmCaptionFont.lfCharSet;
+	tagFontCur.vecCharset[5].second = m_metrics.lfStatusFont.lfCharSet;
 
 	//
 	// 获取所有字体的信息
@@ -444,11 +444,11 @@ void PP1_FontSet::getActualFont(void)
 		0);
 
 	// 将菜单字体的信息应用于其他字体的信息。
-	m_metricsAll.lfStatusFont = m_metricsAll.lfMenuFont;
-	m_metricsAll.lfMessageFont = m_metricsAll.lfMenuFont;
 	m_metricsAll.lfCaptionFont = m_metricsAll.lfMenuFont;
-	m_metricsAll.lfSmCaptionFont = m_metricsAll.lfMenuFont;
 	m_iconFontAll = m_metricsAll.lfMenuFont;
+	m_metricsAll.lfMessageFont = m_metricsAll.lfMenuFont;
+	m_metricsAll.lfSmCaptionFont = m_metricsAll.lfMenuFont;
+	m_metricsAll.lfStatusFont = m_metricsAll.lfMenuFont;
 }
 
 /**
@@ -466,18 +466,19 @@ void PP1_FontSet::theUpdateDisplay(void)
 	m_strIconFontName = m_iconFont.lfFaceName;
 	m_strIconFontName += L"   " + itos(getFontPointInt(&m_iconFont, m_hWnd)) + L"pt";
 
+	// 儊僯儏乕偲慖戰崁栚
+	m_strMenuFontName = m_metrics.lfMenuFont.lfFaceName;
+	m_strMenuFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMenuFont, m_hWnd)) + L"pt";
+
+	m_strMessageFontName = m_metrics.lfMessageFont.lfFaceName;
+	m_strMessageFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMessageFont, m_hWnd)) + L"pt";
+
 	m_strPaletteFontName = m_metrics.lfSmCaptionFont.lfFaceName;
 	m_strPaletteFontName += L"   " + itos(getFontPointInt(&m_metrics.lfSmCaptionFont, m_hWnd)) + L"pt";
 
 	m_strTipFontName = m_metrics.lfStatusFont.lfFaceName;
 	m_strTipFontName += L"   " + itos(getFontPointInt(&m_metrics.lfStatusFont, m_hWnd)) + L"pt";
 
-	m_strMessageFontName = m_metrics.lfMessageFont.lfFaceName;
-	m_strMessageFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMessageFont, m_hWnd)) + L"pt";
-
-	// 儊僯儏乕偲慖戰崁栚
-	m_strMenuFontName = m_metrics.lfMenuFont.lfFaceName;
-	m_strMenuFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMenuFont, m_hWnd)) + L"pt";
 
 	//UpdateData(false);
 	DoDataExchange();
@@ -501,6 +502,18 @@ void PP1_FontSet::theUpdateDisplay(void)
 	m_fontIcon = createFont(&m_iconFont);
 	m_editIconFont.SetFont(m_fontIcon);
 
+	if (m_fontMenu != NULL) {
+		DeleteObject(m_fontMenu);
+	}
+	m_fontMenu = createFont(&m_metrics.lfMenuFont);
+	m_editMenuFont.SetFont(m_fontMenu);
+
+	if (m_fontMessage != NULL) {
+		DeleteObject(m_fontMessage);
+	}
+	m_fontMessage = createFont(&m_metrics.lfMessageFont);
+	m_editMessageFont.SetFont(m_fontMessage);
+
 	if (m_fontPalette != NULL) {
 		DeleteObject(m_fontPalette);
 	}
@@ -512,18 +525,6 @@ void PP1_FontSet::theUpdateDisplay(void)
 	}
 	m_fontTip = createFont(&m_metrics.lfStatusFont);
 	m_editTipFont.SetFont(m_fontTip);
-
-	if (m_fontMessage != NULL) {
-		DeleteObject(m_fontMessage);
-	}
-	m_fontMessage = createFont(&m_metrics.lfMessageFont);
-	m_editMessageFont.SetFont(m_fontMessage);
-
-	if (m_fontMenu != NULL) {
-		DeleteObject(m_fontMenu);
-	}
-	m_fontMenu = createFont(&m_metrics.lfMenuFont);
-	m_editMenuFont.SetFont(m_fontMenu);
 }
 
 int PP1_FontSet::getFontPointInt(LOGFONTW *font, HWND hWnd)
@@ -532,12 +533,12 @@ int PP1_FontSet::getFontPointInt(LOGFONTW *font, HWND hWnd)
 
 	bool WIN8_SIZE = FALSE;
 	if (WIN8_SIZE) {
-		// Windows 8ディスプレイコントロールパネル互換
+		// 兼容Windows 8显示控制面板
 		if ((point > 10) || (point < 8)) {
 			return (int)point;
 		}
 		else {
-			// 10ptまではWindows 7と同様に計算する。
+			// 计算和Windows 7一样高达10pt。
 			// Windows 7以前互換 
 			if (point - abs((int)point) > 0.49) {
 				return (int)point + 1;
@@ -719,14 +720,14 @@ LRESULT PP1_FontSet::OnSetAll(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, 
 	}
 #endif
 
-	// 僼僅儞僩曄峏傪幚巤偡傞丅
-	theSetFont(&m_metricsAll, &m_iconFontAll);
+	//// 僼僅儞僩曄峏傪幚巤偡傞丅
+	//theSetFont(&m_metricsAll, &m_iconFontAll);
 
-	memcpy(&m_metrics, &m_metricsAll, sizeof(NONCLIENTMETRICSW));
-	memcpy(&m_iconFont, &m_iconFontAll, sizeof(LOGFONTW));
+	//memcpy(&m_metrics, &m_metricsAll, sizeof(NONCLIENTMETRICSW));
+	//memcpy(&m_iconFont, &m_iconFontAll, sizeof(LOGFONTW));
 
-	// 昞帵傪峏怴偡傞丅
-	theUpdateDisplay();
+	//// 昞帵傪峏怴偡傞丅
+	//theUpdateDisplay();
 
 	return 0;
 }
@@ -763,12 +764,12 @@ LRESULT PP1_FontSet::OnSelFont(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
 	if (logFont.lfFaceName[0] != _T('\0')) {
 		switch (type) {
 		case allFont:
-			//m_metricsAll.lfMenuFont = logFont;
-			m_metricsAll.lfStatusFont = logFont;
-			m_metricsAll.lfMessageFont = logFont;
 			m_metricsAll.lfCaptionFont = logFont;
-			m_metricsAll.lfSmCaptionFont = logFont;
 			m_iconFontAll = logFont;
+			//m_metricsAll.lfMenuFont = logFont;
+			m_metricsAll.lfMessageFont = logFont;
+			m_metricsAll.lfSmCaptionFont = logFont;
+			m_metricsAll.lfStatusFont = logFont;
 
 			ChangeFont(m_metricsAll.lfMenuFont, logFont, m_strAllFontName, m_fontAll, m_editAllFont);
 			break;
@@ -778,17 +779,17 @@ LRESULT PP1_FontSet::OnSelFont(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
 		case iconFont:
 			ChangeFont(m_iconFont, logFont, m_strIconFontName, m_fontIcon, m_editIconFont);
 			break;
-		case paletteFont:	//lfSmCaptionFont 调色板标题Palette Title字体。small caption font
-			ChangeFont(m_metrics.lfSmCaptionFont, logFont, m_strPaletteFontName, m_fontPalette, m_editPaletteFont);
-			break;
-		case tipFont:	//设置状态栏tooltips字体。 the font used in status bars and tooltips
-			ChangeFont(m_metrics.lfStatusFont, logFont, m_strTipFontName, m_fontTip, m_editTipFont);
+		case menuFont:
+			ChangeFont(m_metrics.lfMenuFont, logFont, m_strMenuFontName, m_fontMenu, m_editMenuFont);
 			break;
 		case messageFont:
 			ChangeFont(m_metrics.lfMessageFont, logFont, m_strMessageFontName, m_fontMessage, m_editMessageFont);
 			break;
-		case menuFont:
-			ChangeFont(m_metrics.lfMenuFont, logFont, m_strMenuFontName, m_fontMenu, m_editMenuFont);
+		case paletteFont:	//lfSmCaptionFont 调色板标题Palette Title字体。small caption font
+			ChangeFont(m_metrics.lfSmCaptionFont, logFont, m_strPaletteFontName, m_fontPalette, m_editPaletteFont);
+			break;
+		case tipFont:		//设置状态栏tooltips字体。 the font used in status bars and tooltips
+			ChangeFont(m_metrics.lfStatusFont, logFont, m_strTipFontName, m_fontTip, m_editTipFont);
 			break;
 		}
 	}
@@ -946,29 +947,17 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 {
 	BOOL loadResult;
 	LOGFONT captionFont;
-	LOGFONT newIconFont;
+	LOGFONT iconFont;
+	LOGFONT menuFont;
+	LOGFONT messageFont;
 	LOGFONT smCaptionFont;
 	LOGFONT statusFont;
-	LOGFONT messageFont;
-	LOGFONT menuFont;
 
 	loadResult = loadFont(filename, L"TitleFont", &captionFont);
 	if (!loadResult) {
 		return FALSE;
 	}
-	loadResult = loadFont(filename, L"IconFont", &newIconFont);
-	if (!loadResult) {
-		return FALSE;
-	}
-	loadResult = loadFont(filename, L"PaletteFont", &smCaptionFont);
-	if (!loadResult) {
-		return FALSE;
-	}
-	loadResult = loadFont(filename, L"HintFont", &statusFont);
-	if (!loadResult) {
-		return FALSE;
-	}
-	loadResult = loadFont(filename, L"MessageFont", &messageFont);
+	loadResult = loadFont(filename, L"IconFont", &iconFont);
 	if (!loadResult) {
 		return FALSE;
 	}
@@ -976,13 +965,25 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 	if (!loadResult) {
 		return FALSE;
 	}
+	loadResult = loadFont(filename, L"MessageFont", &messageFont);
+	if (!loadResult) {
+		return FALSE;
+	}
+	loadResult = loadFont(filename, L"PaletteFont", &smCaptionFont);
+	if (!loadResult) {
+		return FALSE;
+	}
+	loadResult = loadFont(filename, L"TipFont", &statusFont);
+	if (!loadResult) {
+		return FALSE;
+	}
 
 	m_metrics.lfCaptionFont = captionFont;
-	m_iconFont = newIconFont;
+	m_iconFont = iconFont;
+	m_metrics.lfMenuFont = menuFont;
+	m_metrics.lfMessageFont = messageFont;
 	m_metrics.lfSmCaptionFont = smCaptionFont;
 	m_metrics.lfStatusFont = statusFont;
-	m_metrics.lfMessageFont = messageFont;
-	m_metrics.lfMenuFont = menuFont;
 
 	return TRUE;
 }
@@ -1208,11 +1209,7 @@ BOOL PP1_FontSet::startSaveFont(CString filename)
 	if (!saveResult) {
 		return FALSE;
 	}
-	saveResult = saveFont(filename, L"PaletteFont", &m_metrics.lfSmCaptionFont);
-	if (!saveResult) {
-		return FALSE;
-	}
-	saveResult = saveFont(filename, L"HintFont", &m_metrics.lfStatusFont);
+	saveResult = saveFont(filename, L"MenuFont", &m_metrics.lfMenuFont);
 	if (!saveResult) {
 		return FALSE;
 	}
@@ -1220,7 +1217,11 @@ BOOL PP1_FontSet::startSaveFont(CString filename)
 	if (!saveResult) {
 		return FALSE;
 	}
-	saveResult = saveFont(filename, L"MenuFont", &m_metrics.lfMenuFont);
+	saveResult = saveFont(filename, L"PaletteFont", &m_metrics.lfSmCaptionFont);
+	if (!saveResult) {
+		return FALSE;
+	}
+	saveResult = saveFont(filename, L"TipFont", &m_metrics.lfStatusFont);
 	if (!saveResult) {
 		return FALSE;
 	}
@@ -1406,16 +1407,16 @@ int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFo
 	mySetFontItem(iconFont, tagFont.vecFaces[1].second,
 		tagFont.vecSizes[1].second, tagFont.vecCharset[1].second);
 
-	mySetFontItem(metrics.lfSmCaptionFont, tagFont.vecFaces[2].second,
+	mySetFontItem(metrics.lfMenuFont, tagFont.vecFaces[2].second,
 		tagFont.vecSizes[2].second, tagFont.vecCharset[2].second);
 
-	mySetFontItem(metrics.lfStatusFont, tagFont.vecFaces[3].second,
+	mySetFontItem(metrics.lfMessageFont, tagFont.vecFaces[3].second,
 		tagFont.vecSizes[3].second, tagFont.vecCharset[3].second);
 
-	mySetFontItem(metrics.lfMessageFont, tagFont.vecFaces[4].second,
+	mySetFontItem(metrics.lfSmCaptionFont, tagFont.vecFaces[4].second,
 		tagFont.vecSizes[4].second, tagFont.vecCharset[4].second);
 
-	mySetFontItem(metrics.lfMenuFont, tagFont.vecFaces[5].second,
+	mySetFontItem(metrics.lfStatusFont, tagFont.vecFaces[5].second,
 		tagFont.vecSizes[5].second, tagFont.vecCharset[5].second);
 
 	return 0;
@@ -1484,78 +1485,78 @@ void PP1_FontSet::initTagFont(void)
 {
 	// tagFontWin8字体容器初始化
 	// 字体名称容器初始化
-	tagFontWin8.vecFaces.push_back(make_pair(L"CAPTION_FACE_8", L""));
-	tagFontWin8.vecFaces.push_back(make_pair(L"ICON_FACE_8", L""));
-	tagFontWin8.vecFaces.push_back(make_pair(L"SMALLCAPTION_FACE_8", L""));
-	tagFontWin8.vecFaces.push_back(make_pair(L"STATUS_FACE_8", L""));
-	tagFontWin8.vecFaces.push_back(make_pair(L"MESSAGE_FACE_8", L""));
-	tagFontWin8.vecFaces.push_back(make_pair(L"MENU_FACE_8", L""));
+	tagFontWin8.vecFaces.push_back(make_pair(L"CAPTION_FACE_8", L""));		//Title
+	tagFontWin8.vecFaces.push_back(make_pair(L"ICON_FACE_8", L""));			//Icon
+	tagFontWin8.vecFaces.push_back(make_pair(L"MENU_FACE_8", L""));			//Menu
+	tagFontWin8.vecFaces.push_back(make_pair(L"MESSAGE_FACE_8", L""));		//Message
+	tagFontWin8.vecFaces.push_back(make_pair(L"SMALLCAPTION_FACE_8", L""));	//Palette Title
+	tagFontWin8.vecFaces.push_back(make_pair(L"STATUS_FACE_8", L""));		//Tip
 
 	// 字体大小容器初始化
 	tagFontWin8.vecSizes.push_back(make_pair(L"CAPTION_SIZE_8", -1));
 	tagFontWin8.vecSizes.push_back(make_pair(L"ICON_SIZE_8", -1));
+	tagFontWin8.vecSizes.push_back(make_pair(L"MENU_SIZE_8", -1));
+	tagFontWin8.vecSizes.push_back(make_pair(L"MESSAGE_SIZE_8", -1));
 	tagFontWin8.vecSizes.push_back(make_pair(L"SMALLCAPTION_SIZE_8", -1));
 	tagFontWin8.vecSizes.push_back(make_pair(L"STATUS_SIZE_8", -1));
-	tagFontWin8.vecSizes.push_back(make_pair(L"MESSAGE_SIZE_8", -1));
-	tagFontWin8.vecSizes.push_back(make_pair(L"MENU_SIZE_8", -1));
 
 	// 字符集容器初始化
 	tagFontWin8.vecCharset.push_back(make_pair("CAPTION_CHARSET_8", -1));
 	tagFontWin8.vecCharset.push_back(make_pair("ICON_CHARSET_8", -1));
+	tagFontWin8.vecCharset.push_back(make_pair("MENU_CHARSET_8", -1));
+	tagFontWin8.vecCharset.push_back(make_pair("MESSAGE_CHARSET_8", -1));
 	tagFontWin8.vecCharset.push_back(make_pair("SMALLCAPTION_CHARSET_8", -1));
 	tagFontWin8.vecCharset.push_back(make_pair("STATUS_CHARSET_8", -1));
-	tagFontWin8.vecCharset.push_back(make_pair("MESSAGE_CHARSET_8", -1));
-	tagFontWin8.vecCharset.push_back(make_pair("MENU_CHARSET_8", -1));
 
 	// tagFontWin10字体容器初始化
 	// 字体名称容器初始化
 	tagFontWin10.vecFaces.push_back(make_pair(L"CAPTION_FACE_10", L""));
 	tagFontWin10.vecFaces.push_back(make_pair(L"ICON_FACE_10", L""));
+	tagFontWin10.vecFaces.push_back(make_pair(L"MENU_FACE_10", L""));
+	tagFontWin10.vecFaces.push_back(make_pair(L"MESSAGE_FACE_10", L""));
 	tagFontWin10.vecFaces.push_back(make_pair(L"SMALLCAPTION_FACE_10", L""));
 	tagFontWin10.vecFaces.push_back(make_pair(L"STATUS_FACE_10", L""));
-	tagFontWin10.vecFaces.push_back(make_pair(L"MESSAGE_FACE_10", L""));
-	tagFontWin10.vecFaces.push_back(make_pair(L"MENU_FACE_10", L""));
 
 	// 字体大小容器初始化
 	tagFontWin10.vecSizes.push_back(make_pair(L"CAPTION_SIZE_10", -1));
 	tagFontWin10.vecSizes.push_back(make_pair(L"ICON_SIZE_10", -1));
+	tagFontWin10.vecSizes.push_back(make_pair(L"MENU_SIZE_10", -1));
+	tagFontWin10.vecSizes.push_back(make_pair(L"MESSAGE_SIZE_10", -1));
 	tagFontWin10.vecSizes.push_back(make_pair(L"SMALLCAPTION_SIZE_10", -1));
 	tagFontWin10.vecSizes.push_back(make_pair(L"STATUS_SIZE_10", -1));
-	tagFontWin10.vecSizes.push_back(make_pair(L"MESSAGE_SIZE_10", -1));
-	tagFontWin10.vecSizes.push_back(make_pair(L"MENU_SIZE_10", -1));
 
 	// 字符集容器初始化
 	tagFontWin10.vecCharset.push_back(make_pair("CAPTION_CHARSET_10", -1));
 	tagFontWin10.vecCharset.push_back(make_pair("ICON_CHARSET_10", -1));
+	tagFontWin10.vecCharset.push_back(make_pair("MENU_CHARSET_10", -1));
+	tagFontWin10.vecCharset.push_back(make_pair("MESSAGE_CHARSET_10", -1));
 	tagFontWin10.vecCharset.push_back(make_pair("SMALLCAPTION_CHARSET_10", -1));
 	tagFontWin10.vecCharset.push_back(make_pair("STATUS_CHARSET_10", -1));
-	tagFontWin10.vecCharset.push_back(make_pair("MESSAGE_CHARSET_10", -1));
-	tagFontWin10.vecCharset.push_back(make_pair("MENU_CHARSET_10", -1));
 
 	// tagFontCur字体容器初始化
 	// 字体名称容器初始化
 	tagFontCur.vecFaces.push_back(make_pair(L"CAPTION_FACE_CUR", L""));
 	tagFontCur.vecFaces.push_back(make_pair(L"ICON_FACE_CUR", L""));
+	tagFontCur.vecFaces.push_back(make_pair(L"MENU_FACE_CUR", L""));
+	tagFontCur.vecFaces.push_back(make_pair(L"MESSAGE_FACE_CUR", L""));
 	tagFontCur.vecFaces.push_back(make_pair(L"SMALLCAPTION_FACE_CUR", L""));
 	tagFontCur.vecFaces.push_back(make_pair(L"STATUS_FACE_CUR", L""));
-	tagFontCur.vecFaces.push_back(make_pair(L"MESSAGE_FACE_CUR", L""));
-	tagFontCur.vecFaces.push_back(make_pair(L"MENU_FACE_CUR", L""));
 
 	// 字体大小容器初始化
 	tagFontCur.vecSizes.push_back(make_pair(L"CAPTION_SIZE_CUR", -1));
 	tagFontCur.vecSizes.push_back(make_pair(L"ICON_SIZE_CUR", -1));
+	tagFontCur.vecSizes.push_back(make_pair(L"MENU_SIZE_CUR", -1));
+	tagFontCur.vecSizes.push_back(make_pair(L"MESSAGE_SIZE_CUR", -1));
 	tagFontCur.vecSizes.push_back(make_pair(L"SMALLCAPTION_SIZE_CUR", -1));
 	tagFontCur.vecSizes.push_back(make_pair(L"STATUS_SIZE_CUR", -1));
-	tagFontCur.vecSizes.push_back(make_pair(L"MESSAGE_SIZE_CUR", -1));
-	tagFontCur.vecSizes.push_back(make_pair(L"MENU_SIZE_CUR", -1));
 
 	// 字符集容器初始化
 	tagFontCur.vecCharset.push_back(make_pair("CAPTION_CHARSET_CUR", -1));
 	tagFontCur.vecCharset.push_back(make_pair("ICON_CHARSET_CUR", -1));
+	tagFontCur.vecCharset.push_back(make_pair("MENU_CHARSET_CUR", -1));
+	tagFontCur.vecCharset.push_back(make_pair("MESSAGE_CHARSET_CUR", -1));
 	tagFontCur.vecCharset.push_back(make_pair("SMALLCAPTION_CHARSET_CUR", -1));
 	tagFontCur.vecCharset.push_back(make_pair("STATUS_CHARSET_CUR", -1));
-	tagFontCur.vecCharset.push_back(make_pair("MESSAGE_CHARSET_CUR", -1));
-	tagFontCur.vecCharset.push_back(make_pair("MENU_CHARSET_CUR", -1));
 
 }
 
@@ -1566,10 +1567,10 @@ void PP1_FontSet::initSelFont(void)
 	mapSelFont[IDB_SEL_ALLFONT] = make_pair(allFont, &m_metricsAll.lfMenuFont);
 	mapSelFont[IDB_SEL_TITLE] = make_pair(titleFont, &m_metrics.lfCaptionFont);
 	mapSelFont[IDB_SEL_ICON] = make_pair(iconFont, &m_iconFont);
-	mapSelFont[IDB_SEL_ICON] = make_pair(paletteFont, &m_metrics.lfSmCaptionFont);
-	mapSelFont[IDB_SEL_TIP] = make_pair(tipFont, &m_metrics.lfStatusFont);
-	mapSelFont[IDB_SEL_MESSAGE] = make_pair(messageFont, &m_metrics.lfMessageFont);
 	mapSelFont[IDB_SEL_MENU] = make_pair(menuFont, &m_metrics.lfMenuFont);
+	mapSelFont[IDB_SEL_MESSAGE] = make_pair(messageFont, &m_metrics.lfMessageFont);
+	mapSelFont[IDB_SEL_PALETTE] = make_pair(paletteFont, &m_metrics.lfSmCaptionFont);
+	mapSelFont[IDB_SEL_TIP] = make_pair(tipFont, &m_metrics.lfStatusFont);
 }
 
 //我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
@@ -1681,7 +1682,7 @@ void PP1_FontSet::readResourceFile(CString file)
 	readResourceItem(file, L"DLG_TITLE_BAR", L"Title bar");
 	readResourceItem(file, L"DLG_ICON", L"Icon");
 	readResourceItem(file, L"DLG_PALETTE", L"Palette title");
-	readResourceItem(file, L"DLG_HINT", L"Hint");
+	readResourceItem(file, L"DLG_TIP", L"Tip");
 	readResourceItem(file, L"DLG_MESSAGE", L"Message box");
 	readResourceItem(file, L"DLG_MENU", L"Menu");
 	readResourceItem(file, L"DLG_SELECT", L"Select...");

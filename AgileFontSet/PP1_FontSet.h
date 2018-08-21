@@ -298,10 +298,10 @@ public:
 	CString m_strAllFontName;
 	CString m_strTitleFontName;
 	CString m_strIconFontName;
+	CString m_strMenuFontName;
+	CString m_strMessageFontName;
 	CString m_strPaletteFontName;
 	CString m_strTipFontName;
-	CString m_strMessageFontName;
-	CString m_strMenuFontName;
 
 	CString m_strSettingFile;
 
@@ -314,18 +314,18 @@ public:
 	HFONT m_fontAll;
 	HFONT m_fontTitle;
 	HFONT m_fontIcon;
-	HFONT m_fontPalette;
-	HFONT m_fontTip;		//提示，暗示，Tip，Tooltip，Hint
-	HFONT m_fontMessage;
 	HFONT m_fontMenu;
+	HFONT m_fontMessage;
+	HFONT m_fontPalette;
+	HFONT m_fontTip;		//提示，暗示，Tip，Tooltip，Hint。Tip更常用
 
 	CEditImpl m_editAllFont;
 	CEditImpl m_editTitleFont;
 	CEditImpl m_editIconFont;
-	CEditImpl m_editPaletteFont;
-	CEditImpl m_editTipFont;		//提示，暗示，Tip，Tooltip，Hint
-	CEditImpl m_editMessageFont;
 	CEditImpl m_editMenuFont;
+	CEditImpl m_editMessageFont;
+	CEditImpl m_editPaletteFont;
+	CEditImpl m_editTipFont;		//提示，暗示，Tip，Tooltip，Hint。Tip更常用
 
 	bool use7Compat = true;
 	bool hasCurPreset = true;
