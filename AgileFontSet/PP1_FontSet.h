@@ -7,6 +7,7 @@
 #include "resource.h"
 #include "CEditImpl.h"
 #include "CButtonImpl.h"
+#include "CComboImpl.h"
 #include <vector>
 #include <map>
 #include <utility>
@@ -116,6 +117,7 @@ public:
 
 	BEGIN_DDX_MAP(PP1_FontSet)
 		//DDX_CHECK(IDC_CHECK_REFRESH, m_iRefresh)		// DDX_CHECK只能与int类型变量交换数据
+		DDX_CONTROL_HANDLE(IDC_COMBO_PRESET, m_comboPreSet);
 
 		DDX_CONTROL(IDC_CHECK_ALLFONT, m_chkAllfont)
 		DDX_CONTROL(IDC_CHECK_TITLE, m_chkTitle)
@@ -182,6 +184,7 @@ public:
 	//测试EN_CHANGE消息响应
 	CUpDownCtrl m_spin1;
 	CEditImpl m_edit1;
+	CComboImpl m_comboPreSet;
 
 	unsigned m_nOldHS;
 	unsigned m_nOldVS;

@@ -97,6 +97,18 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	::SetWindowTextW(GetDlgItem(IDC_STATIC_VERNO), str);
 
 
+	//------------------------------------------------------
+	//处理 m_comboPreSet
+	//m_comboPreSet.Clear();			//不是清空CComboBox内容。只是删除CComboBox的编辑控件的当前选择（如果有的话）。
+	m_comboPreSet.ResetContent();	//CComboBox::ResetContent函数用于清空内容。
+	//注意设置组合框属性：Type为Drop List，Sort为False
+	m_comboPreSet.AddString(L"当前配置");		//0
+	m_comboPreSet.AddString(L"旧的配置");		//1
+	m_comboPreSet.AddString(L"Win8.x配置");		//2
+	m_comboPreSet.AddString(L"Win10配置");		//3
+	m_comboPreSet.SetCurSel(0);
+	//------------------------------------------------------
+
 	//noMeiryoUI235Dlg::OnInitDialog
 	//////////////////////////////////////////////////////////////////////////
 	FillMemory(&m_metrics, sizeof(NONCLIENTMETRICSW), 0x00);

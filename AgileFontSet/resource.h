@@ -12,23 +12,20 @@
 #define IDD_PP2_README                  109
 #define IDI_ICON_HS                     201
 #define IDI_ICON_VS                     202
-
 #define IDB_SEL_ALLFONT                 1000
 #define IDB_SEL_TITLE                   1001
 #define IDB_SEL_ICON                    1002
 #define IDB_SEL_MENU                    1003
 #define IDB_SEL_MESSAGE                 1004
 #define IDB_SEL_PALETTE                 1005
-#define IDB_SEL_TIP                     1006	
-
-#define IDC_EDIT_ALLFONT                1007	
+#define IDB_SEL_TIP                     1006
+#define IDC_EDIT_ALLFONT                1007
 #define IDC_EDIT_TITLE                  1008
 #define IDC_EDIT_ICON                   1009
 #define IDC_EDIT_MENU                   1010
 #define IDC_EDIT_MESSAGE                1011
 #define IDC_EDIT_PALETTE                1012
-#define IDC_EDIT_TIP                    1013	
-
+#define IDC_EDIT_TIP                    1013
 #define IDC_CHECK_UNDERLINE             1014
 #define IDC_EDIT_README                 1015
 #define IDC_CHECK_STRIKE                1016
@@ -49,8 +46,7 @@
 #define IDC_PRECONFIT                   1031
 #define IDC_STATIC_PRECONFIT            1032
 #define IDC_STATIC_SIZE                 1033
-
-#define IDC_CHECK_ALLFONT               1034	
+#define IDC_CHECK_ALLFONT               1034
 #define IDC_CHECK_TITLE                 1035
 #define IDC_CHECK_ICON                  1036
 #define IDC_CHECK_MENU                  1037
@@ -58,15 +54,13 @@
 #define IDC_CHECK_PALETTE               1039
 #define IDC_CHECK_TIP                   1040
 #define IDC_CHECK_HS                    1041
-#define IDC_CHECK_VS                    1042	
-
+#define IDC_CHECK_VS                    1042
 #define IDC_SPIN_HS                     1043
 #define IDC_SPIN_VS                     1044
-
-#define IDC_EDIT_HS                     1045	
-#define IDC_EDIT_VS                     1046	
-
+#define IDC_EDIT_HS                     1045
+#define IDC_EDIT_VS                     1046
 #define IDC_COMBO_PRECONFIT             1047
+#define IDC_COMBO_PRESET                1047
 #define IDC_BTN_APPLY                   1048
 #define IDC_BTN_LOAD_SET_FROM_FILE      1049
 #define IDC_BTN_SAVE_SET_TO_FILE        1050
