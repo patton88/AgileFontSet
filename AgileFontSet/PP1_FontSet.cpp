@@ -745,7 +745,7 @@ void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFo
 	DWORD_PTR ptr;
 	LRESULT messageResult;
 
-	// 傾僀僐儞偺僼僅儞僩愝掕
+	// 图标字体设置
 	SystemParametersInfo(SPI_SETICONTITLELOGFONT,
 		sizeof(LOGFONTW),
 		iconLogFont,
@@ -765,10 +765,10 @@ void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFo
 		}
 	}
 
-	// 启动独立线程设定字体
-	if (GetMenuState(GetMenu(), IDM_UNIQ_THREAD, MF_BYCOMMAND)) {
-		// UI偲暿僗儗僢僪偱SystemParametersInfo(SPI_SETNONCLIENTMETRICS傪
-		// 幚峴偡傞丅
+	// 除了图标以外的字体设置。启动独立线程设定字体
+	//if (GetMenuState(GetMenu(), IDM_UNIQ_THREAD, MF_BYCOMMAND)) {
+	if (1) {
+		// UI和另一个线程SystemParametersInfo(SPI_SETNONCLIENTMETRICS) 运行它
 		g_pFontMetrics = fontMetrics;	//初始化独立线程的全局参数
 
 										/*
@@ -787,24 +787,24 @@ void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFo
 										// setOnThread 必须定义为全局函数，不能定义为类成员函数。否则报错如下：
 										//(698): error C3867: 'PP1_FontSet::setOnThread': 
 										//	non-standard syntax; use '&' to create a pointer to member
+		//启动执行字体设置的线程
 		uintptr_t startResult = _beginthreadex(NULL, 0, setOnThread, NULL, 0, NULL);
 		if (startResult != 0) {
-			// 惓忢偵僗儗僢僪傪奐巒偟偨傜僗儗僢僪廔椆傪懸婡偡傞丅
+			// 成功启动线程时等待线程终止。
 			HANDLE handle;
 			handle = (HANDLE)startResult;
 
-			// 堦墳5昩傎偳懸偮
+			// 等待大约5秒钟
 			DWORD waitResult = WaitForSingleObject(handle, 5000);
 			if (waitResult == WAIT_TIMEOUT) {
-				// 僗儗僢僪偑廔椆偟側偄応崌偼偳偆偟傛偆傕側偄偺偱僗儗僢僪傪廔椆偡傞丅
+				// 如果线程没有终止，我什么也做不了，所以我退出线程。
 				TerminateThread(handle, 0);
 			}
 			CloseHandle(handle);
 		}
 	}
 	else {
-		// UI偲摨偠僗儗僢僪偱SystemParametersInfo(SPI_SETNONCLIENTMETRICS傪
-		// 幚峴偡傞丅
+		// 用与UI相同的线程运行它
 		SystemParametersInfo(SPI_SETNONCLIENTMETRICS,
 			sizeof(NONCLIENTMETRICSW),
 			fontMetrics,
@@ -826,6 +826,9 @@ void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFo
 		}
 	}
 
+	//通过重置颜色刷新屏幕。
+	//但是，当IObit StartMenu 8运行时，setSysColors
+	//我决定不调用，因为我调用时响应会丢失。
 #if 0
 	DWORD btnColor;
 	btnColor = GetSysColor(COLOR_BTNTEXT);
