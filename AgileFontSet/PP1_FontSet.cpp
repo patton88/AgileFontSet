@@ -60,20 +60,21 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	m_iOldHS = im.iHorzSpacing - 32;
 	m_iOldVS = im.iVertSpacing - 32;
 
-	//Windows内建控件CSpinButtonCtrl的WTL封装类为：CUpDownCtrl
-	//GetWindowRect(&rect);
-	m_spinHS.Attach(GetDlgItem(IDC_SPIN_HS));
-	//Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
-	m_spinHS.SetBuddy(GetDlgItem(IDC_EDIT_HS));
-	m_spinHS.SetRange(0, 150);
-	m_spinHS.SetPos(m_iOldHS);
-	//MoveWindow(rect.top, rect.bottom, rect.Width(), rect.Height(), true);
+	//当设置CEdit控件随对话框自动缩放后，spin控件与CEdit关联的代码放在这里OnInitDialog()中过早，会引起控件错位
+	////Windows内建控件CSpinButtonCtrl的WTL封装类为：CUpDownCtrl
+	////GetWindowRect(&rect);
+	//m_spinHS.Attach(GetDlgItem(IDC_SPIN_HS));
+	////Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
+	//m_spinHS.SetBuddy(GetDlgItem(IDC_EDIT_HS));
+	//m_spinHS.SetRange(0, 150);
+	//m_spinHS.SetPos(m_iOldHS);
+	////MoveWindow(rect.top, rect.bottom, rect.Width(), rect.Height(), true);
 
-	m_spinVS.Attach(GetDlgItem(IDC_SPIN_VS));
-	//Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
-	m_spinVS.SetBuddy(GetDlgItem(IDC_EDIT_VS));
-	m_spinVS.SetRange(0, 150);
-	m_spinVS.SetPos(m_iOldVS);
+	//m_spinVS.Attach(GetDlgItem(IDC_SPIN_VS));
+	////Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
+	//m_spinVS.SetBuddy(GetDlgItem(IDC_EDIT_VS));
+	//m_spinVS.SetRange(0, 150);
+	//m_spinVS.SetPos(m_iOldVS);
 
 	//显示Windows系统版本号
 	CString str;
@@ -181,13 +182,34 @@ BOOL PP1_FontSet::OnSetActive()
 //LONG PP3_FontSet::OnSetPageFocus(UINT wParam, LONG lParam)
 LRESULT PP1_FontSet::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
+	//当设置CEdit控件随对话框自动缩放后，spin控件与CEdit关联的代码放在这里才行。放在OnInitDialog()中过早，会引起控件错位
+	//Windows内建控件CSpinButtonCtrl的WTL封装类为：CUpDownCtrl
+	//GetWindowRect(&rect);
+	if (!m_spinHS.IsWindow())
+	{
+		m_spinHS.Attach(GetDlgItem(IDC_SPIN_HS));
+		//Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
+		m_spinHS.SetBuddy(GetDlgItem(IDC_EDIT_HS));
+		m_spinHS.SetRange(0, 150);
+		m_spinHS.SetPos(m_iOldHS);
+		//MoveWindow(rect.top, rect.bottom, rect.Width(), rect.Height(), true);
+	}
+	if (!m_spinVS.IsWindow())
+	{
+		m_spinVS.Attach(GetDlgItem(IDC_SPIN_VS));
+		//Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
+		m_spinVS.SetBuddy(GetDlgItem(IDC_EDIT_VS));
+		m_spinVS.SetRange(0, 150);
+		m_spinVS.SetPos(m_iOldVS);
+	}
+
 	HWND hwndParent = ::GetParent(m_hWnd);
 	//::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_DEFAULT_ALL), TRUE);	//0 m_btnLoadDefaultAll;		
 	//::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_RELOAD_SET_FROM_FILE), TRUE);	//2	m_btnReloadSetFromFile;	
-	if ((m_spinHS.GetPos() == m_iOldHS) && (m_spinVS.GetPos() == m_iOldVS))		//1	m_btnLoadDefaultCurrPage
-	{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), FALSE); }
-	else
-	{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), TRUE); }
+	//if ((m_spinHS.GetPos() == m_iOldHS) && (m_spinVS.GetPos() == m_iOldVS))		//1	m_btnLoadDefaultCurrPage
+	//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), FALSE); }
+	//else
+	//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), TRUE); }
 
 	//if ((-1 == m_iNewHS) || (m_spinHS.GetPos() == m_iNewHS) && (m_spinVS.GetPos() == m_iNewVS))	//2	m_btnLoadDefaultCurrPage
 	//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_NEW_VALUE), FALSE); }
