@@ -274,7 +274,7 @@ LRESULT PP1_FontSet::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 
 LRESULT PP1_FontSet::OnCheckAllFont(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
-	DoDataExchange(TRUE);		//缺省为TRUE，控件to成员变量
+	DoDataExchange(TRUE);		//控件to成员变量。缺省为FALSE-变量到控件
 
 	if (m_iCheckAllfont)
 	{
@@ -650,7 +650,7 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 	//EndDialog(wID);
 	//theSetFont(&m_metrics, &m_iconFont);
 
-	DoDataExchange(TRUE);		//缺省为TRUE，控件to成员变量
+	DoDataExchange(TRUE);		//控件to成员变量。缺省为FALSE-变量到控件
 
 	if (m_iCheckAllfont)
 	{
@@ -739,6 +739,8 @@ LRESULT PP1_FontSet::OnSetAll(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, 
 
 LRESULT PP1_FontSet::OnSelFont(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
 {
+	DoDataExchange(TRUE);	//控件to成员变量，以备后面恢复。缺省为FALSE-变量到控件。
+
 	LOGFONTW logFont;
 	FillMemory(&logFont, sizeof(LOGFONTW), 0x00);
 
