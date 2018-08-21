@@ -225,7 +225,10 @@ LRESULT PP0_PropertySheet::OnApply(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCt
 
 	m_pp1FontSet.DoDataExchange(TRUE);		//缺省为TRUE，控件to成员变量
 
-	//应用设置，刷新桌面
+	//应用字体设置，刷新桌面
+	m_pp1FontSet.theSetFont(&m_pp1FontSet.m_metrics, &m_pp1FontSet.m_iconFont);
+
+	//应用图标间距设置，刷新桌面
 	SetIconSpacing(m_pp1FontSet.m_spinHS.GetPos(), m_pp1FontSet.m_spinVS.GetPos(), TRUE);
 
 	return true;
