@@ -276,7 +276,7 @@ public:
 	BOOL SaveCurSetToTag();		//保存当前配置到结构体变量
 
 	int mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet);
-	int mySetFontItem2(LOGFONTW& font, wchar_t const* strFaceName, LONG& lHeight, BYTE& bCharSet);
+	int mySetFontItem2(LOGFONTW& dstFont, LOGFONTW& srcFont);
 
 	enum fontType {
 		allFont,

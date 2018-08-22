@@ -1467,14 +1467,15 @@ int PP1_FontSet::mySetFontItem(LOGFONTW& font, CString& strFaceName, LONG& lHeig
 	return 0;
 }
 
-int PP1_FontSet::mySetFontItem2(LOGFONTW& font, wchar_t const* pFaceName, LONG& lHeight, BYTE& bCharSet)
+//int PP1_FontSet::mySetFontItem2(LOGFONTW& font, wchar_t const* pFaceName, LONG& lHeight, BYTE& bCharSet)
+int PP1_FontSet::mySetFontItem2(LOGFONTW& dstFont, LOGFONTW& srcFont)
 {
-	memset(&font, 0, sizeof(LOGFONTW));
-	wcscpy_s(font.lfFaceName, pFaceName);
-	font.lfHeight = lHeight;
-	font.lfWeight = 400;
-	font.lfCharSet = bCharSet;
-	font.lfQuality = 5;
+	memset(&dstFont, 0, sizeof(LOGFONTW));
+	wcscpy_s(dstFont.lfFaceName, srcFont.lfFaceName);
+	dstFont.lfHeight = srcFont.lfHeight;
+	dstFont.lfWeight = 400;
+	dstFont.lfCharSet = srcFont.lfCharSet;
+	dstFont.lfQuality = 5;
 
 	return 0;
 }
@@ -1486,37 +1487,12 @@ int PP1_FontSet::mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPre
 	metrics.cbSize = sizeof(NONCLIENTMETRICS);
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &metrics, 0);
 
-	//error C2664: 'int PP1_FontSet::mySetFontItem(LOGFONTW &,ATL::CString &,LONG &,BYTE &)':
-	//	cannot convert argument 2 from 'WCHAR [32]' to 'ATL::CString &'
-	mySetFontItem2(metrics.lfCaptionFont,
-		tagSet.metrics.lfCaptionFont.lfFaceName,
-		tagSet.metrics.lfCaptionFont.lfHeight,
-		tagSet.metrics.lfCaptionFont.lfCharSet);
-
-	mySetFontItem2(iconFont,
-		tagSet.iconFont.lfFaceName,
-		tagSet.iconFont.lfHeight,
-		tagSet.iconFont.lfCharSet);
-
-	mySetFontItem2(metrics.lfMenuFont,
-		tagSet.metrics.lfMenuFont.lfFaceName,
-		tagSet.metrics.lfMenuFont.lfHeight,
-		tagSet.metrics.lfMenuFont.lfCharSet);
-
-	mySetFontItem2(metrics.lfMessageFont,
-		tagSet.metrics.lfMessageFont.lfFaceName,
-		tagSet.metrics.lfMessageFont.lfHeight,
-		tagSet.metrics.lfMessageFont.lfCharSet);
-
-	mySetFontItem2(metrics.lfSmCaptionFont,
-		tagSet.metrics.lfSmCaptionFont.lfFaceName,
-		tagSet.metrics.lfSmCaptionFont.lfHeight,
-		tagSet.metrics.lfSmCaptionFont.lfCharSet);
-
-	mySetFontItem2(metrics.lfStatusFont,
-		tagSet.metrics.lfStatusFont.lfFaceName,
-		tagSet.metrics.lfStatusFont.lfHeight,
-		tagSet.metrics.lfStatusFont.lfCharSet);
+	mySetFontItem2(metrics.lfCaptionFont, tagSet.metrics.lfCaptionFont);
+	mySetFontItem2(iconFont, tagSet.iconFont);
+	mySetFontItem2(metrics.lfMenuFont, tagSet.metrics.lfMenuFont);
+	mySetFontItem2(metrics.lfMessageFont, tagSet.metrics.lfMessageFont);
+	mySetFontItem2(metrics.lfSmCaptionFont, tagSet.metrics.lfSmCaptionFont);
+	mySetFontItem2(metrics.lfStatusFont, tagSet.metrics.lfStatusFont);
 
 	m_tagIScur.nHS = tagSet.tagIS.nHS;
 	m_tagIScur.nVS = tagSet.tagIS.nVS;
