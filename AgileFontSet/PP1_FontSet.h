@@ -50,6 +50,9 @@ public:
 		//监测文本获得焦点
 		COMMAND_RANGE_CODE_HANDLER_EX(IDC_EDIT_ALLFONT, IDC_EDIT_TIP, EN_SETFOCUS, OnEnSetfoucsEdit)
 
+		//组合框按钮响应
+		COMMAND_HANDLER(IDC_COMBO_PRECONFIT, CBN_SELCHANGE, OnSelchangeCombo)
+
 		CHAIN_MSG_MAP(CPropertyPageImpl<PP1_FontSet>)
 		CHAIN_MSG_MAP(CDialogResize<PP1_FontSet>)
 	END_MSG_MAP()
@@ -169,6 +172,7 @@ public:
 	//LONG OnSetPageFocus(UINT wParam, LONG lParam);
 	LRESULT OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCheckAllFont(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 	// DDX variables
 	CString m_strChrome;
@@ -185,6 +189,7 @@ public:
 	CUpDownCtrl m_spin1;
 	CEditImpl m_edit1;
 	CComboImpl m_comboPreSet;
+	int m_nComboCurSel;
 
 	unsigned m_nOldHS;
 	unsigned m_nOldVS;

@@ -310,6 +310,36 @@ LRESULT PP1_FontSet::OnCheckAllFont(WORD wNotifyCode, WORD wID, HWND hWndCtl, BO
 	return 0;
 }
 
+/*
+m_comboPreSet.AddString(L"µ±«∞≈‰÷√");		//0
+m_comboPreSet.AddString(L"æ…µƒ≈‰÷√");		//1
+m_comboPreSet.AddString(L"Win8.x≈‰÷√");		//2
+m_comboPreSet.AddString(L"Win10≈‰÷√");		//3
+*/
+LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	// TODO : Add Code for control notification handler.
+	m_nComboCurSel = m_comboPreSet.GetCurSel();	//◊È∫œøÚ—°‘Ò
+	switch (m_nComboCurSel)
+	{
+	case 0:
+		OnSetCurrent(wNotifyCode, wID, hWndCtl, bHandled);
+		break;
+	case 1:
+		break;
+	case 2:
+		OnSet8(wNotifyCode, wID, hWndCtl, bHandled);
+		break;
+	case 3:
+		OnSet10(wNotifyCode, wID, hWndCtl, bHandled);
+		break;
+	default:
+		break;
+	}
+
+	return 0;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // noMeiryoUI235Dlg.cpp
 
