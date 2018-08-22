@@ -442,9 +442,7 @@ int PP1_FontSet::getFontSize(int iFontHight)
 //获取当前设置的字体。
 void PP1_FontSet::getActualFont(void)
 {
-	//
-	// 获取单个字体的信息
-	//
+	//// 获取单个字体的信息
 
 	// 获取图标以外的字体信息。
 	m_metrics.cbSize = sizeof(NONCLIENTMETRICSW);
@@ -460,6 +458,10 @@ void PP1_FontSet::getActualFont(void)
 		&m_iconFont,
 		0);
 	m_iconFontOld = m_iconFont;	//保存一份到m_metricsOld
+
+	//保存当前字体信息
+	m_tagSetCur.metrics = m_metrics;
+	m_tagSetCur.iconFont = m_iconFont;
 
 	//保存当前字体信息。参考OnSet8的读取顺序
 	// 保存当前字体名称
@@ -486,14 +488,26 @@ void PP1_FontSet::getActualFont(void)
 	tagFontCur.vecCharset[4].second = m_metrics.lfSmCaptionFont.lfCharSet;
 	tagFontCur.vecCharset[5].second = m_metrics.lfStatusFont.lfCharSet;
 
-	// 保存当前图标间距
-	TagIS tagIS;	
+	////保存当前所有字体信息
+
+	// 将菜单字体的信息应用于其他字体的信息。
+	m_metricsAll = m_metrics;
+	m_iconFontAll = m_iconFont;
+	m_metricsAll.lfCaptionFont = m_metricsAll.lfMenuFont;
+	m_iconFontAll = m_metricsAll.lfMenuFont;
+	m_metricsAll.lfMessageFont = m_metricsAll.lfMenuFont;
+	m_metricsAll.lfSmCaptionFont = m_metricsAll.lfMenuFont;
+	m_metricsAll.lfStatusFont = m_metricsAll.lfMenuFont;
+
+
+	//// 保存当前图标间距
+	TagIS tagIS;
 	if (GetIconSpacing(tagIS))
 	{
 		tagFontCur.vecIS[0].second = tagIS.nHS;
 		tagFontCur.vecIS[1].second = tagIS.nVS;
 	}
-	else	
+	else
 	{	//获取不成功，使用默认值
 		tagFontCur.vecIS[0].second = 80;
 		tagFontCur.vecIS[1].second = 48;
@@ -501,29 +515,8 @@ void PP1_FontSet::getActualFont(void)
 	m_tagIScur.nHS = m_nOldHS = tagFontCur.vecIS[0].second;
 	m_tagIScur.nVS = m_nOldVS = tagFontCur.vecIS[1].second;
 
-	//
-	// 获取所有字体的信息
-	//
-
-	// 获取图标以外的字体信息。
-	m_metricsAll.cbSize = sizeof(NONCLIENTMETRICSW);
-	SystemParametersInfo(SPI_GETNONCLIENTMETRICS,
-		sizeof(NONCLIENTMETRICSW),
-		&m_metricsAll,
-		0);
-
-	// 获取图标的字体信息。
-	SystemParametersInfo(SPI_GETICONTITLELOGFONT,
-		sizeof(LOGFONTW),
-		&m_iconFontAll,
-		0);
-
-	// 将菜单字体的信息应用于其他字体的信息。
-	m_metricsAll.lfCaptionFont = m_metricsAll.lfMenuFont;
-	m_iconFontAll = m_metricsAll.lfMenuFont;
-	m_metricsAll.lfMessageFont = m_metricsAll.lfMenuFont;
-	m_metricsAll.lfSmCaptionFont = m_metricsAll.lfMenuFont;
-	m_metricsAll.lfStatusFont = m_metricsAll.lfMenuFont;
+	//保存图标间距信息
+	m_tagSetCur.tagIS = tagIS;
 }
 
 /**

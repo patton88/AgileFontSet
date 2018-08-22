@@ -23,7 +23,7 @@ struct TagIS			//tag of Icon Spacing
 	unsigned nVS;	//ICON_VERTICAL_SPACING
 };
 
-class CPreset			//class Preset
+class CPreset		//class Preset
 {
 public:
 	CPreset& operator =(const CPreset& tag)	//重载赋值运算符
@@ -32,7 +32,7 @@ public:
 		{
 			this->metrics = tag.metrics;
 			this->iconFont = tag.iconFont;
-			this->tagIScur = tag.tagIScur;
+			this->tagIS = tag.tagIS;
 		}
 		return *this;
 	}
@@ -52,7 +52,7 @@ public:
 	vector<CString> vecRCN;
 	NONCLIENTMETRICSW metrics;
 	LOGFONTW iconFont;
-	TagIS tagIScur;		//存放当前图标间距
+	TagIS tagIS;				//存放图标间距
 
 	//C++11初始化列表。RCN1：Resource Center Name part 1
 	vector<CString> vecRCN1{

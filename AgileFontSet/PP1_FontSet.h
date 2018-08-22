@@ -297,6 +297,12 @@ public:
 	TagFontOld tagFontWin8;
 	TagFontOld tagFontWin10;
 
+	//CPreset m_tagSetCur(L"CUR");		//这种方式报错：error C2059: syntax error: 'string'
+	CPreset m_tagSetCur{ L"CUR" };		//只能使用C++11方式初始化
+	CPreset m_tagSetOld{ L"OLD" };
+	CPreset m_tagSetWin8{ L"8" };
+	CPreset m_tagSetWin10{ L"10" };
+
 	map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
 	
 	//DDX 9个Check按钮的状态
