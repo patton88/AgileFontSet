@@ -68,6 +68,24 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 
 	DoDataExchange();
 
+	//读取Win8.x、Win10预设配置
+	CString langPath;
+	int nRet;
+
+	langPath = getCurDir(1);		//g:\MyVC2017\noMeiryoUI235\Debug		//末尾无斜杠
+	langPath = langPath.Left(langPath.ReverseFind(L'\\') + 1);	//g:\MyVC2017\noMeiryoUI235\ //末尾含斜杠
+	langPath = langPath + L"lang\\" + L"English.lng";	//L"G:\\MyVC2017\\noMeiryoUI235\\lang\\English.lng"
+
+	readResourceFile(langPath);
+	nRet = readFontResource8(langPath);
+	if (!nRet) {
+		has8Preset = false;
+	}
+	nRet = readFontResource10(langPath);
+	if (!nRet) {
+		has10Preset = false;
+	}
+
 	//调用WinAPI获得当前桌面图标间距
 	ICONMETRICSW im;
 	im.cbSize = sizeof(ICONMETRICSW);	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
