@@ -1467,6 +1467,63 @@ int PP1_FontSet::mySetFontItem(LOGFONTW& font, CString& strFaceName, LONG& lHeig
 	return 0;
 }
 
+int PP1_FontSet::mySetFontItem2(LOGFONTW& font, wchar_t const* pFaceName, LONG& lHeight, BYTE& bCharSet)
+{
+	memset(&font, 0, sizeof(LOGFONTW));
+	wcscpy_s(font.lfFaceName, pFaceName);
+	font.lfHeight = lHeight;
+	font.lfWeight = 400;
+	font.lfCharSet = bCharSet;
+	font.lfQuality = 5;
+
+	return 0;
+}
+
+int PP1_FontSet::mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet)
+{
+	//为了保持除字体之外的NONCLIENTMETRICS的当前值，检索NONCLIENTMETRICS的内容。
+	FillMemory(&metrics, sizeof(NONCLIENTMETRICS), 0x00);
+	metrics.cbSize = sizeof(NONCLIENTMETRICS);
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &metrics, 0);
+
+	//error C2664: 'int PP1_FontSet::mySetFontItem(LOGFONTW &,ATL::CString &,LONG &,BYTE &)':
+	//	cannot convert argument 2 from 'WCHAR [32]' to 'ATL::CString &'
+	mySetFontItem2(metrics.lfCaptionFont,
+		tagSet.metrics.lfCaptionFont.lfFaceName,
+		tagSet.metrics.lfCaptionFont.lfHeight,
+		tagSet.metrics.lfCaptionFont.lfCharSet);
+
+	mySetFontItem2(iconFont,
+		tagSet.iconFont.lfFaceName,
+		tagSet.iconFont.lfHeight,
+		tagSet.iconFont.lfCharSet);
+
+	mySetFontItem2(metrics.lfMenuFont,
+		tagSet.metrics.lfMenuFont.lfFaceName,
+		tagSet.metrics.lfMenuFont.lfHeight,
+		tagSet.metrics.lfMenuFont.lfCharSet);
+
+	mySetFontItem2(metrics.lfMessageFont,
+		tagSet.metrics.lfMessageFont.lfFaceName,
+		tagSet.metrics.lfMessageFont.lfHeight,
+		tagSet.metrics.lfMessageFont.lfCharSet);
+
+	mySetFontItem2(metrics.lfSmCaptionFont,
+		tagSet.metrics.lfSmCaptionFont.lfFaceName,
+		tagSet.metrics.lfSmCaptionFont.lfHeight,
+		tagSet.metrics.lfSmCaptionFont.lfCharSet);
+
+	mySetFontItem2(metrics.lfStatusFont,
+		tagSet.metrics.lfStatusFont.lfFaceName,
+		tagSet.metrics.lfStatusFont.lfHeight,
+		tagSet.metrics.lfStatusFont.lfCharSet);
+
+	m_tagIScur.nHS = tagSet.tagIS.nHS;
+	m_tagIScur.nVS = tagSet.tagIS.nVS;
+
+	return 0;
+}
+
 int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFontOld& tagFont)
 {
 	//为了保持除字体之外的NONCLIENTMETRICS的当前值，检索NONCLIENTMETRICS的内容。
@@ -1533,7 +1590,8 @@ LRESULT PP1_FontSet::OnSet10(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, B
 LRESULT PP1_FontSet::OnSetCurrent(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
-	mySetFont(m_metrics, m_iconFont, tagFontCur);
+	//mySetFont(m_metrics, m_iconFont, tagFontCur);
+	mySetFont2(m_metrics, m_iconFont, m_tagSetCur);
 
 	// 更新显示。
 	theUpdateDisplay();
