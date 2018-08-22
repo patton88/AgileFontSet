@@ -247,8 +247,3 @@ LRESULT PP0_PropertySheet::OnApplyAll(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 	return true;
 }
 
-//保存到文件
-BOOL PP0_PropertySheet::SaveAllSetToFile()
-{
-	return true;
-}

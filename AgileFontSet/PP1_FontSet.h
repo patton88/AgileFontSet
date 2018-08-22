@@ -161,7 +161,7 @@ public:
 
 	//自定义类型前置申明
 	enum fontType;
-	struct TagFont;
+	struct TagFontOld;
 	struct TagIS;
 
 	// Message handlers
@@ -268,9 +268,12 @@ public:
 	LRESULT GetIconSpacingOld(vector<unsigned>& vecIS);
 
 	//必须放在TagFont定义之后。已有前置申明
-	int mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFont& tagFont);
+	int mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFontOld& tagFont);
 	//加载预设资源
-	int readFontResource(CString file, TagFont& tagFont);
+	int readFontResource(CString file, TagFontOld& tagFont);
+
+	BOOL SaveCurSetToFile();		//保存当前配置到文件
+	BOOL SaveCurSetToTag();		//保存当前配置到结构体变量
 
 	enum fontType {
 		allFont,
@@ -284,21 +287,69 @@ public:
 
 	struct TagIS			//tag of Icon Spacing
 	{
+		TagIS& operator =(const TagIS& tag)		//重载赋值运算符
+		{
+			if (this != &tag)
+			{
+				this->nHS = tag.nHS;
+				this->nVS = tag.nVS;
+			}
+			return *this;
+		}
+
 		unsigned nHS;	//ICON_HORIZONTAL_SPACING
 		unsigned nVS;	//ICON_VERTICAL_SPACING
 	};
 
-	struct TagFont
+	//C++11初始化列表。FN1：Font Name part 1
+	vector<CString> vecFN1{
+		L"CAPTION",
+		L"ICON",
+		L"MENU",
+		L"MESSAGE",
+		L"SMALLCAPTION",
+		L"STATUS"
+	};
+
+	//C++11初始化列表。FN2：Font Name part 2
+	vector<CString> vecFN2{
+		L"FACE",
+		L"SIZE",
+		L"CHARSET"
+	};
+
+	struct TagSet			//tag of Set
+	{
+		TagSet& operator =(const TagSet& tag)	//重载赋值运算符
+		{
+			if (this != &tag)
+			{
+				this->metrics = tag.metrics;
+				this->iconFont = tag.iconFont;
+				this->tagIScur = tag.tagIScur;
+			}
+			return *this;
+		}
+
+		TagSet(CString str) : strFN3(str) {}
+
+		CString strFN3;	//FN3：Font Name part 3
+		NONCLIENTMETRICSW metrics;
+		LOGFONTW iconFont;
+		TagIS tagIScur;		//存放当前图标间距
+	};
+
+	struct TagFontOld
 	{
 		vector<pair<CString, CString>> vecFaces;
 		vector<pair<CString, LONG>> vecSizes;
 		vector<pair<CString, BYTE>> vecCharset;
 		vector<pair<CString, unsigned>> vecIS;
 	};
-	TagFont tagFontCur;
-	TagFont tagFontOld;
-	TagFont tagFontWin8;
-	TagFont tagFontWin10;
+	TagFontOld tagFontCur;
+	TagFontOld tagFontOld;
+	TagFontOld tagFontWin8;
+	TagFontOld tagFontWin10;
 
 	map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
 	

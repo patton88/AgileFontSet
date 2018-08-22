@@ -1474,7 +1474,7 @@ int PP1_FontSet::mySetFontItem(LOGFONTW& font, CString& strFaceName, LONG& lHeig
 	return 0;
 }
 
-int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFont& tagFont)
+int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFontOld& tagFont)
 {
 	//为了保持除字体之外的NONCLIENTMETRICS的当前值，检索NONCLIENTMETRICS的内容。
 	FillMemory(&metrics, sizeof(NONCLIENTMETRICS), 0x00);
@@ -1850,7 +1850,7 @@ int PP1_FontSet::readFontResource10(CString file)
 }
 
 //加载预设资源
-int PP1_FontSet::readFontResource(CString file, TagFont& tagFont)
+int PP1_FontSet::readFontResource(CString file, TagFontOld& tagFont)
 {
 	// 字体名称容器循环赋值
 	for (auto& x : tagFont.vecFaces) {
@@ -2123,4 +2123,16 @@ LRESULT PP1_FontSet::GetIconSpacingOld(vector<unsigned>& vecIS)
 	}
 
 	return nRet;
+}
+
+//保存当前配置到结构体变量
+BOOL PP1_FontSet::SaveCurSetToTag()
+{
+	return true;
+}
+
+//保存当前配置到文件
+BOOL PP1_FontSet::SaveCurSetToFile()
+{
+	return true;
 }

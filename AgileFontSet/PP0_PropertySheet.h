@@ -48,7 +48,6 @@ public:
 	//LRESULT OnOK(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled)
 	//保存全部修改，不退出设置界面
 	LRESULT OnApplyAll(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled);
-	static BOOL PP0_PropertySheet::SaveAllSetToFile();	//保存到文件
 
 	LRESULT OnApply(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled);
 
