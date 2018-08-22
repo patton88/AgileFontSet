@@ -283,17 +283,17 @@ int APIENTRY VS2013_Win32App_wWinMain(
 			//bRefresh = TRUE;	//前面定义时已付默认初值TRUE
 			if (1 == iSeg)		//L"-r"必须是独立参数
 			{
-				iState = progsheet.m_pp1FontSet.GetIconSpacing(vecUnIS);		//获取当前图标间距
+				iState = progsheet.m_pp1FontSet.GetIconSpacingOld(vecUnIS);		//获取当前图标间距
 			}
 		}
 		else if (L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"" == vecStrIS[1])
 		{	//只有L"-h"、[L"-n"]。此时vecIntIS[0]、vecIntIS[1]都为-1
-			progsheet.m_pp1FontSet.GetIconSpacing(vecUnIS);		//获取当前图标间距
+			progsheet.m_pp1FontSet.GetIconSpacingOld(vecUnIS);		//获取当前图标间距
 			iState = GetDataEx(vecStrIS, vecUnIS, L"-h");
 		}
 		else if (L"-v" == StrToLower(vecStrIS[1].Left(2)) && L"" == vecStrIS[0])
 		{	//只有L"-v"、[L"-n"]
-			progsheet.m_pp1FontSet.GetIconSpacing(vecUnIS);		//获取当前图标间距
+			progsheet.m_pp1FontSet.GetIconSpacingOld(vecUnIS);		//获取当前图标间距
 			iState = GetDataEx(vecStrIS, vecUnIS, L"-v");
 		}
 		else if (L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"-v" == StrToLower(vecStrIS[1].Left(2)))

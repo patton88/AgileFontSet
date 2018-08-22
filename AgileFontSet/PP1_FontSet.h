@@ -159,6 +159,11 @@ public:
 		DDX_TEXT(IDC_EDIT_TIP, m_strTipFontName)
 	END_DDX_MAP()
 
+	//自定义类型前置申明
+	enum fontType;
+	struct TagFont;
+	struct TagIS;
+
 	// Message handlers
 	BOOL OnInitDialog(HWND hwndFocus, LPARAM lParam);
 	BOOL OnSetActive();
@@ -248,6 +253,8 @@ public:
 	int readFontSize(LONG& buffer, CString file, CString key);
 	//加载资源（用于字体字符集）。
 	int readFontCharset(BYTE& buffer, CString file, CString key);
+	//加载资源（用于图标间距）。
+	int readIconSpacing(unsigned& buffer, CString file, CString key);
 	//字体容器、字体选择容器初始化。tag是结构体struct缩写的前缀
 	void initTagFont(void);
 	void initSelFont(void);
@@ -257,7 +264,13 @@ public:
 	//应用设置，刷新桌面
 	LRESULT SetIconSpacing(unsigned iHS, unsigned iVS, BOOL bRefresh = TRUE);
 	//获取当前图标间距
-	LRESULT GetIconSpacing(vector<unsigned>& vecIS);
+	LRESULT GetIconSpacing(TagIS& tagIS);
+	LRESULT GetIconSpacingOld(vector<unsigned>& vecIS);
+
+	//必须放在TagFont定义之后。已有前置申明
+	int mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFont& tagFont);
+	//加载预设资源
+	int readFontResource(CString file, TagFont& tagFont);
 
 	enum fontType {
 		allFont,
@@ -269,13 +282,21 @@ public:
 		tipFont
 	};
 
+	struct TagIS			//tag of Icon Spacing
+	{
+		unsigned nHS;	//ICON_HORIZONTAL_SPACING
+		unsigned nVS;	//ICON_VERTICAL_SPACING
+	};
+
 	struct TagFont
 	{
 		vector<pair<CString, CString>> vecFaces;
 		vector<pair<CString, LONG>> vecSizes;
 		vector<pair<CString, BYTE>> vecCharset;
+		vector<pair<CString, unsigned>> vecIS;
 	};
 	TagFont tagFontCur;
+	TagFont tagFontOld;
 	TagFont tagFontWin8;
 	TagFont tagFontWin10;
 
@@ -315,6 +336,7 @@ public:
 
 	NONCLIENTMETRICSW m_metrics, m_metricsOld;
 	LOGFONTW m_iconFont, m_iconFontOld;
+	TagIS m_tagIScur;	//存放当前图标间距
 
 	NONCLIENTMETRICSW m_metricsAll;
 	LOGFONTW m_iconFontAll;
@@ -344,6 +366,5 @@ public:
 	/**语言资源 */
 	vector<CString> langResource;
 
-	//必须放在TagFont定义之后
-	int mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFont& tagFont);
+
 };

@@ -68,30 +68,30 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 
 	DoDataExchange();
 
-	//读取Win8.x、Win10预设配置
-	CString langPath;
-	int nRet;
+	////读取Win8.x、Win10预设配置
+	//CString langPath;
+	//int nRet;
 
-	langPath = getCurDir(1);		//g:\MyVC2017\noMeiryoUI235\Debug		//末尾无斜杠
-	langPath = langPath.Left(langPath.ReverseFind(L'\\') + 1);	//g:\MyVC2017\noMeiryoUI235\ //末尾含斜杠
-	langPath = langPath + L"lang\\" + L"English.lng";	//L"G:\\MyVC2017\\noMeiryoUI235\\lang\\English.lng"
+	//langPath = getCurDir(1);		//g:\MyVC2017\noMeiryoUI235\Debug		//末尾无斜杠
+	//langPath = langPath.Left(langPath.ReverseFind(L'\\') + 1);	//g:\MyVC2017\noMeiryoUI235\ //末尾含斜杠
+	//langPath = langPath + L"lang\\" + L"English.lng";	//L"G:\\MyVC2017\\noMeiryoUI235\\lang\\English.lng"
 
-	readResourceFile(langPath);
-	nRet = readFontResource8(langPath);
-	if (!nRet) {
-		has8Preset = false;
-	}
-	nRet = readFontResource10(langPath);
-	if (!nRet) {
-		has10Preset = false;
-	}
+	//readResourceFile(langPath);
+	//nRet = readFontResource8(langPath);
+	//if (!nRet) {
+	//	has8Preset = false;
+	//}
+	//nRet = readFontResource10(langPath);
+	//if (!nRet) {
+	//	has10Preset = false;
+	//}
 
 	//调用WinAPI获得当前桌面图标间距
-	ICONMETRICSW im;
-	im.cbSize = sizeof(ICONMETRICSW);	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
-	int ret = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
-	m_nOldHS = im.iHorzSpacing - 32;
-	m_nOldVS = im.iVertSpacing - 32;
+	//ICONMETRICSW im;
+	//im.cbSize = sizeof(ICONMETRICSW);	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
+	//int ret = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
+	//m_nOldHS = im.iHorzSpacing - 32;
+	//m_nOldVS = im.iVertSpacing - 32;
 
 	//当设置CEdit控件随对话框自动缩放后，spin控件与CEdit关联的代码放在这里OnInitDialog()中过早，会引起控件错位
 	////Windows内建控件CSpinButtonCtrl的WTL封装类为：CUpDownCtrl
@@ -486,6 +486,21 @@ void PP1_FontSet::getActualFont(void)
 	tagFontCur.vecCharset[4].second = m_metrics.lfSmCaptionFont.lfCharSet;
 	tagFontCur.vecCharset[5].second = m_metrics.lfStatusFont.lfCharSet;
 
+	// 保存当前图标间距
+	TagIS tagIS;	
+	if (GetIconSpacing(tagIS))
+	{
+		tagFontCur.vecIS[0].second = tagIS.nHS;
+		tagFontCur.vecIS[1].second = tagIS.nVS;
+	}
+	else	
+	{	//获取不成功，使用默认值
+		tagFontCur.vecIS[0].second = 80;
+		tagFontCur.vecIS[1].second = 48;
+	}
+	m_tagIScur.nHS = m_nOldHS = tagFontCur.vecIS[0].second;
+	m_tagIScur.nVS = m_nOldVS = tagFontCur.vecIS[1].second;
+
 	//
 	// 获取所有字体的信息
 	//
@@ -539,6 +554,12 @@ void PP1_FontSet::theUpdateDisplay(void)
 	m_strTipFontName = m_metrics.lfStatusFont.lfFaceName;
 	m_strTipFontName += L"   " + itos(getFontPointInt(&m_metrics.lfStatusFont, m_hWnd)) + L"pt";
 
+	//设置图标间距
+	if (m_spinHS.IsWindow() && m_spinVS.IsWindow())
+	{
+		m_spinHS.SetPos(m_tagIScur.nHS);
+		m_spinVS.SetPos(m_tagIScur.nVS);
+	}
 
 	//UpdateData(false);
 	DoDataExchange();
@@ -1479,6 +1500,9 @@ int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFo
 	mySetFontItem(metrics.lfStatusFont, tagFont.vecFaces[5].second,
 		tagFont.vecSizes[5].second, tagFont.vecCharset[5].second);
 
+	m_tagIScur.nHS = tagFont.vecIS[0].second;
+	m_tagIScur.nVS = tagFont.vecIS[1].second;
+
 	return 0;
 }
 
@@ -1568,6 +1592,10 @@ void PP1_FontSet::initTagFont(void)
 	tagFontWin8.vecCharset.push_back(make_pair("SMALLCAPTION_CHARSET_8", -1));
 	tagFontWin8.vecCharset.push_back(make_pair("STATUS_CHARSET_8", -1));
 
+	// 图标间距容器初始化
+	tagFontWin8.vecIS.push_back(make_pair("ICON_HORIZONTAL_SPACING_8", -1));
+	tagFontWin8.vecIS.push_back(make_pair("ICON_VERTICAL_SPACING_8", -1));
+
 	// tagFontWin10字体容器初始化
 	// 字体名称容器初始化
 	tagFontWin10.vecFaces.push_back(make_pair(L"CAPTION_FACE_10", L""));
@@ -1592,6 +1620,10 @@ void PP1_FontSet::initTagFont(void)
 	tagFontWin10.vecCharset.push_back(make_pair("MESSAGE_CHARSET_10", -1));
 	tagFontWin10.vecCharset.push_back(make_pair("SMALLCAPTION_CHARSET_10", -1));
 	tagFontWin10.vecCharset.push_back(make_pair("STATUS_CHARSET_10", -1));
+
+	// 图标间距容器初始化
+	tagFontWin10.vecIS.push_back(make_pair("ICON_HORIZONTAL_SPACING_10", -1));
+	tagFontWin10.vecIS.push_back(make_pair("ICON_VERTICAL_SPACING_10", -1));
 
 	// tagFontCur字体容器初始化
 	// 字体名称容器初始化
@@ -1618,6 +1650,9 @@ void PP1_FontSet::initTagFont(void)
 	tagFontCur.vecCharset.push_back(make_pair("SMALLCAPTION_CHARSET_CUR", -1));
 	tagFontCur.vecCharset.push_back(make_pair("STATUS_CHARSET_CUR", -1));
 
+	// 图标间距容器初始化
+	tagFontCur.vecIS.push_back(make_pair("ICON_HORIZONTAL_SPACING_CUR", -1));
+	tagFontCur.vecIS.push_back(make_pair("ICON_VERTICAL_SPACING_CUR", -1));
 }
 
 //map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
@@ -1798,54 +1833,43 @@ void PP1_FontSet::readResourceFile(CString file)
 	readResourceItem(file, L"FONT_CHARSET", L"1");
 }
 
-
-/**
-*加载Windows 8的字体预设资源
-*
-* @param文件资源文件名
-* @ return 0：设置失败1：设置成功
-*/
+//加载Windows 8的字体预设资源
 int PP1_FontSet::readFontResource8(CString file)
 {
-	// 字体名称容器循环赋值
-	for (auto& x : tagFontWin8.vecFaces) {
-		if (readFontFace(x.second, file, x.first) == 0) { return 0; }
-	}
-
-	// 字体大小容器循环赋值
-	for (auto& x : tagFontWin8.vecSizes) {
-		if (readFontSize(x.second, file, x.first) == 0) { return 0; }
-	}
-
-	// 字符集容器循环赋值
-	for (auto& x : tagFontWin8.vecCharset) {
-		if (readFontCharset(x.second, file, x.first) == 0) { return 0; }
-	}
+	readFontResource(file, tagFontWin8);
 
 	return 1;
 }
 
-/**
-*加载Windows 10的字体预设资源
-*
-* @param文件资源文件名
-* @ return 0：设置失败1：设置成功
-*/
+//加载Windows 10的字体预设资源
 int PP1_FontSet::readFontResource10(CString file)
 {
+	readFontResource(file, tagFontWin10);
+
+	return 1;
+}
+
+//加载预设资源
+int PP1_FontSet::readFontResource(CString file, TagFont& tagFont)
+{
 	// 字体名称容器循环赋值
-	for (auto& x : tagFontWin10.vecFaces) {
+	for (auto& x : tagFont.vecFaces) {
 		if (readFontFace(x.second, file, x.first) == 0) { return 0; }
 	}
 
 	// 字体大小容器循环赋值
-	for (auto& x : tagFontWin10.vecSizes) {
+	for (auto& x : tagFont.vecSizes) {
 		if (readFontSize(x.second, file, x.first) == 0) { return 0; }
 	}
 
 	// 字符集容器循环赋值
-	for (auto& x : tagFontWin10.vecCharset) {
+	for (auto& x : tagFont.vecCharset) {
 		if (readFontCharset(x.second, file, x.first) == 0) { return 0; }
+	}
+
+	// 图标间距容器循环赋值
+	for (auto& x : tagFont.vecIS) {
+		if (readIconSpacing(x.second, file, x.first) == 0) { return 0; }
 	}
 
 	return 1;
@@ -1900,6 +1924,17 @@ int PP1_FontSet::readFontSize(LONG& buffer, CString file, CString key)
 * @param键键名
 */
 int PP1_FontSet::readFontCharset(BYTE& buffer, CString file, CString key)
+{
+	int size;
+
+	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
+	size = GetPrivateProfileInt(L"PRESET", key, 1, file);
+	buffer = size;
+
+	return size;
+}
+
+int PP1_FontSet::readIconSpacing(unsigned& buffer, CString file, CString key)
 {
 	int size;
 
@@ -2027,7 +2062,39 @@ LRESULT PP1_FontSet::SetIconSpacing(unsigned iHS, unsigned iVS, BOOL bRefresh)
 }
 
 //获取当前图标间距
-LRESULT PP1_FontSet::GetIconSpacing(vector<unsigned>& vecIS)
+LRESULT PP1_FontSet::GetIconSpacing(TagIS& tagIS)
+{
+	int nRet;
+
+	//调用WinAPI设置桌面图标间距
+	ICONMETRICSW im;
+
+	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
+	im.cbSize = sizeof(ICONMETRICSW);
+
+	//读取当期ICONMETRICSW值
+	//SystemParametersInfo返回值Long，非零表示成功，零表示失败。会设置GetLastError
+	//ret返回1，非零表示成功
+	nRet = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
+
+	tagIS.nHS = im.iHorzSpacing - 32;	//Win7风格度量单位，需要-32
+	tagIS.nVS = im.iVertSpacing - 32;	//Win7风格度量单位，需要-32
+
+	if (tagIS.nHS >= 0 && tagIS.nHS <= 150 &&	// 两个数字都位于0-150之间
+		tagIS.nVS >= 0 && tagIS.nVS <= 150)
+	{	//获取当前图标间距成功
+		nRet = 1;
+	}
+	else
+	{
+		nRet = 0;
+	}
+
+	return nRet;
+}
+
+//获取当前图标间距
+LRESULT PP1_FontSet::GetIconSpacingOld(vector<unsigned>& vecIS)
 {
 	int nRet;
 
