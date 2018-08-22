@@ -219,6 +219,7 @@
     <ClInclude Include="CComboImpl.h" />
     <ClInclude Include="CEditImpl.h" />
     <ClInclude Include="CommonFun.h" />
+    <ClInclude Include="CPreset.h" />
     <ClInclude Include="MainDlg.h" />
     <ClInclude Include="PP0_PropertySheet.h" />
     <ClInclude Include="PP1_FontSet.h" />

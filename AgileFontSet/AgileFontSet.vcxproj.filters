@@ -77,6 +77,9 @@
     <ClInclude Include="PP2_Readme.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CPreset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AgileFontSet.rc">

@@ -4,6 +4,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "CPreset.h"
 #include "resource.h"
 #include "CEditImpl.h"
 #include "CButtonImpl.h"
@@ -162,7 +163,6 @@ public:
 	//自定义类型前置申明
 	enum fontType;
 	struct TagFontOld;
-	struct TagIS;
 
 	// Message handlers
 	BOOL OnInitDialog(HWND hwndFocus, LPARAM lParam);
@@ -283,60 +283,6 @@ public:
 		messageFont,
 		paletteFont,
 		tipFont
-	};
-
-	struct TagIS			//tag of Icon Spacing
-	{
-		TagIS& operator =(const TagIS& tag)		//重载赋值运算符
-		{
-			if (this != &tag)
-			{
-				this->nHS = tag.nHS;
-				this->nVS = tag.nVS;
-			}
-			return *this;
-		}
-
-		unsigned nHS;	//ICON_HORIZONTAL_SPACING
-		unsigned nVS;	//ICON_VERTICAL_SPACING
-	};
-
-	//C++11初始化列表。FN1：Font Name part 1
-	vector<CString> vecFN1{
-		L"CAPTION",
-		L"ICON",
-		L"MENU",
-		L"MESSAGE",
-		L"SMALLCAPTION",
-		L"STATUS"
-	};
-
-	//C++11初始化列表。FN2：Font Name part 2
-	vector<CString> vecFN2{
-		L"FACE",
-		L"SIZE",
-		L"CHARSET"
-	};
-
-	struct TagSet			//tag of Set
-	{
-		TagSet& operator =(const TagSet& tag)	//重载赋值运算符
-		{
-			if (this != &tag)
-			{
-				this->metrics = tag.metrics;
-				this->iconFont = tag.iconFont;
-				this->tagIScur = tag.tagIScur;
-			}
-			return *this;
-		}
-
-		TagSet(CString str) : strFN3(str) {}
-
-		CString strFN3;	//FN3：Font Name part 3
-		NONCLIENTMETRICSW metrics;
-		LOGFONTW iconFont;
-		TagIS tagIScur;		//存放当前图标间距
 	};
 
 	struct TagFontOld
