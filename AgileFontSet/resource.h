@@ -6,8 +6,6 @@
 #define IDD_PP1_FontSet                 103
 #define IDM_ABOUT                       104
 #define IDR_MAINFRAME                   105
-#define IDD_MAINDLG                     106
-#define IDD_PP1_FontSet_FONTSEL         107
 #define IDR_MENU1                       108
 #define IDD_PP2_README                  109
 #define IDI_ICON_HS                     201
@@ -26,9 +24,7 @@
 #define IDC_EDIT_MESSAGE                1011
 #define IDC_EDIT_PALETTE                1012
 #define IDC_EDIT_TIP                    1013
-#define IDC_CHECK_UNDERLINE             1014
 #define IDC_EDIT_README                 1015
-#define IDC_CHECK_STRIKE                1016
 #define IDC_STATIC_VERNO                1017
 #define IDC_ICON_HS                     1018
 #define IDC_ICON_VS                     1019
@@ -39,13 +35,10 @@
 #define IDC_STATIC_TIP                  1024
 #define IDC_STATIC_MESSAGE              1025
 #define IDC_STATIC_MENU                 1026
-#define IDC_STATIC_NAME                 1027
 #define IDC_STATIC_ICON_HS              1028
 #define IDC_STATIC_ICON_VS              1029
-#define IDC_STATIC_STYLE                1030
 #define IDC_PRECONFIT                   1031
 #define IDC_STATIC_PRECONFIT            1032
-#define IDC_STATIC_SIZE                 1033
 #define IDC_CHECK_ALLFONT               1034
 #define IDC_CHECK_TITLE                 1035
 #define IDC_CHECK_ICON                  1036
@@ -64,10 +57,6 @@
 #define IDC_BTN_APPLY                   1048
 #define IDC_BTN_LOAD_SET_FROM_FILE      1049
 #define IDC_BTN_SAVE_SET_TO_FILE        1050
-#define IDC_COMBO_NAME                  1051
-#define IDC_COMBO_STYLE                 1052
-#define IDC_COMBO_SIZE                  1053
-#define IDC_COMBO_CHARSET               1054
 #define IDC_GROUP_FONTSET               1055
 #define IDC_GROUP_ICON_SPACING_SET      1056
 #define IDC_GROUP_ICONSPACING_SET       1057
@@ -80,7 +69,6 @@
 #define IDM_SET_8                       32782
 #define IDM_COMPAT7                     32783
 #define IDM_SET_10                      32784
-#define IDC_STATIC_CHARSET              -1
 
 // Next default values for new objects
 // 

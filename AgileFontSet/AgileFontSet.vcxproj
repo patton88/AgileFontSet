@@ -148,6 +148,7 @@
       <ExceptionHandling />
       <DebugInformationFormat />
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/EHsc %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -202,7 +203,6 @@
     <ClCompile Include="CButtonImpl.cpp" />
     <ClCompile Include="CComboImpl.cpp" />
     <ClCompile Include="CEditImpl.cpp" />
-    <ClCompile Include="MainDlg.cpp" />
     <ClCompile Include="PP0_PropertySheet.cpp" />
     <ClCompile Include="PP1_FontSet.cpp" />
     <ClCompile Include="PP2_Readme.cpp" />
@@ -220,7 +220,6 @@
     <ClInclude Include="CEditImpl.h" />
     <ClInclude Include="CommonFun.h" />
     <ClInclude Include="CPreset.h" />
-    <ClInclude Include="MainDlg.h" />
     <ClInclude Include="PP0_PropertySheet.h" />
     <ClInclude Include="PP1_FontSet.h" />
     <ClInclude Include="PP2_Readme.h" />
@@ -237,6 +236,9 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="res\noMeiryoUI235.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="CButtonImpl" Collapsed="true">
+    <Position X="0.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAICAAAAACAACAAAAAAAAQACAgAAAAgAQAIAAA=</HashCode>
+      <FileName>CButtonImpl.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CComboImpl" Collapsed="true">
+    <Position X="5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAICAAAAACAACAAAABAAAAACAoAAAAgAAAIAAg=</HashCode>
+      <FileName>CComboImpl.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CEditImpl" Collapsed="true">
+    <Position X="2.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAISAAAAACAACAAAAAAAAAACAgAAAAAAAAIAAA=</HashCode>
+      <FileName>CEditImpl.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PP0_PropertySheet">
+    <Position X="0.5" Y="0.5" Width="5.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAACQAQAEEAAQgCIAoCAAAAAAAAEAAAQBAEBAAAA=</HashCode>
+      <FileName>PP0_PropertySheet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PP1_FontSet">
+    <Position X="7.25" Y="0.5" Width="7.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="PP1_FontSet::__unnamed_enum_000f_1">
+        <TypeIdentifier>
+          <NewMemberFileName>PP1_FontSet.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="PP1_FontSet::fontType">
+        <TypeIdentifier>
+          <NewMemberFileName>PP1_FontSet.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>3fBOYVMQDDCBxZHAXECjAjQ6tDskQS2MHX1OWIDEDUQ=</HashCode>
+      <FileName>PP1_FontSet.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PP2_Readme">
+    <Position X="0.5" Y="11" Width="6.25" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="PP2_Readme::__unnamed_enum_0011_1">
+        <TypeIdentifier>
+          <NewMemberFileName>PP2_Readme.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AQAAAAEAQAAAgAAAAgAAAAAAByAEAAAAAAACAAAAAAA=</HashCode>
+      <FileName>PP2_Readme.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPreset">
+    <Position X="0.5" Y="5.25" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAIAAAgAAgAAEAAIAACEACAAAAABQgAAAAAQA=</HashCode>
+      <FileName>CPreset.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="TagIS">
+    <Position X="0.5" Y="9" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAAAAAAAAAAABAAAAAAgAAAAAAA=</HashCode>
+      <FileName>CPreset.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="tagFontInfo">
+    <Position X="3.75" Y="9" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>CPreset.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="SimSun" Size="9.26" />
+</ClassDiagram>
