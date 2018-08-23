@@ -90,8 +90,8 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	//ICONMETRICSW im;
 	//im.cbSize = sizeof(ICONMETRICSW);	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
 	//int ret = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
-	//m_nOldHS = im.iHorzSpacing - 32;
-	//m_nOldVS = im.iVertSpacing - 32;
+	//m_tagIScur.nHS = im.iHorzSpacing - 32;
+	//m_tagIScur.nVS = im.iVertSpacing - 32;
 
 	//当设置CEdit控件随对话框自动缩放后，spin控件与CEdit关联的代码放在这里OnInitDialog()中过早，会引起控件错位
 	////Windows内建控件CSpinButtonCtrl的WTL封装类为：CUpDownCtrl
@@ -100,14 +100,14 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	////Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
 	//m_spinHS.SetBuddy(GetDlgItem(IDC_EDIT_HS));
 	//m_spinHS.SetRange(0, 150);
-	//m_spinHS.SetPos(m_nOldHS);
+	//m_spinHS.SetPos(m_tagIScur.nHS);
 	////MoveWindow(rect.top, rect.bottom, rect.Width(), rect.Height(), true);
 
 	//m_spinVS.Attach(GetDlgItem(IDC_SPIN_VS));
 	////Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
 	//m_spinVS.SetBuddy(GetDlgItem(IDC_EDIT_VS));
 	//m_spinVS.SetRange(0, 150);
-	//m_spinVS.SetPos(m_nOldVS);
+	//m_spinVS.SetPos(m_tagIScur.nVS);
 
 	//显示Windows系统版本号
 	CString str;
@@ -121,9 +121,10 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	m_comboPreSet.ResetContent();	//CComboBox::ResetContent函数用于清空内容。
 	//注意设置组合框属性：Type为Drop List，Sort为False
 	m_comboPreSet.AddString(L"当前配置");		//0
-	m_comboPreSet.AddString(L"旧的配置");		//1
-	m_comboPreSet.AddString(L"Win8.x配置");		//2
-	m_comboPreSet.AddString(L"Win10配置");		//3
+	m_comboPreSet.AddString(L"进入时配置");		//1
+	m_comboPreSet.AddString(L"上一次配置");		//2
+	m_comboPreSet.AddString(L"Win8.x配置");		//3
+	m_comboPreSet.AddString(L"Win10配置");		//4
 	m_comboPreSet.SetCurSel(0);
 	//------------------------------------------------------
 
@@ -173,7 +174,7 @@ LRESULT PP1_FontSet::OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl)
 	if (m_spinHS.IsWindow() && m_spinVS.IsWindow())
 	{
 		HWND hwndParent = ::GetParent(m_hWnd);
-		if ((m_spinHS.GetPos() == m_nOldHS) && (m_spinVS.GetPos() == m_nOldVS))		//1	m_btnLoadDefaultCurrPage
+		if ((m_spinHS.GetPos() == m_tagIScur.nHS) && (m_spinVS.GetPos() == m_tagIScur.nVS))		//1	m_btnLoadDefaultCurrPage
 		{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), FALSE); }
 		else
 		{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), TRUE); }
@@ -198,11 +199,11 @@ LRESULT PP1_FontSet::OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl)
 			//MessageBoxW(L"请输入1到150之间的数值");
 			//MessageBoxW(g_lang.TranslateString(IDS_REC_UPDATES));
 			if(nID == IDC_EDIT_HS)
-				::SetWindowTextW(GetDlgItem(nID), (-1 == iHS) ? itos(m_nOldHS) : itos(iHS));
+				::SetWindowTextW(GetDlgItem(nID), (-1 == iHS) ? itos(m_tagIScur.nHS) : itos(iHS));
 			else
-				::SetWindowTextW(GetDlgItem(nID), (-1 == iVS) ? itos(m_nOldVS) : itos(iVS));
+				::SetWindowTextW(GetDlgItem(nID), (-1 == iVS) ? itos(m_tagIScur.nVS) : itos(iVS));
 
-			//::SetWindowTextW(GetDlgItem(nID), (nID == IDC_EDIT_HS) ? itos(m_nOldHS) : itos(m_nOldVS));
+			//::SetWindowTextW(GetDlgItem(nID), (nID == IDC_EDIT_HS) ? itos(m_tagIScur.nHS) : itos(m_tagIScur.nVS));
 			::SendMessageW(GetDlgItem(nID), WM_KEYDOWN, VK_END, 0);
 		}
 		else		//保存最新合法数值
@@ -269,7 +270,7 @@ LRESULT PP1_FontSet::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 		//Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
 		m_spinHS.SetBuddy(GetDlgItem(IDC_EDIT_HS));
 		m_spinHS.SetRange(0, 150);
-		m_spinHS.SetPos(m_nOldHS);
+		m_spinHS.SetPos(m_tagIScur.nHS);
 		//MoveWindow(rect.top, rect.bottom, rect.Width(), rect.Height(), true);
 	}
 	if (!m_spinVS.IsWindow())
@@ -278,13 +279,13 @@ LRESULT PP1_FontSet::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 		//Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
 		m_spinVS.SetBuddy(GetDlgItem(IDC_EDIT_VS));
 		m_spinVS.SetRange(0, 150);
-		m_spinVS.SetPos(m_nOldVS);
+		m_spinVS.SetPos(m_tagIScur.nVS);
 	}
 
 	HWND hwndParent = ::GetParent(m_hWnd);
 	//::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_DEFAULT_ALL), TRUE);	//0 m_btnLoadDefaultAll;		
 	//::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_RELOAD_SET_FROM_FILE), TRUE);	//2	m_btnReloadSetFromFile;	
-	//if ((m_spinHS.GetPos() == m_nOldHS) && (m_spinVS.GetPos() == m_nOldVS))		//1	m_btnLoadDefaultCurrPage
+	//if ((m_spinHS.GetPos() == m_tagIScur.nHS) && (m_spinVS.GetPos() == m_tagIScur.nVS))		//1	m_btnLoadDefaultCurrPage
 	//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), FALSE); }
 	//else
 	//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), TRUE); }
@@ -330,7 +331,7 @@ LRESULT PP1_FontSet::OnCheckAllFont(WORD wNotifyCode, WORD wID, HWND hWndCtl, BO
 
 /*
 m_comboPreSet.AddString(L"当前配置");		//0
-m_comboPreSet.AddString(L"旧的配置");		//1
+m_comboPreSet.AddString(L"上一次配置");		//1
 m_comboPreSet.AddString(L"Win8.x配置");		//2
 m_comboPreSet.AddString(L"Win10配置");		//3
 */
@@ -346,9 +347,11 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 	case 1:
 		break;
 	case 2:
-		OnSet8(wNotifyCode, wID, hWndCtl, bHandled);
 		break;
 	case 3:
+		OnSet8(wNotifyCode, wID, hWndCtl, bHandled);
+		break;
+	case 4:
 		OnSet10(wNotifyCode, wID, hWndCtl, bHandled);
 		break;
 	default:
@@ -452,84 +455,50 @@ LONG PP1_FontSet::getFontHight(int lFontSize)
 	return lFontHight;
 }
 
-//获取当前设置的字体。
+//获取当前配置
 void PP1_FontSet::getActualFont(void)
 {
-	//// 获取单个字体的信息
-
 	// 获取图标以外的字体信息。
 	m_metrics.cbSize = sizeof(NONCLIENTMETRICSW);
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS,
 		sizeof(NONCLIENTMETRICSW),
 		&m_metrics,
 		0);
-	m_metricsOld = m_metrics;	//保存一份到m_metricsOld
 
 	// 获取图标的字体信息。
 	SystemParametersInfo(SPI_GETICONTITLELOGFONT,
 		sizeof(LOGFONTW),
 		&m_iconFont,
 		0);
-	m_iconFontOld = m_iconFont;	//保存一份到m_metricsOld
 
-	//保存当前字体信息
+	//保存当前所有字体信息
+	SetAllFont(m_metrics, m_iconFont);
+
+	// 获得当前图标间距
+	if (!GetIconSpacing(m_tagIScur))
+	{	//获取不成功，使用默认值
+		m_tagIScur.nHS = 80;
+		m_tagIScur.nVS = 48;
+	}
+
+	//保存当前配置，需要保存以下成员
 	m_tagSetCur.metrics = m_metrics;
 	m_tagSetCur.iconFont = m_iconFont;
+	m_tagSetCur.metricsAll = m_metricsAll;
+	m_tagSetCur.iconFontAll = m_iconFontAll;
+	m_tagSetCur.tagIS = m_tagIScur;
+}
 
-	//保存当前字体信息。参考OnSet8的读取顺序
-	// 保存当前字体名称
-	tagFontCur.vecFaces[0].second = m_metrics.lfCaptionFont.lfFaceName;
-	tagFontCur.vecFaces[1].second = m_iconFont.lfFaceName;
-	tagFontCur.vecFaces[2].second = m_metrics.lfMenuFont.lfFaceName;
-	tagFontCur.vecFaces[3].second = m_metrics.lfMessageFont.lfFaceName;
-	tagFontCur.vecFaces[4].second = m_metrics.lfSmCaptionFont.lfFaceName;
-	tagFontCur.vecFaces[5].second = m_metrics.lfStatusFont.lfFaceName;
-
-	// 保存当前字体大小。从字体高度H到字体大小S需要进行换算
-	tagFontCur.vecSizes[0].second = getFontSize(m_metrics.lfCaptionFont.lfHeight);
-	tagFontCur.vecSizes[1].second = getFontSize(m_iconFont.lfHeight);
-	tagFontCur.vecSizes[2].second = getFontSize(m_metrics.lfMenuFont.lfHeight);
-	tagFontCur.vecSizes[3].second = getFontSize(m_metrics.lfMessageFont.lfHeight);
-	tagFontCur.vecSizes[4].second = getFontSize(m_metrics.lfSmCaptionFont.lfHeight);
-	tagFontCur.vecSizes[5].second = getFontSize(m_metrics.lfStatusFont.lfHeight);
-
-	// 保存当前字体字符集
-	tagFontCur.vecCharset[0].second = m_metrics.lfCaptionFont.lfCharSet;
-	tagFontCur.vecCharset[1].second = m_iconFont.lfCharSet;
-	tagFontCur.vecCharset[2].second = m_metrics.lfMenuFont.lfCharSet;
-	tagFontCur.vecCharset[3].second = m_metrics.lfMessageFont.lfCharSet;
-	tagFontCur.vecCharset[4].second = m_metrics.lfSmCaptionFont.lfCharSet;
-	tagFontCur.vecCharset[5].second = m_metrics.lfStatusFont.lfCharSet;
-
-	////保存当前所有字体信息
-
-	// 将菜单字体的信息应用于其他字体的信息。
-	m_metricsAll = m_metrics;
-	m_iconFontAll = m_iconFont;
+// 将菜单字体的信息应用于其他字体的信息。
+void PP1_FontSet::SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont)
+{
+	m_metricsAll = metrics;
+	m_iconFontAll = iconFont;
 	m_metricsAll.lfCaptionFont = m_metricsAll.lfMenuFont;
 	m_iconFontAll = m_metricsAll.lfMenuFont;
 	m_metricsAll.lfMessageFont = m_metricsAll.lfMenuFont;
 	m_metricsAll.lfSmCaptionFont = m_metricsAll.lfMenuFont;
 	m_metricsAll.lfStatusFont = m_metricsAll.lfMenuFont;
-
-
-	//// 保存当前图标间距
-	TagIS tagIS;
-	if (GetIconSpacing(tagIS))
-	{
-		tagFontCur.vecIS[0].second = tagIS.nHS;
-		tagFontCur.vecIS[1].second = tagIS.nVS;
-	}
-	else
-	{	//获取不成功，使用默认值
-		tagFontCur.vecIS[0].second = 80;
-		tagFontCur.vecIS[1].second = 48;
-	}
-	m_tagIScur.nHS = m_nOldHS = tagFontCur.vecIS[0].second;
-	m_tagIScur.nVS = m_nOldVS = tagFontCur.vecIS[1].second;
-
-	//保存图标间距信息
-	m_tagSetCur.tagIS = tagIS;
 }
 
 /**
@@ -735,8 +704,9 @@ HFONT PP1_FontSet::createFont(LOGFONTW *font)
 LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	// TODO: Add validation code 
-	//EndDialog(wID);
-	//theSetFont(&m_metrics, &m_iconFont);
+
+	LOGFONTW iconFont = m_iconFont;
+	NONCLIENTMETRICSW metrics = m_metrics;
 
 	DoDataExchange(TRUE);		//控件to成员变量。缺省为FALSE-变量到控件
 
@@ -751,8 +721,6 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 	}
 	else if (m_iCheckTitle || m_iCheckIcon || m_iCheckMenu || m_iCheckMessage || m_iCheckPalette || m_iCheckTip)
 	{
-		LOGFONTW iconFont = m_iconFontOld;
-		NONCLIENTMETRICSW metrics = m_metricsOld;
 		if (m_iCheckTitle) metrics.lfCaptionFont = m_metrics.lfCaptionFont;
 		if (m_iCheckIcon) iconFont = m_iconFont;
 		if (m_iCheckMenu) metrics.lfMenuFont = m_metrics.lfMenuFont;
@@ -769,13 +737,13 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 	{
 		if (m_iCheckHS) {
 			unsigned nHS = m_spinHS.GetPos();
-			if (nHS >= 0 && nHS <= 150) m_nOldHS = nHS;
+			if (nHS >= 0 && nHS <= 150) m_tagIScur.nHS = nHS;
 		}
 		if (m_iCheckVS) {
 			unsigned nVS = m_spinVS.GetPos();
-			if (nVS >= 0 && nVS <= 150) m_nOldVS = nVS;
+			if (nVS >= 0 && nVS <= 150) m_tagIScur.nVS = nVS;
 		}
-		SetIconSpacing(m_nOldHS, m_nOldVS);
+		SetIconSpacing(m_tagIScur.nHS, m_tagIScur.nVS);
 	}
 
 	return 0;
@@ -1513,38 +1481,6 @@ int PP1_FontSet::mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPre
 	return 0;
 }
 
-int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFontOld& tagFont)
-{
-	//为了保持除字体之外的NONCLIENTMETRICS的当前值，检索NONCLIENTMETRICS的内容。
-	FillMemory(&metrics, sizeof(NONCLIENTMETRICS), 0x00);
-	metrics.cbSize = sizeof(NONCLIENTMETRICS);
-	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &metrics, 0);
-
-	//int SetFontItem(LOGFONTW& font, CString& strFaceName, LONG& lHeight, BYTE& bCharSet)
-	mySetFontItem(metrics.lfCaptionFont, tagFont.vecFaces[0].second,
-		tagFont.vecSizes[0].second, tagFont.vecCharset[0].second);
-
-	mySetFontItem(iconFont, tagFont.vecFaces[1].second,
-		tagFont.vecSizes[1].second, tagFont.vecCharset[1].second);
-
-	mySetFontItem(metrics.lfMenuFont, tagFont.vecFaces[2].second,
-		tagFont.vecSizes[2].second, tagFont.vecCharset[2].second);
-
-	mySetFontItem(metrics.lfMessageFont, tagFont.vecFaces[3].second,
-		tagFont.vecSizes[3].second, tagFont.vecCharset[3].second);
-
-	mySetFontItem(metrics.lfSmCaptionFont, tagFont.vecFaces[4].second,
-		tagFont.vecSizes[4].second, tagFont.vecCharset[4].second);
-
-	mySetFontItem(metrics.lfStatusFont, tagFont.vecFaces[5].second,
-		tagFont.vecSizes[5].second, tagFont.vecCharset[5].second);
-
-	m_tagIScur.nHS = tagFont.vecIS[0].second;
-	m_tagIScur.nVS = tagFont.vecIS[1].second;
-
-	return 0;
-}
-
 /**
 *设置Windows 8 / 8.1的预设值。
 */
@@ -1606,97 +1542,6 @@ LRESULT PP1_FontSet::OnUniqThread(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl
 	return 0;
 }
 
-//字体容器初始化。tag是结构体struct缩写的前缀
-void PP1_FontSet::initTagFont(void)
-{
-	// tagFontWin8字体容器初始化
-	// 字体名称容器初始化
-	tagFontWin8.vecFaces.push_back(make_pair(L"CAPTION_FACE_8", L""));		//Title
-	tagFontWin8.vecFaces.push_back(make_pair(L"ICON_FACE_8", L""));			//Icon
-	tagFontWin8.vecFaces.push_back(make_pair(L"MENU_FACE_8", L""));			//Menu
-	tagFontWin8.vecFaces.push_back(make_pair(L"MESSAGE_FACE_8", L""));		//Message
-	tagFontWin8.vecFaces.push_back(make_pair(L"SMALLCAPTION_FACE_8", L""));	//Palette Title
-	tagFontWin8.vecFaces.push_back(make_pair(L"STATUS_FACE_8", L""));		//Tip
-
-	// 字体大小容器初始化
-	tagFontWin8.vecSizes.push_back(make_pair(L"CAPTION_SIZE_8", -1));
-	tagFontWin8.vecSizes.push_back(make_pair(L"ICON_SIZE_8", -1));
-	tagFontWin8.vecSizes.push_back(make_pair(L"MENU_SIZE_8", -1));
-	tagFontWin8.vecSizes.push_back(make_pair(L"MESSAGE_SIZE_8", -1));
-	tagFontWin8.vecSizes.push_back(make_pair(L"SMALLCAPTION_SIZE_8", -1));
-	tagFontWin8.vecSizes.push_back(make_pair(L"STATUS_SIZE_8", -1));
-
-	// 字符集容器初始化
-	tagFontWin8.vecCharset.push_back(make_pair("CAPTION_CHARSET_8", -1));
-	tagFontWin8.vecCharset.push_back(make_pair("ICON_CHARSET_8", -1));
-	tagFontWin8.vecCharset.push_back(make_pair("MENU_CHARSET_8", -1));
-	tagFontWin8.vecCharset.push_back(make_pair("MESSAGE_CHARSET_8", -1));
-	tagFontWin8.vecCharset.push_back(make_pair("SMALLCAPTION_CHARSET_8", -1));
-	tagFontWin8.vecCharset.push_back(make_pair("STATUS_CHARSET_8", -1));
-
-	// 图标间距容器初始化
-	tagFontWin8.vecIS.push_back(make_pair("ICON_HORIZONTAL_SPACING_8", -1));
-	tagFontWin8.vecIS.push_back(make_pair("ICON_VERTICAL_SPACING_8", -1));
-
-	// tagFontWin10字体容器初始化
-	// 字体名称容器初始化
-	tagFontWin10.vecFaces.push_back(make_pair(L"CAPTION_FACE_10", L""));
-	tagFontWin10.vecFaces.push_back(make_pair(L"ICON_FACE_10", L""));
-	tagFontWin10.vecFaces.push_back(make_pair(L"MENU_FACE_10", L""));
-	tagFontWin10.vecFaces.push_back(make_pair(L"MESSAGE_FACE_10", L""));
-	tagFontWin10.vecFaces.push_back(make_pair(L"SMALLCAPTION_FACE_10", L""));
-	tagFontWin10.vecFaces.push_back(make_pair(L"STATUS_FACE_10", L""));
-
-	// 字体大小容器初始化
-	tagFontWin10.vecSizes.push_back(make_pair(L"CAPTION_SIZE_10", -1));
-	tagFontWin10.vecSizes.push_back(make_pair(L"ICON_SIZE_10", -1));
-	tagFontWin10.vecSizes.push_back(make_pair(L"MENU_SIZE_10", -1));
-	tagFontWin10.vecSizes.push_back(make_pair(L"MESSAGE_SIZE_10", -1));
-	tagFontWin10.vecSizes.push_back(make_pair(L"SMALLCAPTION_SIZE_10", -1));
-	tagFontWin10.vecSizes.push_back(make_pair(L"STATUS_SIZE_10", -1));
-
-	// 字符集容器初始化
-	tagFontWin10.vecCharset.push_back(make_pair("CAPTION_CHARSET_10", -1));
-	tagFontWin10.vecCharset.push_back(make_pair("ICON_CHARSET_10", -1));
-	tagFontWin10.vecCharset.push_back(make_pair("MENU_CHARSET_10", -1));
-	tagFontWin10.vecCharset.push_back(make_pair("MESSAGE_CHARSET_10", -1));
-	tagFontWin10.vecCharset.push_back(make_pair("SMALLCAPTION_CHARSET_10", -1));
-	tagFontWin10.vecCharset.push_back(make_pair("STATUS_CHARSET_10", -1));
-
-	// 图标间距容器初始化
-	tagFontWin10.vecIS.push_back(make_pair("ICON_HORIZONTAL_SPACING_10", -1));
-	tagFontWin10.vecIS.push_back(make_pair("ICON_VERTICAL_SPACING_10", -1));
-
-	// tagFontCur字体容器初始化
-	// 字体名称容器初始化
-	tagFontCur.vecFaces.push_back(make_pair(L"CAPTION_FACE_CUR", L""));
-	tagFontCur.vecFaces.push_back(make_pair(L"ICON_FACE_CUR", L""));
-	tagFontCur.vecFaces.push_back(make_pair(L"MENU_FACE_CUR", L""));
-	tagFontCur.vecFaces.push_back(make_pair(L"MESSAGE_FACE_CUR", L""));
-	tagFontCur.vecFaces.push_back(make_pair(L"SMALLCAPTION_FACE_CUR", L""));
-	tagFontCur.vecFaces.push_back(make_pair(L"STATUS_FACE_CUR", L""));
-
-	// 字体大小容器初始化
-	tagFontCur.vecSizes.push_back(make_pair(L"CAPTION_SIZE_CUR", -1));
-	tagFontCur.vecSizes.push_back(make_pair(L"ICON_SIZE_CUR", -1));
-	tagFontCur.vecSizes.push_back(make_pair(L"MENU_SIZE_CUR", -1));
-	tagFontCur.vecSizes.push_back(make_pair(L"MESSAGE_SIZE_CUR", -1));
-	tagFontCur.vecSizes.push_back(make_pair(L"SMALLCAPTION_SIZE_CUR", -1));
-	tagFontCur.vecSizes.push_back(make_pair(L"STATUS_SIZE_CUR", -1));
-
-	// 字符集容器初始化
-	tagFontCur.vecCharset.push_back(make_pair("CAPTION_CHARSET_CUR", -1));
-	tagFontCur.vecCharset.push_back(make_pair("ICON_CHARSET_CUR", -1));
-	tagFontCur.vecCharset.push_back(make_pair("MENU_CHARSET_CUR", -1));
-	tagFontCur.vecCharset.push_back(make_pair("MESSAGE_CHARSET_CUR", -1));
-	tagFontCur.vecCharset.push_back(make_pair("SMALLCAPTION_CHARSET_CUR", -1));
-	tagFontCur.vecCharset.push_back(make_pair("STATUS_CHARSET_CUR", -1));
-
-	// 图标间距容器初始化
-	tagFontCur.vecIS.push_back(make_pair("ICON_HORIZONTAL_SPACING_CUR", -1));
-	tagFontCur.vecIS.push_back(make_pair("ICON_VERTICAL_SPACING_CUR", -1));
-}
-
 //map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
 //字体选择容器初始化。
 void PP1_FontSet::initSelFont(void)
@@ -1713,8 +1558,7 @@ void PP1_FontSet::initSelFont(void)
 //我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
 void PP1_FontSet::initializeLocale(void)
 {
-	//字体容器、字体选择容器初始化。tag是结构体struct缩写的前缀
-	initTagFont();
+	//字体选择容器初始化。tag是结构体struct缩写的前缀
 	initSelFont();
 
 	CString langPath;
@@ -1924,32 +1768,6 @@ int PP1_FontSet::readFontResource10(CString file)
 	return 1;
 }
 
-//加载预设资源
-int PP1_FontSet::readFontResource(CString file, TagFontOld& tagFont)
-{
-	// 字体名称容器循环赋值
-	for (auto& x : tagFont.vecFaces) {
-		if (readFontFace(x.second, file, x.first) == 0) { return 0; }
-	}
-
-	// 字体大小容器循环赋值
-	for (auto& x : tagFont.vecSizes) {
-		if (readFontSize(x.second, file, x.first) == 0) { return 0; }
-	}
-
-	// 字符集容器循环赋值
-	for (auto& x : tagFont.vecCharset) {
-		if (readFontCharset(x.second, file, x.first) == 0) { return 0; }
-	}
-
-	// 图标间距容器循环赋值
-	for (auto& x : tagFont.vecIS) {
-		if (readIconSpacing(x.second, file, x.first) == 0) { return 0; }
-	}
-
-	return 1;
-}
-
 /**
 *加载资源（用于字体名称）。
 *
@@ -1980,20 +1798,6 @@ int PP1_FontSet::readFontFace2(wchar_t* buffer, CString file, CString key)
 	return len;
 }
 
-int PP1_FontSet::readFontFace(CString& buffer, CString file, CString key)
-{
-	wchar_t buf[255];
-	int len;
-
-	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	len = GetPrivateProfileString(L"PRESET", key, L"", buf, 255, file);
-	if (len > 0) {
-		buffer = buf;
-	}
-
-	return len;
-}
-
 /**
 *加载资源（字体大小）。
 *
@@ -2012,17 +1816,6 @@ LONG PP1_FontSet::readFontSize2(LONG* buffer, CString file, CString key)
 	return *buffer;
 }
 
-int PP1_FontSet::readFontSize(LONG& buffer, CString file, CString key)
-{
-	int size;
-
-	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	size = GetPrivateProfileInt(L"PRESET", key, 0, file);
-	buffer = size;
-
-	return size;
-}
-
 /**
 *加载资源（用于字体字符集）。
 *
@@ -2037,17 +1830,6 @@ int PP1_FontSet::readFontCharset2(BYTE* buffer, CString file, CString key)
 	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
 	iSize = GetPrivateProfileInt(L"PRESET", key, 0, file);
 	*buffer = iSize;
-
-	return iSize;
-}
-
-int PP1_FontSet::readFontCharset(BYTE& buffer, CString file, CString key)
-{
-	int iSize;
-
-	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	iSize = GetPrivateProfileInt(L"PRESET", key, 0, file);
-	buffer = iSize;
 
 	return iSize;
 }

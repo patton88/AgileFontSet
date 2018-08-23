@@ -196,8 +196,8 @@ public:
 	CComboImpl m_comboPreSet;
 	int m_nComboCurSel;
 
-	unsigned m_nOldHS;
-	unsigned m_nOldVS;
+	//unsigned m_nOldHS;
+	//unsigned m_nOldVS;
 
 	//添加自noMeiryoUI235
 	LRESULT OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -252,18 +252,14 @@ public:
 	//加载Windows 10的字体预设资源
 	int readFontResource10(CString file);
 	//加载资源（用于字体名称）。
-	int readFontFace(CString &buffer, CString file, CString key);
 	int readFontFace2(wchar_t* buffer, CString file, CString key);
 	//加载资源（字体大小）。
-	int readFontSize(LONG& buffer, CString file, CString key);
 	LONG readFontSize2(LONG* buffer, CString file, CString key);
 	//加载资源（用于字体字符集）。
-	int readFontCharset(BYTE& buffer, CString file, CString key);
 	int readFontCharset2(BYTE* buffer, CString file, CString key);
 	//加载资源（用于图标间距）。
 	int readIconSpacing(unsigned& buffer, CString file, CString key);
 	//字体容器、字体选择容器初始化。tag是结构体struct缩写的前缀
-	void initTagFont(void);
 	void initSelFont(void);
 	int mySetFontItem(LOGFONTW& font, CString& strFaceName, LONG& lHeight, BYTE& bCharSet);
 	int ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontName, HFONT& hFont, CEditImpl& edit);
@@ -275,11 +271,10 @@ public:
 	LRESULT GetIconSpacingOld(vector<unsigned>& vecIS);
 
 	//必须放在TagFont定义之后。已有前置申明
-	int mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFontOld& tagFont);
-	//加载预设资源
-	int readFontResource(CString file, TagFontOld& tagFont);
 	//加载预设资源
 	int readFontResource2(CString file, CPreset& tagSet);
+	// 将菜单字体的信息应用于其他字体的信息。
+	void SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont);
 
 	BOOL SaveCurSetToFile();		//保存当前配置到文件
 	BOOL SaveCurSetToTag();		//保存当前配置到结构体变量
@@ -297,23 +292,25 @@ public:
 		tipFont
 	};
 
-	struct TagFontOld
-	{
-		vector<pair<CString, CString>> vecFaces;
-		vector<pair<CString, LONG>> vecSizes;
-		vector<pair<CString, BYTE>> vecCharset;
-		vector<pair<CString, unsigned>> vecIS;
-	};
-	TagFontOld tagFontCur;
-	TagFontOld tagFontOld;
-	TagFontOld tagFontWin8;
-	TagFontOld tagFontWin10;
+	//struct TagFontOld
+	//{
+	//	vector<pair<CString, CString>> vecFaces;
+	//	vector<pair<CString, LONG>> vecSizes;
+	//	vector<pair<CString, BYTE>> vecCharset;
+	//	vector<pair<CString, unsigned>> vecIS;
+	//};
+	//TagFontOld tagFontCur;
+	//TagFontOld tagFontOld;
+	//TagFontOld tagFontWin8;
+	//TagFontOld tagFontWin10;
 
 	//CPreset m_tagSetCur(L"CUR");		//这种方式报错：error C2059: syntax error: 'string'
-	CPreset m_tagSetCur{ L"CUR" };		//只能使用C++11方式初始化
-	CPreset m_tagSetOld{ L"OLD" };
-	CPreset m_tagSetWin8{ L"8" };
-	CPreset m_tagSetWin10{ L"10" };
+	//只能使用C++11方式初始化
+	CPreset m_tagSetCur{ L"CUR" };		//0 当前显示配置	
+	CPreset m_tagSetOld{ L"OLD" };		//1 进入程序时的旧有配置
+	CPreset m_tagSetLast{ L"LAST" };		//2 上一次配置
+	CPreset m_tagSetWin8{ L"8" };		//3 Win8.x配置
+	CPreset m_tagSetWin10{ L"10" };		//4 Win10配置
 
 	map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
 	
@@ -349,9 +346,10 @@ public:
 
 	CString m_strSettingFile;
 
-	NONCLIENTMETRICSW m_metrics, m_metricsOld;
-	LOGFONTW m_iconFont, m_iconFontOld;
-	TagIS m_tagIScur;	//存放当前图标间距
+	//存放当前配置
+	NONCLIENTMETRICSW m_metrics;
+	LOGFONTW m_iconFont;
+	TagIS m_tagIScur;
 
 	NONCLIENTMETRICSW m_metricsAll;
 	LOGFONTW m_iconFontAll;
@@ -380,6 +378,4 @@ public:
 	bool WIN8_SIZE = true;
 	/**语言资源 */
 	vector<CString> langResource;
-
-
 };

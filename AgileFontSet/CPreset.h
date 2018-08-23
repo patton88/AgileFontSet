@@ -40,6 +40,8 @@ public:
 		{
 			this->metrics = tag.metrics;
 			this->iconFont = tag.iconFont;
+			this->metricsAll = tag.metricsAll;
+			this->iconFontAll = tag.iconFontAll;
 			this->tagIS = tag.tagIS;
 		}
 		return *this;
@@ -68,16 +70,12 @@ public:
 		L"ICON_VERTICAL_SPACING"
 	};
 
-
-	//map<RCN2, map<RCN1, tagFontInfo>> mapRCN2;
-	//map<CString, pair<CString, tagFontInfo>> mapRCNb;
-
-	//map<RCN1, tagFontInfo>> mapRCN;
+	//用于循环处理的关键数据结构mapRCN
 	map<CString, tagFontInfo> mapRCN;
 
 	//生成读写ini文件时的键值名
 	CPreset(CString str) : strRCN3(str)	{
-
+		//生成一种配置所包含的字符标识容器数组vecRCN
 		for(unsigned j = 0; j < vecRCN2.size(); j++) {
 			for (unsigned i = 0; i < vecRCN1.size(); i++) {
 				vecRCN.push_back(vecRCN1[i] + L"_" + vecRCN1[j] + L"_" + strRCN3);
@@ -86,8 +84,6 @@ public:
 		}
 		vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
 		vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
-
-		//mapRCN[vecRCN1[0] + L"_" + vecRCN2[0] + L"_" + strRCN3] = &metrics.lfCaptionFont.lfFaceName;
 
 		//为已创建的mapRCN元素赋值
 		mapRCN[vecRCN1[0]].m0_strFace = metrics.lfCaptionFont.lfFaceName;
@@ -115,17 +111,27 @@ public:
 		mapRCN[vecRCN1[5]].m2_bCharset = &metrics.lfStatusFont.lfCharSet;
 	}
 
+	// 将菜单字体的信息应用于其他字体的信息。
+	void SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont)
+	{
+		metricsAll = metrics;
+		iconFontAll = iconFont;
+		metricsAll.lfCaptionFont = metricsAll.lfMenuFont;
+		iconFontAll = metricsAll.lfMenuFont;
+		metricsAll.lfMessageFont = metricsAll.lfMenuFont;
+		metricsAll.lfSmCaptionFont = metricsAll.lfMenuFont;
+		metricsAll.lfStatusFont = metricsAll.lfMenuFont;
+	}
+
 	const CString strRCN3;	//RCN3：Resource Center Name part 3
 	vector<CString> vecRCN;
-	//map<CString, LOGFONTW*> mapRCN;
- 	NONCLIENTMETRICSW metrics;
-	LOGFONTW iconFont, theIS;
 
-	//为便于循环处理，用tagLOGFONTW的lfHeight存放nHS、用lfWidth存放nVS
-	//typedef struct tagLOGFONTW
-	//{
-	//	LONG      lfHeight;
-	//	LONG      lfWidth;
+	//赋值操作时，需要复制以下成员
+	NONCLIENTMETRICSW metrics;
+	LOGFONTW iconFont;
+
+	NONCLIENTMETRICSW metricsAll;
+	LOGFONTW iconFontAll;
 
 	TagIS tagIS;				//存放图标间距
 

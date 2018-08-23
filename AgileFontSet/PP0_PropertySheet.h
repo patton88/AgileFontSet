@@ -32,7 +32,7 @@ public:
 	BEGIN_MSG_MAP(PP0_PropertySheet)
 		//MSG_WM_INITDIALOG(OnInitDialog)
 		MSG_WM_SHOWWINDOW(OnShowWindow)
-		COMMAND_ID_HANDLER(IDOK, OnApplyAll)					// 应用设置，退出设置界面
+		COMMAND_ID_HANDLER(IDOK, OnApplyAll)						// 应用设置，退出设置界面
 		//COMMAND_ID_HANDLER(IDM_ABOUT, OnAppAbout)				// 响应关于菜单项
 		//COMMAND_HANDLER(IDOK, BN_CLICKED, OnSaveAllToFile)
 		COMMAND_HANDLER(IDC_BTN_APPLY, BN_CLICKED, OnApply)		// 应用设置，不退出设置界面
