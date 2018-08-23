@@ -2109,24 +2109,24 @@ int PP1_FontSet::readFontSize(LONG& buffer, CString file, CString key)
 */
 int PP1_FontSet::readFontCharset2(BYTE* buffer, CString file, CString key)
 {
-	int size;
+	int iSize;
 
 	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	size = GetPrivateProfileInt(L"PRESET", key, 1, file);
-	*buffer = size;
+	iSize = GetPrivateProfileInt(L"PRESET", key, 0, file);
+	*buffer = iSize;
 
-	return size;
+	return iSize;
 }
 
 int PP1_FontSet::readFontCharset(BYTE& buffer, CString file, CString key)
 {
-	int size;
+	int iSize;
 
 	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	size = GetPrivateProfileInt(L"PRESET", key, 1, file);
-	buffer = size;
+	iSize = GetPrivateProfileInt(L"PRESET", key, 0, file);
+	buffer = iSize;
 
-	return size;
+	return iSize;
 }
 
 int PP1_FontSet::readIconSpacing(unsigned& buffer, CString file, CString key)
@@ -2134,7 +2134,7 @@ int PP1_FontSet::readIconSpacing(unsigned& buffer, CString file, CString key)
 	int iSize;
 
 	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	iSize = GetPrivateProfileInt(L"PRESET", key, 1, file);
+	iSize = GetPrivateProfileInt(L"PRESET", key, 0, file);
 	buffer = iSize;
 
 	return iSize;
@@ -2143,7 +2143,7 @@ int PP1_FontSet::readIconSpacing(unsigned& buffer, CString file, CString key)
 //应用设置，刷新桌面
 LRESULT PP1_FontSet::SetIconSpacing(unsigned iHS, unsigned iVS, BOOL bRefresh)
 {
-	int ret;
+	int iRet;
 
 	//调用WinAPI设置桌面图标间距
 	//NONCLIENTMETRICS ncm;
@@ -2178,7 +2178,7 @@ LRESULT PP1_FontSet::SetIconSpacing(unsigned iHS, unsigned iVS, BOOL bRefresh)
 	//读取当期ICONMETRICSW值
 	//SystemParametersInfo返回值Long，非零表示成功，零表示失败。会设置GetLastError
 	//ret返回1，非零表示成功
-	ret = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
+	iRet = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
 
 	im.iHorzSpacing = iHS + 32;
 	im.iVertSpacing = iVS + 32;
@@ -2195,13 +2195,13 @@ LRESULT PP1_FontSet::SetIconSpacing(unsigned iHS, unsigned iVS, BOOL bRefresh)
 
 	//这几种合也行，修改桌面图标间距后才能立即生效
 	//修改桌面图标间距
-	ret = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, iHS + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-	ret = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, iVS + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+	iRet = ::SystemParametersInfo(SPI_ICONHORIZONTALSPACING, iHS + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+	iRet = ::SystemParametersInfo(SPI_ICONVERTICALSPACING, iVS + 32, NULL, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
 
 	//刷新桌面，立即生效
 	if (bRefresh)
 	{
-		ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+		iRet = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
 	}
 	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, NULL);		//可以
 	//ret = ::SystemParametersInfo(SPI_SETICONMETRICS, sizeof(ICONMETRICSW), &im, SPIF_UPDATEINIFILE);	//可以
