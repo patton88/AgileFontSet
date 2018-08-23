@@ -225,6 +225,7 @@ public:
 
 	void getActualFont(void);
 	void theUpdateDisplay(void);
+	void theUpdateDisplay2(void);
 	int getFontPointInt(LOGFONTW *font, HWND hWnd);
 	double getFontPoint(LOGFONTW *font, HWND hWnd);
 	HFONT createFont(LOGFONTW *font);
@@ -235,7 +236,11 @@ public:
 	BOOL loadFont(CString filename, CString section, LOGFONT* font);
 	BOOL loadFontInfo(CString filename);
 	int getDPI(void);
-	int getFontSize(int iFontHight);
+
+	//从字体高度获取字体大小。
+	int getFontSize(LONG iFontHight);
+	//从字体大小获取字体高度。
+	LONG getFontHight(int lFontSize);
 
 	//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
 	void initializeLocale(void);
@@ -252,7 +257,7 @@ public:
 	int readFontFace2(wchar_t* buffer, CString file, CString key);
 	//加载资源（字体大小）。
 	int readFontSize(LONG& buffer, CString file, CString key);
-	int readFontSize2(LONG* buffer, CString file, CString key);
+	LONG readFontSize2(LONG* buffer, CString file, CString key);
 	//加载资源（用于字体字符集）。
 	int readFontCharset(BYTE& buffer, CString file, CString key);
 	int readFontCharset2(BYTE* buffer, CString file, CString key);

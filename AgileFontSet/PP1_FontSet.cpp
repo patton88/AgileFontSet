@@ -424,8 +424,8 @@ BOOL PP1_FontSet::IsCtrl(HWND hWnd, CString str)
 	return TRUE; // continue enumeration
 }
 
-//获取字体大小。
-int PP1_FontSet::getFontSize(int iFontHight)
+//从字体高度获取字体大小。
+int PP1_FontSet::getFontSize(LONG lFontHight)
 {
 	//获得字体大小。从字体高度H到字体大小S需要进行换算，
 	//H = -(S * dpiY / 72)
@@ -433,10 +433,23 @@ int PP1_FontSet::getFontSize(int iFontHight)
 	//MulDiv(a, b, c) 就是计算 a * b / c，结果四舍五入
 	//m_metrics.lfCaptionFont.lfHeight = -MulDiv(fontSizes8[0], dpiY, 72);
 
-	//获取DPI。
-	int dpiY = getDPI();
-	int iSzie = -(iFontHight * 72 / dpiY);
+	int dpiY = getDPI();		//获取DPI。
+	int iSzie = -(lFontHight * 72 / dpiY);
 	return iSzie;
+}
+
+//从字体大小获取字体高度。
+LONG PP1_FontSet::getFontHight(int lFontSize)
+{
+	//获得字体大小。从字体高度H到字体大小S需要进行换算，
+	//H = -(S * dpiY / 72)
+	//S = -(H * 72 / dpiY)
+	//MulDiv(a, b, c) 就是计算 a * b / c，结果四舍五入
+	//m_metrics.lfCaptionFont.lfHeight = -MulDiv(fontSizes8[0], dpiY, 72);
+
+	int dpiY = getDPI();		//获取DPI。
+	int lFontHight = -(lFontSize * dpiY / 72);
+	return lFontHight;
 }
 
 //获取当前设置的字体。
@@ -517,6 +530,85 @@ void PP1_FontSet::getActualFont(void)
 
 	//保存图标间距信息
 	m_tagSetCur.tagIS = tagIS;
+}
+
+void PP1_FontSet::theUpdateDisplay2(void)
+{
+	// 僼僅儞僩柤丄億僀儞僩悢昞帵暥帤楍傪嶌惉偡傞丅
+	m_strAllFontName = m_metricsAll.lfMenuFont.lfFaceName;
+	m_strAllFontName += L"   " + itos(getFontPointInt(&(m_metricsAll.lfMenuFont), m_hWnd)) + L"pt";
+
+	m_strTitleFontName = m_metrics.lfCaptionFont.lfFaceName;
+	m_strTitleFontName += L"   " + itos(getFontPointInt(&(m_metrics.lfCaptionFont), m_hWnd)) + L"pt";
+
+	m_strIconFontName = m_iconFont.lfFaceName;
+	m_strIconFontName += L"   " + itos(getFontPointInt(&m_iconFont, m_hWnd)) + L"pt";
+
+	// 儊僯儏乕偲慖戰崁栚
+	m_strMenuFontName = m_metrics.lfMenuFont.lfFaceName;
+	m_strMenuFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMenuFont, m_hWnd)) + L"pt";
+
+	m_strMessageFontName = m_metrics.lfMessageFont.lfFaceName;
+	m_strMessageFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMessageFont, m_hWnd)) + L"pt";
+
+	m_strPaletteFontName = m_metrics.lfSmCaptionFont.lfFaceName;
+	m_strPaletteFontName += L"   " + itos(getFontPointInt(&m_metrics.lfSmCaptionFont, m_hWnd)) + L"pt";
+
+	m_strTipFontName = m_metrics.lfStatusFont.lfFaceName;
+	m_strTipFontName += L"   " + itos(getFontPointInt(&m_metrics.lfStatusFont, m_hWnd)) + L"pt";
+
+	//设置图标间距
+	if (m_spinHS.IsWindow() && m_spinVS.IsWindow())
+	{
+		m_spinHS.SetPos(m_tagIScur.nHS);
+		m_spinVS.SetPos(m_tagIScur.nVS);
+	}
+
+	//UpdateData(false);
+	DoDataExchange();
+
+	// 慖戰偟偨僼僅儞僩傪僥僉僗僩儃僢僋僗偵愝掕偡傞丅
+	if (m_fontAll != NULL) {
+		DeleteObject(m_fontAll);
+	}
+	m_fontAll = createFont(&m_metricsAll.lfMenuFont);
+	m_editAllFont.SetFont(m_fontAll);
+
+	if (m_fontTitle != NULL) {
+		DeleteObject(m_fontTitle);
+	}
+	m_fontTitle = createFont(&m_metrics.lfCaptionFont);
+	m_editTitleFont.SetFont(m_fontTitle);
+
+	if (m_fontIcon != NULL) {
+		DeleteObject(m_fontIcon);
+	}
+	m_fontIcon = createFont(&m_iconFont);
+	m_editIconFont.SetFont(m_fontIcon);
+
+	if (m_fontMenu != NULL) {
+		DeleteObject(m_fontMenu);
+	}
+	m_fontMenu = createFont(&m_metrics.lfMenuFont);
+	m_editMenuFont.SetFont(m_fontMenu);
+
+	if (m_fontMessage != NULL) {
+		DeleteObject(m_fontMessage);
+	}
+	m_fontMessage = createFont(&m_metrics.lfMessageFont);
+	m_editMessageFont.SetFont(m_fontMessage);
+
+	if (m_fontPalette != NULL) {
+		DeleteObject(m_fontPalette);
+	}
+	m_fontPalette = createFont(&m_metrics.lfSmCaptionFont);
+	m_editPaletteFont.SetFont(m_fontPalette);
+
+	if (m_fontTip != NULL) {
+		DeleteObject(m_fontTip);
+	}
+	m_fontTip = createFont(&m_metrics.lfStatusFont);
+	m_editTipFont.SetFont(m_fontTip);
 }
 
 /**
@@ -1949,13 +2041,17 @@ int PP1_FontSet::readFontFace2(wchar_t* buffer, CString file, CString key)
 	wchar_t buf[255];
 	int len;
 
+	//wcscpy_s是一个能够拷贝宽字符类型字符串的安全函数。它返回一个error_t类型的值。函数原型为:
+	//error_t wcscpy_s(wchar_t *strDestination, size_t numberOfCharacters, const wchar_t *strSource);
+
 	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
 	len = GetPrivateProfileString(L"PRESET", key, L"", buf, 255, file);
 	if (len > 0) {
 		//buffer = buf;
-		//在使用wcscpy_s这些之类的函数时，如果DesBuf是数组，记得用_countof求长度。
-		//CString str = buf;
-		wcscpy_s(buffer, wcslen(buf) + 1, buf);
+
+		//buffer是LOGFONTW类型：WCHAR lfFaceName[LF_FACESIZE];	//#define LF_FACESIZE 32 //Logical Font
+		//所以拷贝的字符串(含末尾\0)的总长度不能超过32
+		wcscpy_s(buffer, min(wcslen(buf) + 1, 32), buf);
 	}
 
 	return len;
@@ -1982,15 +2078,15 @@ int PP1_FontSet::readFontFace(CString& buffer, CString file, CString key)
 * @param文件资源文件名
 * @param键键名
 */
-int PP1_FontSet::readFontSize2(LONG* buffer, CString file, CString key)
+LONG PP1_FontSet::readFontSize2(LONG* buffer, CString file, CString key)
 {
-	int size;
+	int iSize;
 
 	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	size = GetPrivateProfileInt(L"PRESET", key, 0, file);
-	*buffer = size;
+	iSize = GetPrivateProfileInt(L"PRESET", key, 0, file);
+	*buffer = getFontHight(iSize);	//将获得的iSize转换为字体高返回
 
-	return size;
+	return *buffer;
 }
 
 int PP1_FontSet::readFontSize(LONG& buffer, CString file, CString key)
