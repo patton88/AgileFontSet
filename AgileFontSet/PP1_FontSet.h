@@ -252,16 +252,15 @@ public:
 	//加载Windows 10的字体预设资源
 	int readFontResource10(CString file);
 	//加载资源（用于字体名称）。
-	int readFontFace2(wchar_t* buffer, CString file, CString key);
+	int readFontFace(wchar_t* buffer, CString file, CString key);
 	//加载资源（字体大小）。
-	LONG readFontSize2(LONG* buffer, CString file, CString key);
+	LONG readFontSize(LONG* buffer, CString file, CString key);
 	//加载资源（用于字体字符集）。
-	int readFontCharset2(BYTE* buffer, CString file, CString key);
+	int readFontCharset(BYTE* buffer, CString file, CString key);
 	//加载资源（用于图标间距）。
 	int readIconSpacing(unsigned& buffer, CString file, CString key);
 	//字体容器、字体选择容器初始化。tag是结构体struct缩写的前缀
 	void initSelFont(void);
-	int mySetFontItem(LOGFONTW& font, CString& strFaceName, LONG& lHeight, BYTE& bCharSet);
 	int ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontName, HFONT& hFont, CEditImpl& edit);
 
 	//应用设置，刷新桌面
@@ -272,7 +271,7 @@ public:
 
 	//必须放在TagFont定义之后。已有前置申明
 	//加载预设资源
-	int readFontResource2(CString file, CPreset& tagSet);
+	int readFontResource(CString file, CPreset& tagSet);
 	// 将菜单字体的信息应用于其他字体的信息。
 	void SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont);
 	// 将当前显示配置保存到tagSet中
@@ -281,8 +280,8 @@ public:
 	BOOL SaveCurSetToFile();		//保存当前显示配置到文件
 	BOOL SaveCurSetToTag();		//保存当前显示配置到结构体变量
 
-	int mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet);
-	int mySetFontItem2(LOGFONTW& dstFont, LOGFONTW& srcFont);
+	int mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet);
+	int mySetFontItem(LOGFONTW& dstFont, LOGFONTW& srcFont);
 
 	enum fontType {
 		allFont,

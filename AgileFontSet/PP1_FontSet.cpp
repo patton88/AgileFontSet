@@ -336,23 +336,23 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 	switch (m_nComboCurSel)
 	{
 	case 0:		//0 进入程序时的旧有配置
-		mySetFont2(m_metrics, m_iconFont, m_tagSetOld);
+		mySetFont(m_metrics, m_iconFont, m_tagSetOld);
 		theUpdateDisplay();
 		break;
 	case 1:		//1 上一次配置
 		//tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
 		if (-1 != m_tagSetLast.tagIS.nHS) {
 			m_tagSetCur = m_tagSetLast;	//在mySetFont2()中，将会把当前配置写入m_tagSetLast，所以这里先保存
-			mySetFont2(m_metrics, m_iconFont, m_tagSetCur);
+			mySetFont(m_metrics, m_iconFont, m_tagSetCur);
 			theUpdateDisplay();
 		}
 		break;
 	case 2:		//2 Win8.x配置
-		mySetFont2(m_metrics, m_iconFont, m_tagSetWin8);
+		mySetFont(m_metrics, m_iconFont, m_tagSetWin8);
 		theUpdateDisplay();
 		break;
 	case 3:		//3 Win10配置
-		mySetFont2(m_metrics, m_iconFont, m_tagSetWin10);
+		mySetFont(m_metrics, m_iconFont, m_tagSetWin10);
 		theUpdateDisplay();
 		break;
 	default:
@@ -1445,24 +1445,8 @@ int PP1_FontSet::getDPI(void)
 	return dpiY;
 }
 
-int PP1_FontSet::mySetFontItem(LOGFONTW& font, CString& strFaceName, LONG& lHeight, BYTE& bCharSet)
-{
-	memset(&font, 0, sizeof(LOGFONTW));
-	//wcscpy_s(m_metrics.lfCaptionFont.lfFaceName, fontFaces8[0]);
-	wcscpy_s(font.lfFaceName, strFaceName);
-	//MulDiv(a, b, c) 就是计算 a * b / c，结果四舍五入
-	//m_metrics.lfCaptionFont.lfHeight = -MulDiv(fontSizes8[0], dpiY, 72);
-	font.lfHeight = -MulDiv(lHeight, getDPI(), 72);
-	font.lfWeight = 400;
-	//m_metrics.lfCaptionFont.lfCharSet = fontCharset8[0];
-	font.lfCharSet = bCharSet;
-	font.lfQuality = 5;
-
-	return 0;
-}
-
 //int PP1_FontSet::mySetFontItem2(LOGFONTW& font, wchar_t const* pFaceName, LONG& lHeight, BYTE& bCharSet)
-int PP1_FontSet::mySetFontItem2(LOGFONTW& dstFont, LOGFONTW& srcFont)
+int PP1_FontSet::mySetFontItem(LOGFONTW& dstFont, LOGFONTW& srcFont)
 {
 	memset(&dstFont, 0, sizeof(LOGFONTW));
 	wcscpy_s(dstFont.lfFaceName, srcFont.lfFaceName);
@@ -1473,7 +1457,7 @@ int PP1_FontSet::mySetFontItem2(LOGFONTW& dstFont, LOGFONTW& srcFont)
 
 	return 0;
 }
-int PP1_FontSet::mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet)
+int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet)
 {
 	//应用新配置前，保存当前显示配置到m_tagSetLast
 	SaveCurSet(m_tagSetLast);
@@ -1483,12 +1467,12 @@ int PP1_FontSet::mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPre
 	metrics.cbSize = sizeof(NONCLIENTMETRICS);
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &metrics, 0);
 
-	mySetFontItem2(metrics.lfCaptionFont, tagSet.metrics.lfCaptionFont);
-	mySetFontItem2(iconFont, tagSet.iconFont);
-	mySetFontItem2(metrics.lfMenuFont, tagSet.metrics.lfMenuFont);
-	mySetFontItem2(metrics.lfMessageFont, tagSet.metrics.lfMessageFont);
-	mySetFontItem2(metrics.lfSmCaptionFont, tagSet.metrics.lfSmCaptionFont);
-	mySetFontItem2(metrics.lfStatusFont, tagSet.metrics.lfStatusFont);
+	mySetFontItem(metrics.lfCaptionFont, tagSet.metrics.lfCaptionFont);
+	mySetFontItem(iconFont, tagSet.iconFont);
+	mySetFontItem(metrics.lfMenuFont, tagSet.metrics.lfMenuFont);
+	mySetFontItem(metrics.lfMessageFont, tagSet.metrics.lfMessageFont);
+	mySetFontItem(metrics.lfSmCaptionFont, tagSet.metrics.lfSmCaptionFont);
+	mySetFontItem(metrics.lfStatusFont, tagSet.metrics.lfStatusFont);
 
 	m_tagIScur.nHS = tagSet.tagIS.nHS;
 	m_tagIScur.nVS = tagSet.tagIS.nVS;
@@ -1506,7 +1490,7 @@ LRESULT PP1_FontSet::OnSet8(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BO
 {
 	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
 	//mySetFont(m_metrics, m_iconFont, tagFontWin8);
-	mySetFont2(m_metrics, m_iconFont, m_tagSetWin8);
+	mySetFont(m_metrics, m_iconFont, m_tagSetWin8);
 
 	// 更新显示。
 	theUpdateDisplay();
@@ -1521,7 +1505,7 @@ LRESULT PP1_FontSet::OnSet10(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, B
 {
 	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
 	//mySetFont(m_metrics, m_iconFont, tagFontWin10);
-	mySetFont2(m_metrics, m_iconFont, m_tagSetWin10);
+	mySetFont(m_metrics, m_iconFont, m_tagSetWin10);
 
 	// 更新显示。
 	theUpdateDisplay();
@@ -1536,7 +1520,7 @@ LRESULT PP1_FontSet::OnSetCurrent(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl
 {
 	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
 	//mySetFont(m_metrics, m_iconFont, tagFontCur);
-	mySetFont2(m_metrics, m_iconFont, m_tagSetCur);
+	mySetFont(m_metrics, m_iconFont, m_tagSetCur);
 
 	// 更新显示。
 	theUpdateDisplay();
@@ -1741,12 +1725,12 @@ void PP1_FontSet::readResourceFile(CString file)
 int PP1_FontSet::readFontResource8(CString file)
 {
 	//readFontResource(file, tagFontWin8);
-	readFontResource2(file, m_tagSetWin8);
+	readFontResource(file, m_tagSetWin8);
 	return 1;
 }
 
 //加载预设资源
-int PP1_FontSet::readFontResource2(CString file, CPreset& tagSet)
+int PP1_FontSet::readFontResource(CString file, CPreset& tagSet)
 {
 	// 读取字体容器循环赋值
 	CString str;
@@ -1754,25 +1738,25 @@ int PP1_FontSet::readFontResource2(CString file, CPreset& tagSet)
 		for (auto& rcn1 : tagSet.vecRCN1) {
 			str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
 			if (rcn2 == tagSet.vecRCN2[0]) {			// 字体名称容器赋值
-				if (readFontFace2(tagSet.mapRCN[rcn1].m0_strFace, file, str) == 0) { return 0; }
+				if (readFontFace(tagSet.mapRCN[rcn1].m0_strFace, file, str) == 0) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[1]) {	// 字体大小循环赋值
-				if (readFontSize2(tagSet.mapRCN[rcn1].m1_lHeight, file, str) == 0) { return 0; }
+				if (readFontSize(tagSet.mapRCN[rcn1].m1_lHeight, file, str) == 0) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[2]) {	// 字符集循环赋值
-				if (readFontCharset2(tagSet.mapRCN[rcn1].m2_bCharset, file, str) == 0) { return 0; }
+				if (readFontCharset(tagSet.mapRCN[rcn1].m2_bCharset, file, str) == 0) { return 0; }
 			}
 		}
 	}
+
+	//保存所有字体信息
+	tagSet.SetAllFont();
 
 	// 读取图标间距。读取不成功，使用默认值
 	if (readIconSpacing(tagSet.tagIS.nHS, file, tagSet.vecIS[0] + L"_" + tagSet.strRCN3) == 0) {
 		tagSet.tagIS.nHS = 80; }
 	if (readIconSpacing(tagSet.tagIS.nVS, file, tagSet.vecIS[1] + L"_" + tagSet.strRCN3) == 0) {
 		tagSet.tagIS.nVS = 48; }
-
-	//tagSet.metrics;
-	//tagSet.iconFont;
 
 	return 0;
 }
@@ -1781,7 +1765,7 @@ int PP1_FontSet::readFontResource2(CString file, CPreset& tagSet)
 int PP1_FontSet::readFontResource10(CString file)
 {
 	//readFontResource(file, tagFontWin10);
-	readFontResource2(file, m_tagSetWin10);
+	readFontResource(file, m_tagSetWin10);
 
 	return 1;
 }
@@ -1795,7 +1779,7 @@ int PP1_FontSet::readFontResource10(CString file)
 */
 // 字体名称
 //result = readFontFace(fontFaces8, file, _T("CAPTION_FACE_8"));		//CAPTION_FACE_8=Segoe UI
-int PP1_FontSet::readFontFace2(wchar_t* buffer, CString file, CString key)
+int PP1_FontSet::readFontFace(wchar_t* buffer, CString file, CString key)
 {
 	wchar_t buf[255];
 	int len;
@@ -1823,7 +1807,7 @@ int PP1_FontSet::readFontFace2(wchar_t* buffer, CString file, CString key)
 * @param文件资源文件名
 * @param键键名
 */
-LONG PP1_FontSet::readFontSize2(LONG* buffer, CString file, CString key)
+LONG PP1_FontSet::readFontSize(LONG* buffer, CString file, CString key)
 {
 	int iSize;
 
@@ -1841,7 +1825,7 @@ LONG PP1_FontSet::readFontSize2(LONG* buffer, CString file, CString key)
 * @param文件资源文件名
 * @param键键名
 */
-int PP1_FontSet::readFontCharset2(BYTE* buffer, CString file, CString key)
+int PP1_FontSet::readFontCharset(BYTE* buffer, CString file, CString key)
 {
 	int iSize;
 

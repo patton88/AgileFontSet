@@ -47,6 +47,18 @@ public:
 		return *this;
 	}
 
+	const CString strRCN3;	//RCN3：Resource Center Name part 3
+	vector<CString> vecRCN;
+
+	//赋值操作时，需要复制以下成员
+	NONCLIENTMETRICSW metrics;
+	LOGFONTW iconFont;
+
+	NONCLIENTMETRICSW metricsAll;
+	LOGFONTW iconFontAll;
+
+	TagIS tagIS;				//存放图标间距
+
 	//C++11初始化列表。RCN1：Resource Center Name part 1
 	vector<CString> vecRCN1{
 		L"CAPTION",
@@ -114,7 +126,7 @@ public:
 	}
 
 	// 将菜单字体的信息应用于其他字体的信息。
-	void SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont)
+	void SetAllFont()
 	{
 		metricsAll = metrics;
 		iconFontAll = iconFont;
@@ -124,21 +136,4 @@ public:
 		metricsAll.lfSmCaptionFont = metricsAll.lfMenuFont;
 		metricsAll.lfStatusFont = metricsAll.lfMenuFont;
 	}
-
-	const CString strRCN3;	//RCN3：Resource Center Name part 3
-	vector<CString> vecRCN;
-
-	//赋值操作时，需要复制以下成员
-	NONCLIENTMETRICSW metrics;
-	LOGFONTW iconFont;
-
-	NONCLIENTMETRICSW metricsAll;
-	LOGFONTW iconFontAll;
-
-	TagIS tagIS;				//存放图标间距
-
-
-
-
-
 };
