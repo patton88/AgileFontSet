@@ -109,6 +109,8 @@ public:
 		mapRCN[vecRCN1[5]].m0_strFace = metrics.lfStatusFont.lfFaceName;
 		mapRCN[vecRCN1[5]].m1_lHeight = &metrics.lfStatusFont.lfHeight;
 		mapRCN[vecRCN1[5]].m2_bCharset = &metrics.lfStatusFont.lfCharSet;
+
+		tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
 	}
 
 	// 将菜单字体的信息应用于其他字体的信息。

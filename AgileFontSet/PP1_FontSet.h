@@ -275,9 +275,11 @@ public:
 	int readFontResource2(CString file, CPreset& tagSet);
 	// 将菜单字体的信息应用于其他字体的信息。
 	void SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont);
+	// 将当前显示配置保存到tagSet中
+	void SaveCurSet(CPreset& tagSet);
 
-	BOOL SaveCurSetToFile();		//保存当前配置到文件
-	BOOL SaveCurSetToTag();		//保存当前配置到结构体变量
+	BOOL SaveCurSetToFile();		//保存当前显示配置到文件
+	BOOL SaveCurSetToTag();		//保存当前显示配置到结构体变量
 
 	int mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet);
 	int mySetFontItem2(LOGFONTW& dstFont, LOGFONTW& srcFont);
@@ -346,7 +348,7 @@ public:
 
 	CString m_strSettingFile;
 
-	//存放当前配置
+	//存放当前显示配置
 	NONCLIENTMETRICSW m_metrics;
 	LOGFONTW m_iconFont;
 	TagIS m_tagIScur;

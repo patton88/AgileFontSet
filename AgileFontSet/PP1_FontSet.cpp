@@ -120,7 +120,7 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	//m_comboPreSet.Clear();			//不是清空CComboBox内容。只是删除CComboBox的编辑控件的当前选择（如果有的话）。
 	m_comboPreSet.ResetContent();	//CComboBox::ResetContent函数用于清空内容。
 	//注意设置组合框属性：Type为Drop List，Sort为False
-	m_comboPreSet.AddString(L"当前配置");		//0
+	m_comboPreSet.AddString(L"当前显示配置");		//0
 	m_comboPreSet.AddString(L"进入时配置");		//1
 	m_comboPreSet.AddString(L"上一次配置");		//2
 	m_comboPreSet.AddString(L"Win8.x配置");		//3
@@ -330,7 +330,7 @@ LRESULT PP1_FontSet::OnCheckAllFont(WORD wNotifyCode, WORD wID, HWND hWndCtl, BO
 }
 
 /*
-m_comboPreSet.AddString(L"当前配置");		//0
+m_comboPreSet.AddString(L"当前显示配置");		//0
 m_comboPreSet.AddString(L"上一次配置");		//1
 m_comboPreSet.AddString(L"Win8.x配置");		//2
 m_comboPreSet.AddString(L"Win10配置");		//3
@@ -341,18 +341,29 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 	m_nComboCurSel = m_comboPreSet.GetCurSel();	//组合框选择
 	switch (m_nComboCurSel)
 	{
-	case 0:
-		OnSetCurrent(wNotifyCode, wID, hWndCtl, bHandled);
+	case 0:		//0 当前显示配置	
+		mySetFont2(m_metrics, m_iconFont, m_tagSetCur);
+		theUpdateDisplay();
 		break;
-	case 1:
+	case 1:		//1 进入程序时的旧有配置
+		mySetFont2(m_metrics, m_iconFont, m_tagSetOld);
+		theUpdateDisplay();
 		break;
-	case 2:
+	case 2:		//2 上一次配置
+		//tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
+		if (-1 != m_tagSetLast.tagIS.nHS) {
+			m_tagSetCur = m_tagSetLast;	//在mySetFont2()中，将会把当前配置写入m_tagSetLast，所以这里先保存
+			mySetFont2(m_metrics, m_iconFont, m_tagSetCur);
+			theUpdateDisplay();
+		}
 		break;
-	case 3:
-		OnSet8(wNotifyCode, wID, hWndCtl, bHandled);
+	case 3:		//3 Win8.x配置
+		mySetFont2(m_metrics, m_iconFont, m_tagSetWin8);
+		theUpdateDisplay();
 		break;
-	case 4:
-		OnSet10(wNotifyCode, wID, hWndCtl, bHandled);
+	case 4:		//4 Win10配置
+		mySetFont2(m_metrics, m_iconFont, m_tagSetWin10);
+		theUpdateDisplay();
 		break;
 	default:
 		break;
@@ -455,7 +466,7 @@ LONG PP1_FontSet::getFontHight(int lFontSize)
 	return lFontHight;
 }
 
-//获取当前配置
+//获取当前显示配置
 void PP1_FontSet::getActualFont(void)
 {
 	// 获取图标以外的字体信息。
@@ -481,12 +492,9 @@ void PP1_FontSet::getActualFont(void)
 		m_tagIScur.nVS = 48;
 	}
 
-	//保存当前配置，需要保存以下成员
-	m_tagSetCur.metrics = m_metrics;
-	m_tagSetCur.iconFont = m_iconFont;
-	m_tagSetCur.metricsAll = m_metricsAll;
-	m_tagSetCur.iconFontAll = m_iconFontAll;
-	m_tagSetCur.tagIS = m_tagIScur;
+	//保存当前显示配置，需要保存以下成员
+	SaveCurSet(m_tagSetCur);
+	m_tagSetOld = m_tagSetCur;
 }
 
 // 将菜单字体的信息应用于其他字体的信息。
@@ -499,6 +507,17 @@ void PP1_FontSet::SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont)
 	m_metricsAll.lfMessageFont = m_metricsAll.lfMenuFont;
 	m_metricsAll.lfSmCaptionFont = m_metricsAll.lfMenuFont;
 	m_metricsAll.lfStatusFont = m_metricsAll.lfMenuFont;
+}
+
+// 将当前显示配置保存到tagSet中
+void PP1_FontSet::SaveCurSet(CPreset& tagSet)
+{
+	//保存当前显示配置，需要保存以下成员
+	tagSet.metrics = m_metrics;
+	tagSet.iconFont = m_iconFont;
+	tagSet.metricsAll = m_metricsAll;
+	tagSet.iconFontAll = m_iconFontAll;
+	tagSet.tagIS = m_tagIScur;
 }
 
 /**
@@ -815,6 +834,7 @@ LRESULT PP1_FontSet::OnSelFont(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
 		return 0;
 	}
 
+	//用新选择的字体更新m_metricsAll、m_iconFontAll、m_metrics、m_iconFont和字体显示名称
 	enum fontType type = mapSelFont[wID].first;	//代替1个20多行的switch (wID)语句
 	if (logFont.lfFaceName[0] != _T('\0')) {
 		switch (type) {
@@ -848,6 +868,9 @@ LRESULT PP1_FontSet::OnSelFont(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
 			break;
 		}
 	}
+
+	//字体选择变更后，保存当前显示配置
+	SaveCurSet(m_tagSetCur);
 
 	theUpdateDisplay();
 
@@ -1460,9 +1483,11 @@ int PP1_FontSet::mySetFontItem2(LOGFONTW& dstFont, LOGFONTW& srcFont)
 
 	return 0;
 }
-
 int PP1_FontSet::mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet)
 {
+	//应用新配置前，保存当前显示配置到m_tagSetLast
+	SaveCurSet(m_tagSetLast);
+
 	//为了保持除字体之外的NONCLIENTMETRICS的当前值，检索NONCLIENTMETRICS的内容。
 	FillMemory(&metrics, sizeof(NONCLIENTMETRICS), 0x00);
 	metrics.cbSize = sizeof(NONCLIENTMETRICS);
@@ -1477,6 +1502,9 @@ int PP1_FontSet::mySetFont2(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPre
 
 	m_tagIScur.nHS = tagSet.tagIS.nHS;
 	m_tagIScur.nVS = tagSet.tagIS.nVS;
+
+	//应用新配置前，将新配置保存为当前显示配置
+	SaveCurSet(m_tagSetCur);
 
 	return 0;
 }
@@ -2025,13 +2053,13 @@ LRESULT PP1_FontSet::GetIconSpacingOld(vector<unsigned>& vecIS)
 	return nRet;
 }
 
-//保存当前配置到结构体变量
+//保存当前显示配置到结构体变量
 BOOL PP1_FontSet::SaveCurSetToTag()
 {
 	return true;
 }
 
-//保存当前配置到文件
+//保存当前显示配置到文件
 BOOL PP1_FontSet::SaveCurSetToFile()
 {
 	return true;
