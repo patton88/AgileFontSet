@@ -1538,7 +1538,8 @@ int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFo
 LRESULT PP1_FontSet::OnSet8(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
-	mySetFont(m_metrics, m_iconFont, tagFontWin8);
+	//mySetFont(m_metrics, m_iconFont, tagFontWin8);
+	mySetFont2(m_metrics, m_iconFont, m_tagSetWin8);
 
 	// 更新显示。
 	theUpdateDisplay();
@@ -1894,6 +1895,9 @@ int PP1_FontSet::readFontResource2(CString file, CPreset& tagSet)
 	if (readIconSpacing(tagSet.tagIS.nVS, file, tagSet.vecIS[1]) == 0) {
 		tagSet.tagIS.nVS = 48; }
 
+	tagSet.metrics;
+	tagSet.iconFont;
+
 	return 0;
 }
 
@@ -1940,7 +1944,7 @@ int PP1_FontSet::readFontResource(CString file, TagFontOld& tagFont)
 */
 // 字体名称
 //result = readFontFace(fontFaces8, file, _T("CAPTION_FACE_8"));		//CAPTION_FACE_8=Segoe UI
-int PP1_FontSet::readFontFace2(wchar_t const* buffer, CString file, CString key)
+int PP1_FontSet::readFontFace2(wchar_t* buffer, CString file, CString key)
 {
 	wchar_t buf[255];
 	int len;
@@ -1948,7 +1952,10 @@ int PP1_FontSet::readFontFace2(wchar_t const* buffer, CString file, CString key)
 	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
 	len = GetPrivateProfileString(L"PRESET", key, L"", buf, 255, file);
 	if (len > 0) {
-		buffer = buf;
+		//buffer = buf;
+		//在使用wcscpy_s这些之类的函数时，如果DesBuf是数组，记得用_countof求长度。
+		//CString str = buf;
+		wcscpy_s(buffer, wcslen(buffer), buf);
 	}
 
 	return len;

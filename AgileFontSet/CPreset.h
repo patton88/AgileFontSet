@@ -26,7 +26,7 @@ struct TagIS			//tag of Icon Spacing
 
 struct tagFontInfo
 {
-	wchar_t const* m0_strFace;	//L"FACE"
+	wchar_t* m0_strFace;	//L"FACE"
 	LONG* m1_lHeight;			//L"SIZE"，在显示到CEdit、存入文件时，需将m1_lHeight转换为Size
 	BYTE* m2_bCharset;			//L"CHARSET"
 };

@@ -249,7 +249,7 @@ public:
 	int readFontResource10(CString file);
 	//加载资源（用于字体名称）。
 	int readFontFace(CString &buffer, CString file, CString key);
-	int readFontFace2(wchar_t const* buffer, CString file, CString key);
+	int readFontFace2(wchar_t* buffer, CString file, CString key);
 	//加载资源（字体大小）。
 	int readFontSize(LONG& buffer, CString file, CString key);
 	int readFontSize2(LONG* buffer, CString file, CString key);
