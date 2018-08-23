@@ -308,11 +308,11 @@ public:
 
 	//CPreset m_tagSetCur(L"CUR");		//这种方式报错：error C2059: syntax error: 'string'
 	//只能使用C++11方式初始化
-	CPreset m_tagSetCur{ L"CUR" };		//0 当前显示配置	
-	CPreset m_tagSetOld{ L"OLD" };		//1 进入程序时的旧有配置
-	CPreset m_tagSetLast{ L"LAST" };		//2 上一次配置
-	CPreset m_tagSetWin8{ L"8" };		//3 Win8.x配置
-	CPreset m_tagSetWin10{ L"10" };		//4 Win10配置
+	CPreset m_tagSetCur{ L"CUR" };		//  当前显示配置	
+	CPreset m_tagSetOld{ L"OLD" };		//0 进入程序时的旧有配置
+	CPreset m_tagSetLast{ L"LAST" };		//1 上一次配置
+	CPreset m_tagSetWin8{ L"8" };		//2 Win8.x配置
+	CPreset m_tagSetWin10{ L"10" };		//3 Win10配置
 
 	map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
 	

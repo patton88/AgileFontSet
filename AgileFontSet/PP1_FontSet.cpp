@@ -120,11 +120,11 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	//m_comboPreSet.Clear();			//不是清空CComboBox内容。只是删除CComboBox的编辑控件的当前选择（如果有的话）。
 	m_comboPreSet.ResetContent();	//CComboBox::ResetContent函数用于清空内容。
 	//注意设置组合框属性：Type为Drop List，Sort为False
-	m_comboPreSet.AddString(L"当前显示配置");		//0
-	m_comboPreSet.AddString(L"进入时配置");		//1
-	m_comboPreSet.AddString(L"上一次配置");		//2
-	m_comboPreSet.AddString(L"Win8.x配置");		//3
-	m_comboPreSet.AddString(L"Win10配置");		//4
+	//m_comboPreSet.AddString(L"当前显示配置");	//，该项无意义，所以去除
+	m_comboPreSet.AddString(L"进入时配置");		//0
+	m_comboPreSet.AddString(L"上一次配置");		//1
+	m_comboPreSet.AddString(L"Win8.x配置");		//2
+	m_comboPreSet.AddString(L"Win10配置");		//3
 	m_comboPreSet.SetCurSel(0);
 	//------------------------------------------------------
 
@@ -329,27 +329,17 @@ LRESULT PP1_FontSet::OnCheckAllFont(WORD wNotifyCode, WORD wID, HWND hWndCtl, BO
 	return 0;
 }
 
-/*
-m_comboPreSet.AddString(L"当前显示配置");		//0
-m_comboPreSet.AddString(L"上一次配置");		//1
-m_comboPreSet.AddString(L"Win8.x配置");		//2
-m_comboPreSet.AddString(L"Win10配置");		//3
-*/
 LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	// TODO : Add Code for control notification handler.
 	m_nComboCurSel = m_comboPreSet.GetCurSel();	//组合框选择
 	switch (m_nComboCurSel)
 	{
-	case 0:		//0 当前显示配置	
-		mySetFont2(m_metrics, m_iconFont, m_tagSetCur);
-		theUpdateDisplay();
-		break;
-	case 1:		//1 进入程序时的旧有配置
+	case 0:		//0 进入程序时的旧有配置
 		mySetFont2(m_metrics, m_iconFont, m_tagSetOld);
 		theUpdateDisplay();
 		break;
-	case 2:		//2 上一次配置
+	case 1:		//1 上一次配置
 		//tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
 		if (-1 != m_tagSetLast.tagIS.nHS) {
 			m_tagSetCur = m_tagSetLast;	//在mySetFont2()中，将会把当前配置写入m_tagSetLast，所以这里先保存
@@ -357,11 +347,11 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 			theUpdateDisplay();
 		}
 		break;
-	case 3:		//3 Win8.x配置
+	case 2:		//2 Win8.x配置
 		mySetFont2(m_metrics, m_iconFont, m_tagSetWin8);
 		theUpdateDisplay();
 		break;
-	case 4:		//4 Win10配置
+	case 3:		//3 Win10配置
 		mySetFont2(m_metrics, m_iconFont, m_tagSetWin10);
 		theUpdateDisplay();
 		break;
