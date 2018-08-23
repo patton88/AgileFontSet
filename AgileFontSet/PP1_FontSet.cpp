@@ -1863,35 +1863,36 @@ void PP1_FontSet::readResourceFile(CString file)
 //加载Windows 8的字体预设资源
 int PP1_FontSet::readFontResource8(CString file)
 {
-	readFontResource(file, tagFontWin8);
-
+	//readFontResource(file, tagFontWin8);
+	readFontResource2(file, m_tagSetWin8);
 	return 1;
 }
+
 //加载预设资源
 int PP1_FontSet::readFontResource2(CString file, CPreset& tagSet)
 {
-	// 字体容器循环赋值
-
-	//for (auto& x : tagSet.vecRCN) {
-	//	if (readFontFace(x.second, file, x.first) == 0) { return 0; }
-	//}
-
-	int i = 0, j = 0;
-	int len1 = tagSet.vecRCN1.size();	//6
-	int len2 = tagSet.vecIS.size();		//2
-	for (auto& rcn2 : tagSet.vecRCN2) {
-		for (; i < j; i++) {
-		}
-	}
-
+	// 读取字体容器循环赋值
+	CString str;
 	for (auto& rcn2 : tagSet.vecRCN2) {
 		for (auto& rcn1 : tagSet.vecRCN1) {
-			//vecRCN.push_back(rcn1 + L"_" + rcn2 + L"_" + strRCN3);
+			str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
+			if (rcn2 == tagSet.vecRCN2[0]) {			// 字体名称容器赋值
+				if (readFontFace2(tagSet.mapRCN[rcn1].m0_strFace, file, str) == 0) { return 0; }
+			}
+			else if (rcn2 == tagSet.vecRCN2[1]) {	// 字体大小循环赋值
+				if (readFontSize2(tagSet.mapRCN[rcn1].m1_lHeight, file, str) == 0) { return 0; }
+			}
+			else if (rcn2 == tagSet.vecRCN2[2]) {	// 字符集循环赋值
+				if (readFontCharset2(tagSet.mapRCN[rcn1].m2_bCharset, file, str) == 0) { return 0; }
+			}
 		}
 	}
 
-	//tagSet.vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
-	//tagSet.vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
+	// 读取图标间距。读取不成功，使用默认值
+	if (readIconSpacing(tagSet.tagIS.nHS, file, tagSet.vecIS[0]) == 0) {
+		tagSet.tagIS.nHS = 80; }
+	if (readIconSpacing(tagSet.tagIS.nVS, file, tagSet.vecIS[1]) == 0) {
+		tagSet.tagIS.nVS = 48; }
 
 	return 0;
 }
@@ -1939,6 +1940,20 @@ int PP1_FontSet::readFontResource(CString file, TagFontOld& tagFont)
 */
 // 字体名称
 //result = readFontFace(fontFaces8, file, _T("CAPTION_FACE_8"));		//CAPTION_FACE_8=Segoe UI
+int PP1_FontSet::readFontFace2(wchar_t const* buffer, CString file, CString key)
+{
+	wchar_t buf[255];
+	int len;
+
+	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
+	len = GetPrivateProfileString(L"PRESET", key, L"", buf, 255, file);
+	if (len > 0) {
+		buffer = buf;
+	}
+
+	return len;
+}
+
 int PP1_FontSet::readFontFace(CString& buffer, CString file, CString key)
 {
 	wchar_t buf[255];
@@ -1960,6 +1975,17 @@ int PP1_FontSet::readFontFace(CString& buffer, CString file, CString key)
 * @param文件资源文件名
 * @param键键名
 */
+int PP1_FontSet::readFontSize2(LONG* buffer, CString file, CString key)
+{
+	int size;
+
+	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
+	size = GetPrivateProfileInt(L"PRESET", key, 0, file);
+	*buffer = size;
+
+	return size;
+}
+
 int PP1_FontSet::readFontSize(LONG& buffer, CString file, CString key)
 {
 	int size;
@@ -1978,6 +2004,17 @@ int PP1_FontSet::readFontSize(LONG& buffer, CString file, CString key)
 * @param文件资源文件名
 * @param键键名
 */
+int PP1_FontSet::readFontCharset2(BYTE* buffer, CString file, CString key)
+{
+	int size;
+
+	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
+	size = GetPrivateProfileInt(L"PRESET", key, 1, file);
+	*buffer = size;
+
+	return size;
+}
+
 int PP1_FontSet::readFontCharset(BYTE& buffer, CString file, CString key)
 {
 	int size;

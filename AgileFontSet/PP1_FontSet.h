@@ -249,10 +249,13 @@ public:
 	int readFontResource10(CString file);
 	//加载资源（用于字体名称）。
 	int readFontFace(CString &buffer, CString file, CString key);
+	int readFontFace2(wchar_t const* buffer, CString file, CString key);
 	//加载资源（字体大小）。
 	int readFontSize(LONG& buffer, CString file, CString key);
+	int readFontSize2(LONG* buffer, CString file, CString key);
 	//加载资源（用于字体字符集）。
 	int readFontCharset(BYTE& buffer, CString file, CString key);
+	int readFontCharset2(BYTE* buffer, CString file, CString key);
 	//加载资源（用于图标间距）。
 	int readIconSpacing(unsigned& buffer, CString file, CString key);
 	//字体容器、字体选择容器初始化。tag是结构体struct缩写的前缀
