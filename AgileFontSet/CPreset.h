@@ -5,11 +5,12 @@
 
 #include "stdafx.h"
 #include <vector>
-using std::vector;
+#include <map>
+using std::vector; using std::map;
 
 struct TagIS			//tag of Icon Spacing
 {
-	TagIS& operator =(const TagIS& tag)		//é‡è½½èµ‹å€¼è¿ç®—ç¬¦
+	TagIS& operator =(const TagIS& tag)		//ÖØÔØ¸³ÖµÔËËã·û
 	{
 		if (this != &tag)
 		{
@@ -23,10 +24,17 @@ struct TagIS			//tag of Icon Spacing
 	unsigned nVS;	//ICON_VERTICAL_SPACING
 };
 
+struct tagFontInfo
+{
+	wchar_t const* m0_strFace;	//L"FACE"
+	LONG* m1_lHeight;			//L"SIZE"£¬ÔÚÏÔÊ¾µ½CEdit¡¢´æÈëÎÄ¼þÊ±£¬Ðè½«m1_lHeight×ª»»ÎªSize
+	BYTE* m2_bCharset;			//L"CHARSET"
+};
+
 class CPreset		//class Preset
 {
 public:
-	CPreset& operator =(const CPreset& tag)	//é‡è½½èµ‹å€¼è¿ç®—ç¬¦
+	CPreset& operator =(const CPreset& tag)	//ÖØÔØ¸³ÖµÔËËã·û
 	{
 		if (this != &tag)
 		{
@@ -37,24 +45,7 @@ public:
 		return *this;
 	}
 
-	//ç”Ÿæˆè¯»å†™iniæ–‡ä»¶æ—¶çš„é”®å€¼å
-	CPreset(CString str) : strRCN3(str)	{
-		for (auto& rcn2 : vecRCN2) {
-			for (auto& rcn1 : vecRCN1) {
-				vecRCN.push_back(rcn1 + L"_" + rcn2 + L"_" + strRCN3);
-			}
-		}
-		vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
-		vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
-	}
-
-	const CString strRCN3;	//RCN3ï¼šResource Center Name part 3
-	vector<CString> vecRCN;
-	NONCLIENTMETRICSW metrics;
-	LOGFONTW iconFont;
-	TagIS tagIS;				//å­˜æ”¾å›¾æ ‡é—´è·
-
-	//C++11åˆå§‹åŒ–åˆ—è¡¨ã€‚RCN1ï¼šResource Center Name part 1
+	//C++11³õÊ¼»¯ÁÐ±í¡£RCN1£ºResource Center Name part 1
 	vector<CString> vecRCN1{
 		L"CAPTION",
 		L"ICON",
@@ -64,16 +55,82 @@ public:
 		L"STATUS"
 	};
 
-	//C++11åˆå§‹åŒ–åˆ—è¡¨ã€‚RCN2ï¼šResource Center Name part 2
+	//C++11³õÊ¼»¯ÁÐ±í¡£RCN2£ºResource Center Name part 2
 	vector<CString> vecRCN2{
 		L"FACE",
 		L"SIZE",
 		L"CHARSET"
 	};
 
-	//C++11åˆå§‹åŒ–åˆ—è¡¨ã€‚ISï¼šIcon Spacing
+	//C++11³õÊ¼»¯ÁÐ±í¡£IS£ºIcon Spacing
 	vector<CString> vecIS{
 		L"ICON_HORIZONTAL_SPACING",
 		L"ICON_VERTICAL_SPACING"
 	};
+
+
+	//map<RCN2, map<RCN1, tagFontInfo>> mapRCN2;
+	//map<CString, pair<CString, tagFontInfo>> mapRCNb;
+
+	//map<RCN1, tagFontInfo>> mapRCN;
+	map<CString, tagFontInfo> mapRCN;
+
+	//Éú³É¶ÁÐ´iniÎÄ¼þÊ±µÄ¼üÖµÃû
+	CPreset(CString str) : strRCN3(str)	{
+
+		for(unsigned j = 0; j < vecRCN2.size(); j++) {
+			for (unsigned i = 0; i < vecRCN1.size(); i++) {
+				vecRCN.push_back(vecRCN1[i] + L"_" + vecRCN1[j] + L"_" + strRCN3);
+				if (0 == j) { mapRCN[vecRCN1[i]] = tagFontInfo(); }	//´´½¨mapRCNÔªËØ
+			}
+		}
+		vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
+		vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
+
+		//mapRCN[vecRCN1[0] + L"_" + vecRCN2[0] + L"_" + strRCN3] = &metrics.lfCaptionFont.lfFaceName;
+
+		//ÎªÒÑ´´½¨µÄmapRCNÔªËØ¸³Öµ
+		mapRCN[vecRCN1[0]].m0_strFace = metrics.lfCaptionFont.lfFaceName;
+		mapRCN[vecRCN1[0]].m1_lHeight = &metrics.lfCaptionFont.lfHeight;
+		mapRCN[vecRCN1[0]].m2_bCharset = &metrics.lfCaptionFont.lfCharSet;
+
+		mapRCN[vecRCN1[1]].m0_strFace = iconFont.lfFaceName;
+		mapRCN[vecRCN1[1]].m1_lHeight = &iconFont.lfHeight;
+		mapRCN[vecRCN1[1]].m2_bCharset = &iconFont.lfCharSet;
+
+		mapRCN[vecRCN1[2]].m0_strFace = metrics.lfMenuFont.lfFaceName;
+		mapRCN[vecRCN1[2]].m1_lHeight = &metrics.lfMenuFont.lfHeight;
+		mapRCN[vecRCN1[2]].m2_bCharset = &metrics.lfMenuFont.lfCharSet;
+
+		mapRCN[vecRCN1[3]].m0_strFace = metrics.lfMessageFont.lfFaceName;
+		mapRCN[vecRCN1[3]].m1_lHeight = &metrics.lfMessageFont.lfHeight;
+		mapRCN[vecRCN1[3]].m2_bCharset = &metrics.lfMessageFont.lfCharSet;
+
+		mapRCN[vecRCN1[4]].m0_strFace = metrics.lfSmCaptionFont.lfFaceName;
+		mapRCN[vecRCN1[4]].m1_lHeight = &metrics.lfSmCaptionFont.lfHeight;
+		mapRCN[vecRCN1[4]].m2_bCharset = &metrics.lfSmCaptionFont.lfCharSet;
+
+		mapRCN[vecRCN1[5]].m0_strFace = metrics.lfStatusFont.lfFaceName;
+		mapRCN[vecRCN1[5]].m1_lHeight = &metrics.lfStatusFont.lfHeight;
+		mapRCN[vecRCN1[5]].m2_bCharset = &metrics.lfStatusFont.lfCharSet;
+	}
+
+	const CString strRCN3;	//RCN3£ºResource Center Name part 3
+	vector<CString> vecRCN;
+	//map<CString, LOGFONTW*> mapRCN;
+ 	NONCLIENTMETRICSW metrics;
+	LOGFONTW iconFont, theIS;
+
+	//Îª±ãÓÚÑ­»·´¦Àí£¬ÓÃtagLOGFONTWµÄlfHeight´æ·ÅnHS¡¢ÓÃlfWidth´æ·ÅnVS
+	//typedef struct tagLOGFONTW
+	//{
+	//	LONG      lfHeight;
+	//	LONG      lfWidth;
+
+	TagIS tagIS;				//´æ·ÅÍ¼±ê¼ä¾à
+
+
+
+
+
 };

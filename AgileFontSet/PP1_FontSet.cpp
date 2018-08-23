@@ -1880,13 +1880,18 @@ int PP1_FontSet::readFontResource2(CString file, CPreset& tagSet)
 	int len1 = tagSet.vecRCN1.size();	//6
 	int len2 = tagSet.vecIS.size();		//2
 	for (auto& rcn2 : tagSet.vecRCN2) {
-		j += i + len1;
 		for (; i < j; i++) {
 		}
-		//tagSet.vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
-		//tagSet.vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
-		i += len2;
 	}
+
+	for (auto& rcn2 : tagSet.vecRCN2) {
+		for (auto& rcn1 : tagSet.vecRCN1) {
+			//vecRCN.push_back(rcn1 + L"_" + rcn2 + L"_" + strRCN3);
+		}
+	}
+
+	//tagSet.vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
+	//tagSet.vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
 
 	return 0;
 }
