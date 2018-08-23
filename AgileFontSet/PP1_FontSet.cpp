@@ -1982,13 +1982,13 @@ int PP1_FontSet::readFontResource2(CString file, CPreset& tagSet)
 	}
 
 	// 读取图标间距。读取不成功，使用默认值
-	if (readIconSpacing(tagSet.tagIS.nHS, file, tagSet.vecIS[0]) == 0) {
+	if (readIconSpacing(tagSet.tagIS.nHS, file, tagSet.vecIS[0] + L"_" + tagSet.strRCN3) == 0) {
 		tagSet.tagIS.nHS = 80; }
-	if (readIconSpacing(tagSet.tagIS.nVS, file, tagSet.vecIS[1]) == 0) {
+	if (readIconSpacing(tagSet.tagIS.nVS, file, tagSet.vecIS[1] + L"_" + tagSet.strRCN3) == 0) {
 		tagSet.tagIS.nVS = 48; }
 
-	tagSet.metrics;
-	tagSet.iconFont;
+	//tagSet.metrics;
+	//tagSet.iconFont;
 
 	return 0;
 }
@@ -2131,13 +2131,13 @@ int PP1_FontSet::readFontCharset(BYTE& buffer, CString file, CString key)
 
 int PP1_FontSet::readIconSpacing(unsigned& buffer, CString file, CString key)
 {
-	int size;
+	int iSize;
 
 	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	size = GetPrivateProfileInt(L"PRESET", key, 1, file);
-	buffer = size;
+	iSize = GetPrivateProfileInt(L"PRESET", key, 1, file);
+	buffer = iSize;
 
-	return size;
+	return iSize;
 }
 
 //应用设置，刷新桌面
