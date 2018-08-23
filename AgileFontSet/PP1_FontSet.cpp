@@ -173,11 +173,11 @@ LRESULT PP1_FontSet::OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl)
 	//关键在于：调用m_spinXXX之前，应该增加判断m_spinXXX是否是一个窗口。否则异常报错
 	if (m_spinHS.IsWindow() && m_spinVS.IsWindow())
 	{
-		HWND hwndParent = ::GetParent(m_hWnd);
-		if ((m_spinHS.GetPos() == m_tagIScur.nHS) && (m_spinVS.GetPos() == m_tagIScur.nVS))		//1	m_btnLoadDefaultCurrPage
-		{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), FALSE); }
-		else
-		{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), TRUE); }
+		//HWND hwndParent = ::GetParent(m_hWnd);
+		//if ((m_spinHS.GetPos() == m_tagIScur.nHS) && (m_spinVS.GetPos() == m_tagIScur.nVS))		//1	m_btnLoadDefaultCurrPage
+		//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), FALSE); }
+		//else
+		//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), TRUE); }
 
 		//if ((-1 == m_iNewHS) || (m_spinHS.GetPos() == m_iNewHS) && (m_spinVS.GetPos() == m_iNewVS))	//2	m_btnLoadDefaultCurrPage
 		//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_NEW_VALUE), FALSE); }
@@ -192,8 +192,8 @@ LRESULT PP1_FontSet::OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl)
 		//WTL只允许输入0-150之间的数值
 		if (len > 3
 			|| 1 == len && (sz[0] < 48 || sz[0] > 57)
-			|| 2 == len && (sz[1] < 48 || sz[1] > 57)
-			|| 3 == len && (sz[2] < 48 || sz[2] > 57)
+			|| 2 == len && (sz[0] < 48 || sz[0] > 57 || sz[1] < 48 || sz[1] > 57)
+			|| 3 == len && (sz[0] < 48 || sz[0] > 57 || sz[1] < 48 || sz[1] > 57 || sz[2] < 48 || sz[2] > 57)
 			|| _wtoi(sz) < 0 || _wtoi(sz) > 150)
 		{
 			//MessageBoxW(L"请输入1到150之间的数值");
@@ -212,6 +212,21 @@ LRESULT PP1_FontSet::OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl)
 				iHS = _wtoi(sz);
 			else
 				iVS = _wtoi(sz);
+		}
+
+		if (len > 1 && len < 4)
+		{
+			//去掉前导0
+			int f = 0;
+			while (len > 1 && 48 == sz[0])
+			{
+				f++;
+				for (int i = 0; i < len; i++) { sz[i] = sz[i + 1]; }
+				len--;
+				sz[len] = 0;
+			}
+			
+			if (f > 0){ ::SetWindowTextW(GetDlgItem(nID), CString(sz));	}	//写回编辑框
 		}
 	}
 
@@ -397,7 +412,7 @@ LRESULT PP1_FontSet::OnEnSetfoucsEdit(UINT uNotifyCode, int nID, CWindow wndCtl)
 		edit.Attach(GetDlgItem(nID));
 		edit.SetRedraw(FALSE);	// 避免闪烁，先禁止重绘
 		edit.SetSel(-1, -1);		// 0 表示起点，-1 表示终点
-									//edit.PostMessage(EM_SETSEL, 0, 0);		//与edit.SetSel(0, 0)类似
+								//edit.PostMessage(EM_SETSEL, 0, 0);		//与edit.SetSel(0, 0)类似
 		edit.SetRedraw(TRUE);	// 允许重绘
 		edit.Invalidate(TRUE);	// 重绘Edit
 		edit.Detach();
