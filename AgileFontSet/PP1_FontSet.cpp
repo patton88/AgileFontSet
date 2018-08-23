@@ -532,85 +532,6 @@ void PP1_FontSet::getActualFont(void)
 	m_tagSetCur.tagIS = tagIS;
 }
 
-void PP1_FontSet::theUpdateDisplay2(void)
-{
-	// 僼僅儞僩柤丄億僀儞僩悢昞帵暥帤楍傪嶌惉偡傞丅
-	m_strAllFontName = m_metricsAll.lfMenuFont.lfFaceName;
-	m_strAllFontName += L"   " + itos(getFontPointInt(&(m_metricsAll.lfMenuFont), m_hWnd)) + L"pt";
-
-	m_strTitleFontName = m_metrics.lfCaptionFont.lfFaceName;
-	m_strTitleFontName += L"   " + itos(getFontPointInt(&(m_metrics.lfCaptionFont), m_hWnd)) + L"pt";
-
-	m_strIconFontName = m_iconFont.lfFaceName;
-	m_strIconFontName += L"   " + itos(getFontPointInt(&m_iconFont, m_hWnd)) + L"pt";
-
-	// 儊僯儏乕偲慖戰崁栚
-	m_strMenuFontName = m_metrics.lfMenuFont.lfFaceName;
-	m_strMenuFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMenuFont, m_hWnd)) + L"pt";
-
-	m_strMessageFontName = m_metrics.lfMessageFont.lfFaceName;
-	m_strMessageFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMessageFont, m_hWnd)) + L"pt";
-
-	m_strPaletteFontName = m_metrics.lfSmCaptionFont.lfFaceName;
-	m_strPaletteFontName += L"   " + itos(getFontPointInt(&m_metrics.lfSmCaptionFont, m_hWnd)) + L"pt";
-
-	m_strTipFontName = m_metrics.lfStatusFont.lfFaceName;
-	m_strTipFontName += L"   " + itos(getFontPointInt(&m_metrics.lfStatusFont, m_hWnd)) + L"pt";
-
-	//设置图标间距
-	if (m_spinHS.IsWindow() && m_spinVS.IsWindow())
-	{
-		m_spinHS.SetPos(m_tagIScur.nHS);
-		m_spinVS.SetPos(m_tagIScur.nVS);
-	}
-
-	//UpdateData(false);
-	DoDataExchange();
-
-	// 慖戰偟偨僼僅儞僩傪僥僉僗僩儃僢僋僗偵愝掕偡傞丅
-	if (m_fontAll != NULL) {
-		DeleteObject(m_fontAll);
-	}
-	m_fontAll = createFont(&m_metricsAll.lfMenuFont);
-	m_editAllFont.SetFont(m_fontAll);
-
-	if (m_fontTitle != NULL) {
-		DeleteObject(m_fontTitle);
-	}
-	m_fontTitle = createFont(&m_metrics.lfCaptionFont);
-	m_editTitleFont.SetFont(m_fontTitle);
-
-	if (m_fontIcon != NULL) {
-		DeleteObject(m_fontIcon);
-	}
-	m_fontIcon = createFont(&m_iconFont);
-	m_editIconFont.SetFont(m_fontIcon);
-
-	if (m_fontMenu != NULL) {
-		DeleteObject(m_fontMenu);
-	}
-	m_fontMenu = createFont(&m_metrics.lfMenuFont);
-	m_editMenuFont.SetFont(m_fontMenu);
-
-	if (m_fontMessage != NULL) {
-		DeleteObject(m_fontMessage);
-	}
-	m_fontMessage = createFont(&m_metrics.lfMessageFont);
-	m_editMessageFont.SetFont(m_fontMessage);
-
-	if (m_fontPalette != NULL) {
-		DeleteObject(m_fontPalette);
-	}
-	m_fontPalette = createFont(&m_metrics.lfSmCaptionFont);
-	m_editPaletteFont.SetFont(m_fontPalette);
-
-	if (m_fontTip != NULL) {
-		DeleteObject(m_fontTip);
-	}
-	m_fontTip = createFont(&m_metrics.lfStatusFont);
-	m_editTipFont.SetFont(m_fontTip);
-}
-
 /**
 * 僼僅儞僩昞帵傪峏怴偡傞丅
 */
@@ -618,26 +539,26 @@ void PP1_FontSet::theUpdateDisplay(void)
 {
 	// 僼僅儞僩柤丄億僀儞僩悢昞帵暥帤楍傪嶌惉偡傞丅
 	m_strAllFontName = m_metricsAll.lfMenuFont.lfFaceName;
-	m_strAllFontName += L"   " + itos(getFontPointInt(&(m_metricsAll.lfMenuFont), m_hWnd)) + L"pt";
+	m_strAllFontName += L"    " + itos(getFontPointInt(&(m_metricsAll.lfMenuFont), m_hWnd)) + L"pt";
 
 	m_strTitleFontName = m_metrics.lfCaptionFont.lfFaceName;
-	m_strTitleFontName += L"   " + itos(getFontPointInt(&(m_metrics.lfCaptionFont), m_hWnd)) + L"pt";
+	m_strTitleFontName += L"    " + itos(getFontPointInt(&(m_metrics.lfCaptionFont), m_hWnd)) + L"pt";
 
 	m_strIconFontName = m_iconFont.lfFaceName;
-	m_strIconFontName += L"   " + itos(getFontPointInt(&m_iconFont, m_hWnd)) + L"pt";
+	m_strIconFontName += L"    " + itos(getFontPointInt(&m_iconFont, m_hWnd)) + L"pt";
 
 	// 儊僯儏乕偲慖戰崁栚
 	m_strMenuFontName = m_metrics.lfMenuFont.lfFaceName;
-	m_strMenuFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMenuFont, m_hWnd)) + L"pt";
+	m_strMenuFontName += L"    " + itos(getFontPointInt(&m_metrics.lfMenuFont, m_hWnd)) + L"pt";
 
 	m_strMessageFontName = m_metrics.lfMessageFont.lfFaceName;
-	m_strMessageFontName += L"   " + itos(getFontPointInt(&m_metrics.lfMessageFont, m_hWnd)) + L"pt";
+	m_strMessageFontName += L"    " + itos(getFontPointInt(&m_metrics.lfMessageFont, m_hWnd)) + L"pt";
 
 	m_strPaletteFontName = m_metrics.lfSmCaptionFont.lfFaceName;
-	m_strPaletteFontName += L"   " + itos(getFontPointInt(&m_metrics.lfSmCaptionFont, m_hWnd)) + L"pt";
+	m_strPaletteFontName += L"    " + itos(getFontPointInt(&m_metrics.lfSmCaptionFont, m_hWnd)) + L"pt";
 
 	m_strTipFontName = m_metrics.lfStatusFont.lfFaceName;
-	m_strTipFontName += L"   " + itos(getFontPointInt(&m_metrics.lfStatusFont, m_hWnd)) + L"pt";
+	m_strTipFontName += L"    " + itos(getFontPointInt(&m_metrics.lfStatusFont, m_hWnd)) + L"pt";
 
 	//设置图标间距
 	if (m_spinHS.IsWindow() && m_spinVS.IsWindow())

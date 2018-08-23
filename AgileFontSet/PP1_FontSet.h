@@ -225,7 +225,6 @@ public:
 
 	void getActualFont(void);
 	void theUpdateDisplay(void);
-	void theUpdateDisplay2(void);
 	int getFontPointInt(LOGFONTW *font, HWND hWnd);
 	double getFontPoint(LOGFONTW *font, HWND hWnd);
 	HFONT createFont(LOGFONTW *font);
