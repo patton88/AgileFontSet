@@ -167,7 +167,7 @@ public:
 	// Message handlers
 	BOOL OnInitDialog(HWND hwndFocus, LPARAM lParam);
 	BOOL OnSetActive();
-
+	
 	//监测文本改变
 	LRESULT OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl);
 
