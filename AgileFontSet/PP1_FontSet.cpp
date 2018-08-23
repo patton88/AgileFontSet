@@ -1955,7 +1955,7 @@ int PP1_FontSet::readFontFace2(wchar_t* buffer, CString file, CString key)
 		//buffer = buf;
 		//在使用wcscpy_s这些之类的函数时，如果DesBuf是数组，记得用_countof求长度。
 		//CString str = buf;
-		wcscpy_s(buffer, wcslen(buffer), buf);
+		wcscpy_s(buffer, wcslen(buf) + 1, buf);
 	}
 
 	return len;
