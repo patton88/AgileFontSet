@@ -1566,7 +1566,8 @@ LRESULT PP1_FontSet::OnSet8(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BO
 LRESULT PP1_FontSet::OnSet10(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
-	mySetFont(m_metrics, m_iconFont, tagFontWin10);
+	//mySetFont(m_metrics, m_iconFont, tagFontWin10);
+	mySetFont2(m_metrics, m_iconFont, m_tagSetWin10);
 
 	// 更新显示。
 	theUpdateDisplay();
@@ -1917,7 +1918,8 @@ int PP1_FontSet::readFontResource2(CString file, CPreset& tagSet)
 //加载Windows 10的字体预设资源
 int PP1_FontSet::readFontResource10(CString file)
 {
-	readFontResource(file, tagFontWin10);
+	//readFontResource(file, tagFontWin10);
+	readFontResource2(file, m_tagSetWin10);
 
 	return 1;
 }
