@@ -43,9 +43,9 @@ public:
 			for (auto& rcn1 : vecRCN1) {
 				vecRCN.push_back(rcn1 + L"_" + rcn2 + L"_" + strRCN3);
 			}
-			vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
-			vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
 		}
+		vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
+		vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
 	}
 
 	const CString strRCN3;	//RCN3：Resource Center Name part 3

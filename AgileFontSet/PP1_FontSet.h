@@ -271,6 +271,8 @@ public:
 	int mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, TagFontOld& tagFont);
 	//加载预设资源
 	int readFontResource(CString file, TagFontOld& tagFont);
+	//加载预设资源
+	int readFontResource2(CString file, CPreset& tagSet);
 
 	BOOL SaveCurSetToFile();		//保存当前配置到文件
 	BOOL SaveCurSetToTag();		//保存当前配置到结构体变量
