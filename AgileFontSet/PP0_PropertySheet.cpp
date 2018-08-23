@@ -210,7 +210,7 @@ void PP0_PropertySheet::OnShowWindow(BOOL bShowing, int nReason)
 
 	SetIcon(hIcon);
 
-	PostMessageW(WM_SETFOCUS, IDCANCEL, NULL);	//有效
+	//PostMessageW(WM_SETFOCUS, IDCANCEL, NULL);	//有效
 
 	//为属性表单添加菜单成功。属性页无法添加菜单
 	//CMenu menu;

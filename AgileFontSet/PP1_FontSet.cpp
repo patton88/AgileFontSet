@@ -309,7 +309,15 @@ LRESULT PP1_FontSet::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 
 	//::PostMessageW(GetParent(), WM_SETFOCUS, IDCANCEL, NULL);//无效
 
-	//m_editAllFont.SetFocus();		//有效
+	m_editAllFont.SetFocus();		//有效
+
+	//PostMessageW(WM_SETFOCUS, IDB_SEL_ALLFONT, NULL);//无效
+	//SendMessageW(WM_SETFOCUS, IDB_SEL_ALLFONT, NULL);//无效
+
+	//CButtonImpl btn;
+	//btn.Attach(GetDlgItem(IDB_SEL_ALLFONT));
+	//btn.SetFocus();	//有效
+	//btn.Detach();
 
 	return 0;
 }
