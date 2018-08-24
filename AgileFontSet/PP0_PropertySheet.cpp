@@ -224,21 +224,16 @@ LRESULT PP0_PropertySheet::OnApply(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 
 }
 
-// 应用设置，退出设置界面
-//LRESULT PP0_PropertySheet::OnApplyAll(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
-//{
-	//OnApply(wNotifyCode, wID, hWndCtl, bHandled);	// 应用设置
-	//this->PostMessageW(WM_CLOSE);					// 退出设置界面。用PostMessageW是允许进行后续扫尾处理
+LRESULT PP0_PropertySheet::OnLoad(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	int iRet = m_pp1FontSet.OnLoad(wNotifyCode, wID, hWndCtl, bHandled);
 
-	//// 僼僅儞僩曄峏傪幚巤偡傞丅
-	//m_pp1FontSet.theSetFont(&m_pp1FontSet.m_metricsAll, &m_pp1FontSet.m_iconFontAll);
+	return iRet;
+}
 
-	//memcpy(&m_pp1FontSet.m_metrics, &m_pp1FontSet.m_metricsAll, sizeof(NONCLIENTMETRICSW));
-	//memcpy(&m_pp1FontSet.m_iconFont, &m_pp1FontSet.m_iconFontAll, sizeof(LOGFONTW));
+LRESULT PP0_PropertySheet::OnSave(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	int iRet = m_pp1FontSet.OnSave(wNotifyCode, wID, hWndCtl, bHandled);
 
-	//// 昞帵傪峏怴偡傞丅
-	//m_pp1FontSet.theUpdateDisplay();
-
-//	return true;
-//}
-
+	return iRet;
+}
