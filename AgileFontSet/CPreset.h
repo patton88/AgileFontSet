@@ -152,6 +152,12 @@ public:
 		vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
 		vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
 
+		FillMemory(&metrics, sizeof(NONCLIENTMETRICSW), 0x00);
+		FillMemory(&metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
+		FillMemory(&iconFont, sizeof(LOGFONTW), 0x00);
+		FillMemory(&iconFontAll, sizeof(LOGFONTW), 0x00);
+		tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
+
 		//为已创建的mapRCN元素赋值
 		//error C2440: '=': cannot convert from 'WCHAR (*)[32]' to 'wchar_t *'
 		//WCHAR(*p)[32];
@@ -159,18 +165,15 @@ public:
 
 		//m_vecTagSetUser[i].initmapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
 		//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
-		initmapRCN();
+		RefreshMapRCN();
 	}
 
+	//CPreset对象必须在创建后进行初始化，否则地址不对。
+	//发现在运行过程中这些地址会变化，所以每次使用之前，都需要调用该函数刷新地址。
+	//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
 	// 将菜单字体的信息应用于其他字体的信息。
-	void initmapRCN()
+	void RefreshMapRCN()
 	{
-		FillMemory(&metrics, sizeof(NONCLIENTMETRICSW), 0x00);
-		FillMemory(&metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
-		FillMemory(&iconFont, sizeof(LOGFONTW), 0x00);
-		FillMemory(&iconFontAll, sizeof(LOGFONTW), 0x00);
-		tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
-
 		mapRCN[vecRCN1[0]].m0_strFace = &metrics.lfCaptionFont.lfFaceName;
 		mapRCN[vecRCN1[0]].m1_lHeight = &metrics.lfCaptionFont.lfHeight;
 		mapRCN[vecRCN1[0]].m2_bCharset = &metrics.lfCaptionFont.lfCharSet;

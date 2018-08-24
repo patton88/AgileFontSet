@@ -139,11 +139,11 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 
 	//动态创建的CPreset对象必须在创建后进行初始化，否则地址不对。成员变量好像地址正确，但保险起见还是显示初始化
 	//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
-	m_tagSetCur.initmapRCN();
-	m_tagSetOld.initmapRCN();
-	m_tagSetLast.initmapRCN();
-	m_tagSetWin8.initmapRCN();
-	m_tagSetWin10.initmapRCN();
+	m_tagSetCur.RefreshMapRCN();
+	m_tagSetOld.RefreshMapRCN();
+	m_tagSetLast.RefreshMapRCN();
+	m_tagSetWin8.RefreshMapRCN();
+	m_tagSetWin10.RefreshMapRCN();
 
 	//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
 	initializeLocale();
@@ -1125,7 +1125,7 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 		if (isSectionExists(strSec, filename))
 		{
 			m_vecTagSetUser.emplace_back(CPreset(strSuf));
-			m_vecTagSetUser[i].initmapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
+			m_vecTagSetUser[i].RefreshMapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
 			readFontResource(filename, strSec, m_vecTagSetUser[i]);
 			m_comboPreSet.AddString(L"用户配置" + itos(i));	//3 + i
 		}
@@ -1385,6 +1385,18 @@ BOOL PP1_FontSet::startSaveFont(CString filename)
 	if (!saveResult) {
 		return FALSE;
 	}
+	//保存可能存在的用户加载的配置UserPreset1-UserPreset100
+	CString strSec0 = L"UserPreset", strSec;
+	//m_vecTagSetUser.emplace_back(CPreset(L"U0"));	//为从U1开始，所以先存放一个未用的填充元素
+	int iLen = m_vecTagSetUser.size();
+	for (int i = 1; i < iLen; i++)
+	{
+		strSec = strSec0 + itos(i);		//段名
+		//CPreset对象必须在创建后进行初始化，否则地址不对。
+		//发现在运行过程中这些地址会变化，所以每次使用之前，都需要调用该函数刷新地址。
+		m_vecTagSetUser[i].RefreshMapRCN();
+		saveResult = savePreset(filename, strSec, m_vecTagSetUser[i]);
+	}
 
 	return TRUE;
 }
@@ -1406,7 +1418,7 @@ BOOL PP1_FontSet::savePreset(CString filename, CString section, CPreset& tagSet)
 			}
 			else if (rcn2 == tagSet.vecRCN2[1]) {	// 写入字体大小循环
 				bRet = WritePrivateProfileString(
-					section, str,  itos(getFontSize(*tagSet.mapRCN[rcn1].m1_lHeight)), filename);
+					section, str, itos(getFontSize(*tagSet.mapRCN[rcn1].m1_lHeight)), filename);
 				if (!bRet) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[2]) {	// 写入字符集循环
