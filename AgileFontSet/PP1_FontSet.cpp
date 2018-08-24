@@ -137,6 +137,14 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	FillMemory(&m_iconFontAll, sizeof(LOGFONTW), 0x00);
 	m_tagIScur.nHS = m_tagIScur.nVS = -1;
 
+	//动态创建的CPreset对象必须在创建后进行初始化，否则地址不对。成员变量好像地址正确，但保险起见还是显示初始化
+	//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
+	m_tagSetCur.initmapRCN();
+	m_tagSetOld.initmapRCN();
+	m_tagSetLast.initmapRCN();
+	m_tagSetWin8.initmapRCN();
+	m_tagSetWin10.initmapRCN();
+
 	//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
 	initializeLocale();
 
@@ -146,12 +154,12 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	}
 
 	//处理菜单的禁用启用
-	if (!use7Compat) {
-		// 在Windows 7或更早版本的情况下，无法更改字体大小的处理模式。
-		CheckMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_UNCHECKED);
-		EnableMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-	}
-	CheckMenuItem(GetMenu(), IDM_UNIQ_THREAD, MF_BYCOMMAND | MF_CHECKED);
+	//if (!use7Compat) {
+	//	// 在Windows 7或更早版本的情况下，无法更改字体大小的处理模式。
+	//	CheckMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_UNCHECKED);
+	//	EnableMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+	//}
+	//CheckMenuItem(GetMenu(), IDM_UNIQ_THREAD, MF_BYCOMMAND | MF_CHECKED);
 
 	//显示Windows系统版本号
 	//CString str;
@@ -160,8 +168,7 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 
 	// 更新字体名称显示
 	theUpdateDisplay();
-
-
+	
 	return FALSE;
 }
 
