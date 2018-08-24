@@ -134,6 +134,7 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	FillMemory(&m_metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
 	FillMemory(&m_iconFont, sizeof(LOGFONTW), 0x00);
 	FillMemory(&m_iconFontAll, sizeof(LOGFONTW), 0x00);
+	m_tagIScur.nHS = m_tagIScur.nVS = -1;
 
 	//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
 	initializeLocale();
@@ -1704,21 +1705,13 @@ void PP1_FontSet::initializeLocale(void)
 	initSelFont();
 
 	CString langPath;
-	int nRet;
 
 	langPath = getCurDir(1);		//g:\MyVC2017\noMeiryoUI235\Debug		//末尾无斜杠
 	langPath = langPath.Left(langPath.ReverseFind(L'\\') + 1);	//g:\MyVC2017\noMeiryoUI235\ //末尾含斜杠
 	langPath = langPath + L"lang\\" + L"English.lng";	//L"G:\\MyVC2017\\noMeiryoUI235\\lang\\English.lng"
 
-	readResourceFile(langPath);
-	nRet = readFontResource8(langPath);
-	if (!nRet) {
-		has8Preset = false;
-	}
-	nRet = readFontResource10(langPath);
-	if (!nRet) {
-		has10Preset = false;
-	}
+	if (0 == readFontResource(langPath, m_tagSetWin8)) { has8Preset = false; }
+	if (0 == readFontResource(langPath, m_tagSetWin10)) { has10Preset = false; }
 
 	//设置Win7兼容风格度量菜单是否可用
 	//warning C4996: 'GetVersion': was declared deprecated
@@ -1861,14 +1854,6 @@ void PP1_FontSet::readResourceFile(CString file)
 	readResourceItem(file, L"FONT_CHARSET", L"1");
 }
 
-//加载Windows 8的字体预设资源
-int PP1_FontSet::readFontResource8(CString file)
-{
-	//readFontResource(file, tagFontWin8);
-	readFontResource(file, m_tagSetWin8);
-	return 1;
-}
-
 //加载预设资源
 int PP1_FontSet::readFontResource(CString file, CPreset& tagSet)
 {
@@ -1906,15 +1891,6 @@ int PP1_FontSet::readFontResource(CString file, CPreset& tagSet)
 	if (0 == iRet) { tagSet.tagIS.nVS = 48; }
 
 	return 0;
-}
-
-//加载Windows 10的字体预设资源
-int PP1_FontSet::readFontResource10(CString file)
-{
-	//readFontResource(file, tagFontWin10);
-	readFontResource(file, m_tagSetWin10);
-
-	return 1;
 }
 
 //应用设置，刷新桌面

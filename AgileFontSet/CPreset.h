@@ -122,6 +122,10 @@ public:
 		mapRCN[vecRCN1[5]].m1_lHeight = &metrics.lfStatusFont.lfHeight;
 		mapRCN[vecRCN1[5]].m2_bCharset = &metrics.lfStatusFont.lfCharSet;
 
+		FillMemory(&metrics, sizeof(NONCLIENTMETRICSW), 0x00);
+		FillMemory(&metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
+		FillMemory(&iconFont, sizeof(LOGFONTW), 0x00);
+		FillMemory(&iconFontAll, sizeof(LOGFONTW), 0x00);
 		tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
 	}
 
