@@ -1329,12 +1329,43 @@ BOOL PP1_FontSet::startSaveFont(CString filename)
 	if (!saveResult) {
 		return FALSE;
 	}
+	saveResult = saveIS(filename, L"IconSpacing", &m_tagIScur);
+	if (!saveResult) {
+		return FALSE;
+	}
 
 	return TRUE;
 }
 
+//Save Icon Sapcing
+BOOL PP1_FontSet::saveIS(CString filename, CString section, TagIS* tagIS)
+{
+	BOOL bRet;
+
+	unsigned nHS;	//ICON_HORIZONTAL_SPACING
+	unsigned nVS;	//ICON_VERTICAL_SPACING
+
+	bRet = WritePrivateProfileString(section,
+		L"IconHorizontalSpacing",
+		itos(tagIS->nHS),
+		filename);
+	if (!bRet) {
+		return FALSE;
+	}
+
+	bRet = WritePrivateProfileString(section,
+		L"IconVerticalSpacing",
+		itos(tagIS->nVS),
+		filename);
+	if (!bRet) {
+		return FALSE;
+	}
+
+	return bRet;
+}
+
 //saveResult = saveFont(filename, L"TitleFont", &m_metrics.lfCaptionFont);
-BOOL PP1_FontSet::saveFont(CString filename, CString section, LOGFONT *font)
+BOOL PP1_FontSet::saveFont(CString filename, CString section, LOGFONT* font)
 {
 	BOOL bRet;
 

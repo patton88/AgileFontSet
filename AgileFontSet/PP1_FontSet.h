@@ -234,6 +234,7 @@ public:
 	void theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFont);
 	BOOL startSaveFont(CString filename);
 	BOOL saveFont(CString filename, CString section, LOGFONT* font);
+	BOOL saveIS(CString filename, CString section, TagIS *tagIS);	//Save Icon Sapcing
 	BOOL loadFont(CString filename, CString section, LOGFONT* font);
 	BOOL loadFontInfo(CString filename);
 	int getDPI(void);
