@@ -315,10 +315,12 @@ LRESULT PP1_FontSet::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 	//else
 	//{ ::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_NEW_VALUE), TRUE); }
 
-	::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_APPLY), TRUE);				//3	m_btnSaveCurrPage;		
-	::EnableWindow(::GetDlgItem(hwndParent, IDOK), TRUE);						//4	m_btnSaveAll;			
+	::EnableWindow(::GetDlgItem(hwndParent, IDB_LOAD_SET), TRUE);
+	::EnableWindow(::GetDlgItem(hwndParent, IDB_SAVE_SET), TRUE);
+	//::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_APPLY), TRUE);		//3	m_btnSaveCurrPage;		
+	::EnableWindow(::GetDlgItem(hwndParent, IDOK), TRUE);				//4	m_btnSaveAll;			
 
-	::SendMessage(GetDlgItem(IDC_EDIT_HS), WM_KEYDOWN, VK_END, 0);	//发送一个End按键，取消选中状态
+	//::SendMessage(GetDlgItem(IDC_EDIT_HS), WM_KEYDOWN, VK_END, 0);	//发送一个End按键，取消选中状态
 
 	//m_editChrome.SetFocus();		//有效。该方式CEdit获得焦点后光标控制正确
 

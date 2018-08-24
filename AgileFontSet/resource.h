@@ -55,8 +55,8 @@
 #define IDC_COMBO_PRECONFIT             1047
 #define IDC_COMBO_PRESET                1047
 #define IDC_BTN_APPLY                   1048
-#define IDC_BTN_LOAD_SET_FROM_FILE      1049
-#define IDC_BTN_SAVE_SET_TO_FILE        1050
+#define IDB_LOAD_SET                    1049
+#define IDB_SAVE_SET                    1050
 #define IDC_GROUP_FONTSET               1055
 #define IDC_GROUP_ICON_SPACING_SET      1056
 #define IDC_GROUP_ICONSPACING_SET       1057

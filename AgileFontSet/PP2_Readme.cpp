@@ -151,12 +151,10 @@ LRESULT PP2_Readme::OnSetPageFocus(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lP
 	//GetDlgItem(IDC_EDIT_README).PostMessage(EM_SETSEL, 0, 0);	//这样会将光标定位到最前面，无法保持上一次位置
 
 	HWND hwndParent = ::GetParent(m_hWnd);
-	//::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_DEFAULT_ALL), FALSE);			//0 m_btnLoadDefaultAll;		
-	::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_LOAD_SET_FROM_FILE), FALSE);			//1	m_btnLoadDefaultCurrPage
-	::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_SAVE_SET_TO_FILE), FALSE);			//2	m_btnLoadDefaultCurrPage
-	::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_APPLY), FALSE);					//3	m_btnSaveCurrPage;		
-	::EnableWindow(::GetDlgItem(hwndParent, IDOK), FALSE);							//4	m_btnSaveAll;			
-	//5 IDCANCEL 退出
+	::EnableWindow(::GetDlgItem(hwndParent, IDB_LOAD_SET), FALSE);
+	::EnableWindow(::GetDlgItem(hwndParent, IDB_SAVE_SET), FALSE);
+	//::EnableWindow(::GetDlgItem(hwndParent, IDC_BTN_APPLY), FALSE);
+	::EnableWindow(::GetDlgItem(hwndParent, IDOK), FALSE);
 
 	return 0;
 }

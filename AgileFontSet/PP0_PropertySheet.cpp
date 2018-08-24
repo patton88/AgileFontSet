@@ -108,11 +108,11 @@ void PP0_PropertySheet::OnShowWindow(BOOL bShowing, int nReason)
 	}
 
 	// OK、Cancel 按钮改名
-	::SetWindowText(GetDlgItem(IDOK), L"全部应用");		// 应用设置，退出设置界面
+	::SetWindowText(GetDlgItem(IDOK), L"应用");		// 应用设置，退出设置界面
 	::SetWindowText(GetDlgItem(IDCANCEL), L"退出");		// 不保存，退出设置界面
 
 	CRect rectNew, rectOK, rectCancel, rectWnd, rectTab;
-	int nWidthBTN, nIntervalBTN;
+	int nWidthBTN, nIntervalBTN, nFix;
 
 	//Get button sizes and positions
 
@@ -134,27 +134,20 @@ void PP0_PropertySheet::OnShowWindow(BOOL bShowing, int nReason)
 	ScreenToClient(rectTab);
 
 	// 调整按钮大小，以适应各种不同dpi
-	rectCancel.left += 10;
-	rectCancel.right = rectTab.right - 1;
-	//rectCancel.left -= 5;
-	//rectCancel.right -= 20;
+	//nIntervalBTN = rectCancel.left - rectOK.right;
+	nFix = 5;
+	nIntervalBTN = 25;
+	nWidthBTN = rectCancel.Width() - nFix;
+
+	rectCancel.right = rectTab.right - 2;
+	rectCancel.left = rectCancel.right - nWidthBTN;
 	GetDlgItem(IDCANCEL).MoveWindow(rectCancel);
 
-	//nIntervalBTN = rectCancel.left - rectOK.right;
-	nIntervalBTN = 20;
-	nWidthBTN = rectCancel.Width();
-
-	rectOK.left += 20;	//rectOK按钮减小20
-	//rectOK.right -= 20;
-	//rectOK.left -= 0;
-	//rectOK.right -= 20;
-	//::MoveWindow(GetDlgItem(IDOK), rectOK);
-	//rectOK.MoveToX(rectOK.right - nIntervalBTN);	//将rectOK.Left = 参数
+	rectOK.left = rectOK.right - nWidthBTN;
 	rectOK.MoveToX(rectCancel.left - nIntervalBTN - rectOK.Width());
 	GetDlgItem(IDOK).MoveWindow(rectOK);
 	
 	//不行::ScreenToClient(::GetParent(m_hWnd), &rectOK);	::ScreenToClient(::GetParent(m_hWnd), &rectTab);
-
 
 	rectNew = rectCancel;
 	//rectNew.left = rectWnd.left + (rectWnd.right - rectCancel.right);
@@ -165,22 +158,22 @@ void PP0_PropertySheet::OnShowWindow(BOOL bShowing, int nReason)
 	//rectNew.MoveToX(rectOK.left - (rectNew.Width() + nIntervalBTN));
 	//rectNew.MoveToX(rectTab.left + 20);
 	m_btnLoadOldValue.Create(m_hWnd, rectNew, L"加载设置", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE |
-		WS_TABSTOP, NULL, IDC_BTN_LOAD_SET_FROM_FILE, (LPVOID)IDC_BTN_LOAD_SET_FROM_FILE);
+		WS_TABSTOP, NULL, IDB_LOAD_SET, (LPVOID)IDB_LOAD_SET);
 	m_btnLoadOldValue.SetFont(GetFont());
 
 	// 恢复新的设置，不退出设置界面
 	rectNew.MoveToX(rectNew.right + nIntervalBTN);
 	//rectNew.MoveToX(rectNew.left + 145);
 	m_btnLoadNewValue.Create(m_hWnd, rectNew, L"保存设置", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE |
-		WS_TABSTOP, NULL, IDC_BTN_SAVE_SET_TO_FILE, (LPVOID)IDC_BTN_SAVE_SET_TO_FILE);
+		WS_TABSTOP, NULL, IDB_SAVE_SET, (LPVOID)IDB_SAVE_SET);
 	m_btnLoadNewValue.SetFont(GetFont());
 
 	// 应用设置，不退出设置界面
-	rectNew.MoveToX(rectOK.left - (rectNew.Width() + nIntervalBTN));
-	//rectNew.MoveToX(rectNew.left + 265);
-	m_btnApply.Create(m_hWnd, rectNew, L"应用", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE |
-		WS_TABSTOP, NULL, IDC_BTN_APPLY, (LPVOID)IDC_BTN_APPLY);
-	m_btnApply.SetFont(GetFont());
+	//rectNew.MoveToX(rectOK.left - (rectNew.Width() + nIntervalBTN));
+	////rectNew.MoveToX(rectNew.left + 265);
+	//m_btnApply.Create(m_hWnd, rectNew, L"应用", BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE |
+	//	WS_TABSTOP, NULL, IDC_BTN_APPLY, (LPVOID)IDC_BTN_APPLY);
+	//m_btnApply.SetFont(GetFont());
 
 
 	//SetWindowPos代码设置控件Tab顺序完全成功
@@ -188,8 +181,8 @@ void PP0_PropertySheet::OnShowWindow(BOOL bShowing, int nReason)
 	::SetWindowPos(GetDlgItem(IDCANCEL), m_hWnd, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 	::SetWindowPos(GetDlgItem(IDOK) , GetDlgItem(IDCANCEL), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);//wndTop是设置为Z顺序的最顶部!)
 	::SetWindowPos(GetDlgItem(IDC_BTN_APPLY), GetDlgItem(IDOK), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
-	::SetWindowPos(GetDlgItem(IDC_BTN_SAVE_SET_TO_FILE), GetDlgItem(IDC_BTN_APPLY), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
-	::SetWindowPos(GetDlgItem(IDC_BTN_LOAD_SET_FROM_FILE), GetDlgItem(IDC_BTN_SAVE_SET_TO_FILE), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+	::SetWindowPos(GetDlgItem(IDB_SAVE_SET), GetDlgItem(IDC_BTN_APPLY), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+	::SetWindowPos(GetDlgItem(IDB_LOAD_SET), GetDlgItem(IDB_SAVE_SET), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
 
 	//m_btnApplyQuit.Attach(GetDlgItem(IDOK));	//退出报错，估计系统已经绑定该控件
 	//m_btnCancle.Attach(GetDlgItem(IDCANCEL));	//退出报错，估计系统已经绑定该控件
@@ -232,8 +225,8 @@ LRESULT PP0_PropertySheet::OnApply(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 }
 
 // 应用设置，退出设置界面
-LRESULT PP0_PropertySheet::OnApplyAll(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
-{
+//LRESULT PP0_PropertySheet::OnApplyAll(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+//{
 	//OnApply(wNotifyCode, wID, hWndCtl, bHandled);	// 应用设置
 	//this->PostMessageW(WM_CLOSE);					// 退出设置界面。用PostMessageW是允许进行后续扫尾处理
 
@@ -246,6 +239,6 @@ LRESULT PP0_PropertySheet::OnApplyAll(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 	//// 昞帵傪峏怴偡傞丅
 	//m_pp1FontSet.theUpdateDisplay();
 
-	return true;
-}
+//	return true;
+//}
 

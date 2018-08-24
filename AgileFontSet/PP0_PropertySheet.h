@@ -32,11 +32,12 @@ public:
 	BEGIN_MSG_MAP(PP0_PropertySheet)
 		//MSG_WM_INITDIALOG(OnInitDialog)
 		MSG_WM_SHOWWINDOW(OnShowWindow)
-		COMMAND_ID_HANDLER(IDOK, OnApplyAll)						// 应用设置，退出设置界面
+		COMMAND_ID_HANDLER(IDOK, OnApply)						// 应用设置，退出设置界面
+		//COMMAND_ID_HANDLER(IDOK, OnApplyAll)					// 应用设置，退出设置界面
 		//COMMAND_ID_HANDLER(IDM_ABOUT, OnAppAbout)				// 响应关于菜单项
 		//COMMAND_HANDLER(IDOK, BN_CLICKED, OnSaveAllToFile)
-		COMMAND_HANDLER(IDC_BTN_APPLY, BN_CLICKED, OnApply)		// 应用设置，不退出设置界面
-		COMMAND_HANDLER(IDC_BTN_LOAD_SET_FROM_FILE, BN_CLICKED, OnLoadSetFromFile)
+		//COMMAND_HANDLER(IDC_BTN_APPLY, BN_CLICKED, OnApply)	// 应用设置，不退出设置界面
+		COMMAND_HANDLER(IDB_LOAD_SET, BN_CLICKED, OnLoadSetFromFile)
 		//COMMAND_HANDLER(IDC_BTN_LOAD_NEW_VALUE, BN_CLICKED, OnLoadDefaultAll)
 		//COMMAND_HANDLER(IDC_BTN_LOAD_NEW_VALUE, BN_CLICKED, OnLoadNewValue)// 加载新的设置，不退出设置界面
 		//COMMAND_HANDLER(IDC_BTN_LOAD_OLD_VALUE, BN_CLICKED, OnLoadOldValue)// 恢复旧有设置，不退出设置界面
@@ -47,7 +48,7 @@ public:
 	//bool OnSaveAllToFile(CString strFileName);
 	//LRESULT OnOK(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled)
 	//保存全部修改，不退出设置界面
-	LRESULT OnApplyAll(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled);
+	//LRESULT OnApplyAll(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled);
 
 	LRESULT OnApply(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& bHandled);
 
