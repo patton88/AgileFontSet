@@ -138,7 +138,7 @@ public:
 		//生成一种配置所包含的字符标识容器数组vecRCN
 		for(unsigned j = 0; j < vecRCN2.size(); j++) {
 			for (unsigned i = 0; i < vecRCN1.size(); i++) {
-				vecRCN.push_back(vecRCN1[i] + L"_" + vecRCN1[j] + L"_" + strRCN3);
+				vecRCN.push_back(vecRCN1[i] + L"_" + vecRCN2[j] + L"_" + strRCN3);
 				if (0 == j) { mapRCN[vecRCN1[i]] = tagFontInfo(); }	//创建mapRCN元素
 			}
 		}
