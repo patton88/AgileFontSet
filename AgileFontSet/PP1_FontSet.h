@@ -255,14 +255,6 @@ public:
 	int readFontResource8(CString file);
 	//加载Windows 10的字体预设资源
 	int readFontResource10(CString file);
-	//加载资源（用于字体名称）。
-	int readFontFace(wchar_t* buffer, CString file, CString key);
-	//加载资源（字体大小）。
-	LONG readFontSize(LONG* buffer, CString file, CString key);
-	//加载资源（用于字体字符集）。
-	int readFontCharset(BYTE* buffer, CString file, CString key);
-	//加载资源（用于图标间距）。
-	int readIconSpacing(unsigned& buffer, CString file, CString key);
 	//字体容器、字体选择容器初始化。tag是结构体struct缩写的前缀
 	void initSelFont(void);
 	int ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontName, HFONT& hFont, CEditImpl& edit);

@@ -1874,17 +1874,23 @@ int PP1_FontSet::readFontResource(CString file, CPreset& tagSet)
 {
 	// 读取字体容器循环赋值
 	CString str;
+	int iRet;
 	for (auto& rcn2 : tagSet.vecRCN2) {
 		for (auto& rcn1 : tagSet.vecRCN1) {
 			str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
 			if (rcn2 == tagSet.vecRCN2[0]) {			// 字体名称容器赋值
-				if (readFontFace(tagSet.mapRCN[rcn1].m0_strFace, file, str) == 0) { return 0; }
+				iRet = GetPrivateProfileString(L"PRESET", str, L"", tagSet.mapRCN[rcn1].m0_strFace, 255, file);
+				if (0 == iRet) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[1]) {	// 字体大小循环赋值
-				if (readFontSize(tagSet.mapRCN[rcn1].m1_lHeight, file, str) == 0) { return 0; }
+				iRet = GetPrivateProfileInt(L"PRESET", str, 0, file);
+				if (0 == iRet) { return 0; }
+				*tagSet.mapRCN[rcn1].m1_lHeight = getFontHight(iRet);	//将获得的iSize转换为字体高返回
 			}
 			else if (rcn2 == tagSet.vecRCN2[2]) {	// 字符集循环赋值
-				if (readFontCharset(tagSet.mapRCN[rcn1].m2_bCharset, file, str) == 0) { return 0; }
+				iRet = GetPrivateProfileInt(L"PRESET", str, 0, file);
+				if (0 == iRet) { return 0; }
+				*tagSet.mapRCN[rcn1].m2_bCharset = iRet;
 			}
 		}
 	}
@@ -1893,10 +1899,11 @@ int PP1_FontSet::readFontResource(CString file, CPreset& tagSet)
 	tagSet.SetAllFont();
 
 	// 读取图标间距。读取不成功，使用默认值
-	if (readIconSpacing(tagSet.tagIS.nHS, file, tagSet.vecIS[0] + L"_" + tagSet.strRCN3) == 0) {
-		tagSet.tagIS.nHS = 80; }
-	if (readIconSpacing(tagSet.tagIS.nVS, file, tagSet.vecIS[1] + L"_" + tagSet.strRCN3) == 0) {
-		tagSet.tagIS.nVS = 48; }
+	tagSet.tagIS.nHS = iRet = GetPrivateProfileInt(L"PRESET", tagSet.vecIS[0] + L"_" + tagSet.strRCN3, 0, file);
+	if (0 == iRet) { tagSet.tagIS.nHS = 80; }
+
+	tagSet.tagIS.nVS = iRet = GetPrivateProfileInt(L"PRESET", tagSet.vecIS[1] + L"_" + tagSet.strRCN3, 0, file);
+	if (0 == iRet) { tagSet.tagIS.nVS = 48; }
 
 	return 0;
 }
@@ -1908,83 +1915,6 @@ int PP1_FontSet::readFontResource10(CString file)
 	readFontResource(file, m_tagSetWin10);
 
 	return 1;
-}
-
-/**
-*加载资源（用于字体名称）。
-*
-* @param缓冲存储位置
-* @param文件资源文件名
-* @param键键名
-*/
-// 字体名称
-//result = readFontFace(fontFaces8, file, _T("CAPTION_FACE_8"));		//CAPTION_FACE_8=Segoe UI
-int PP1_FontSet::readFontFace(wchar_t* buffer, CString file, CString key)
-{
-	wchar_t buf[255];
-	int len;
-
-	//wcscpy_s是一个能够拷贝宽字符类型字符串的安全函数。它返回一个error_t类型的值。函数原型为:
-	//error_t wcscpy_s(wchar_t *strDestination, size_t numberOfCharacters, const wchar_t *strSource);
-
-	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	len = GetPrivateProfileString(L"PRESET", key, L"", buf, 255, file);
-	if (len > 0) {
-		//buffer = buf;
-
-		//buffer是LOGFONTW类型：WCHAR lfFaceName[LF_FACESIZE];	//#define LF_FACESIZE 32 //Logical Font
-		//所以拷贝的字符串(含末尾\0)的总长度不能超过32
-		wcscpy_s(buffer, min(wcslen(buf) + 1, 32), buf);
-	}
-
-	return len;
-}
-
-/**
-*加载资源（字体大小）。
-*
-* @param缓冲存储位置
-* @param文件资源文件名
-* @param键键名
-*/
-LONG PP1_FontSet::readFontSize(LONG* buffer, CString file, CString key)
-{
-	int iSize;
-
-	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	iSize = GetPrivateProfileInt(L"PRESET", key, 0, file);
-	*buffer = getFontHight(iSize);	//将获得的iSize转换为字体高返回
-
-	return *buffer;
-}
-
-/**
-*加载资源（用于字体字符集）。
-*
-* @param缓冲存储位置
-* @param文件资源文件名
-* @param键键名
-*/
-int PP1_FontSet::readFontCharset(BYTE* buffer, CString file, CString key)
-{
-	int iSize;
-
-	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	iSize = GetPrivateProfileInt(L"PRESET", key, 0, file);
-	*buffer = iSize;
-
-	return iSize;
-}
-
-int PP1_FontSet::readIconSpacing(unsigned& buffer, CString file, CString key)
-{
-	int iSize;
-
-	//读取INI文件。 如果该文件在Unicode版本的API中是非Unicode的，它读作每种语言的字符代码文件。
-	iSize = GetPrivateProfileInt(L"PRESET", key, 0, file);
-	buffer = iSize;
-
-	return iSize;
 }
 
 //应用设置，刷新桌面
