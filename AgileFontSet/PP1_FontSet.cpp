@@ -1333,17 +1333,90 @@ BOOL PP1_FontSet::startSaveFont(CString filename)
 	if (!saveResult) {
 		return FALSE;
 	}
+	saveResult = savePreset(filename, L"Win8xPreset", m_tagSetWin8);
+	if (!saveResult) {
+		return FALSE;
+	}
+	saveResult = savePreset(filename, L"Win10Preset", m_tagSetWin10);
+	if (!saveResult) {
+		return FALSE;
+	}
 
 	return TRUE;
+}
+
+//Save Windows Preset
+BOOL PP1_FontSet::savePreset(CString filename, CString section, CPreset& tagSet)
+{
+	BOOL bRet;
+
+	// 写入字体容器循环赋值
+	CString str;
+	for (auto& rcn2 : tagSet.vecRCN2) {
+		for (auto& rcn1 : tagSet.vecRCN1) {
+			str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
+			if (rcn2 == tagSet.vecRCN2[0]) {			// 写入字体名称容器
+				bRet = WritePrivateProfileString(
+					section, str, tagSet.mapRCN[rcn1].m0_strFace, filename);
+				if (!bRet) { return 0; }
+			}
+			else if (rcn2 == tagSet.vecRCN2[1]) {	// 写入字体大小循环
+				bRet = WritePrivateProfileString(
+					section, str,  itos(getFontSize(*tagSet.mapRCN[rcn1].m1_lHeight)), filename);
+				if (!bRet) { return 0; }
+			}
+			else if (rcn2 == tagSet.vecRCN2[2]) {	// 写入字符集循环
+				bRet = WritePrivateProfileString(
+					section, str, itos(*tagSet.mapRCN[rcn1].m2_bCharset), filename);
+				if (!bRet) { return 0; }
+			}
+		}
+	}
+
+	// 写入图标间距
+	bRet = WritePrivateProfileString(
+		section, tagSet.vecIS[0] + L"_" + tagSet.strRCN3, itos(tagSet.tagIS.nHS), filename);
+	if (!bRet) { return FALSE; }
+
+	bRet = WritePrivateProfileString(
+		section, tagSet.vecIS[1] + L"_" + tagSet.strRCN3, itos(tagSet.tagIS.nVS), filename);
+	if (!bRet) { return FALSE; }
+
+	//// 读取字体容器循环赋值
+	//CString str;
+	//for (auto& rcn2 : tagSet.vecRCN2) {
+	//	for (auto& rcn1 : tagSet.vecRCN1) {
+	//		str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
+	//		if (rcn2 == tagSet.vecRCN2[0]) {			// 字体名称容器赋值
+	//			if (readFontFace(tagSet.mapRCN[rcn1].m0_strFace, file, str) == 0) { return 0; }
+	//		}
+	//		else if (rcn2 == tagSet.vecRCN2[1]) {	// 字体大小循环赋值
+	//			if (readFontSize(tagSet.mapRCN[rcn1].m1_lHeight, file, str) == 0) { return 0; }
+	//		}
+	//		else if (rcn2 == tagSet.vecRCN2[2]) {	// 字符集循环赋值
+	//			if (readFontCharset(tagSet.mapRCN[rcn1].m2_bCharset, file, str) == 0) { return 0; }
+	//		}
+	//	}
+	//}
+
+	////保存所有字体信息
+	//tagSet.SetAllFont();
+
+	//// 读取图标间距。读取不成功，使用默认值
+	//if (readIconSpacing(tagSet.tagIS.nHS, file, tagSet.vecIS[0] + L"_" + tagSet.strRCN3) == 0) {
+	//	tagSet.tagIS.nHS = 80;
+	//}
+	//if (readIconSpacing(tagSet.tagIS.nVS, file, tagSet.vecIS[1] + L"_" + tagSet.strRCN3) == 0) {
+	//	tagSet.tagIS.nVS = 48;
+	//}
+
+	return bRet;
 }
 
 //Save Icon Sapcing
 BOOL PP1_FontSet::saveIS(CString filename, CString section, TagIS* tagIS)
 {
 	BOOL bRet;
-
-	unsigned nHS;	//ICON_HORIZONTAL_SPACING
-	unsigned nVS;	//ICON_VERTICAL_SPACING
 
 	bRet = WritePrivateProfileString(section,
 		L"IconHorizontalSpacing",

@@ -235,6 +235,7 @@ public:
 	BOOL startSaveFont(CString filename);
 	BOOL saveFont(CString filename, CString section, LOGFONT* font);
 	BOOL saveIS(CString filename, CString section, TagIS *tagIS);	//Save Icon Sapcing
+	BOOL savePreset(CString filename, CString section, CPreset& tagSet);//Save Windows Preset
 	BOOL loadFont(CString filename, CString section, LOGFONT* font);
 	BOOL loadFontInfo(CString filename);
 	int getDPI(void);
