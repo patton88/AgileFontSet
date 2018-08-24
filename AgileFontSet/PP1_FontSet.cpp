@@ -1118,6 +1118,7 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 		if (isSectionExists(strSec, filename))
 		{
 			m_vecTagSetUser.emplace_back(CPreset(strSuf));
+			m_vecTagSetUser[i].initmapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
 			readFontResource(filename, strSec, m_vecTagSetUser[i]);
 			m_comboPreSet.AddString(L"用户配置" + itos(i));	//3 + i
 		}
@@ -1393,7 +1394,7 @@ BOOL PP1_FontSet::savePreset(CString filename, CString section, CPreset& tagSet)
 			str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
 			if (rcn2 == tagSet.vecRCN2[0]) {			// 写入字体名称容器
 				bRet = WritePrivateProfileString(
-					section, str, tagSet.mapRCN[rcn1].m0_strFace, filename);
+					section, str, *tagSet.mapRCN[rcn1].m0_strFace, filename);
 				if (!bRet) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[1]) {	// 写入字体大小循环
@@ -1902,8 +1903,8 @@ int PP1_FontSet::readFontResource(CString filename, CString sectionName, CPreset
 	for (auto& rcn2 : tagSet.vecRCN2) {
 		for (auto& rcn1 : tagSet.vecRCN1) {
 			str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
-			if (rcn2 == tagSet.vecRCN2[0]) {			// 字体名称容器赋值
-				iRet = GetPrivateProfileString(sectionName, str, L"", tagSet.mapRCN[rcn1].m0_strFace, 255, filename);
+			if (rcn2 == tagSet.vecRCN2[0]) {		// 字体名称容器赋值
+				iRet = GetPrivateProfileString(sectionName, str, L"", *tagSet.mapRCN[rcn1].m0_strFace, 255, filename);
 				if (0 == iRet) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[1]) {	// 字体大小循环赋值

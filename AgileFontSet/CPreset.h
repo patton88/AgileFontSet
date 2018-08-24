@@ -26,11 +26,18 @@ struct TagIS			//tag of Icon Spacing
 	unsigned nVS;	//ICON_VERTICAL_SPACING
 };
 
+//数组指针的定义
+//int(*PArrayType)[5];
+//int c[5] = { 1,2,3,4,5 };
+////PArrayType pArray;
+//PArrayType = &c;
+
 struct tagFontInfo
 {
-	wchar_t* m0_strFace;	//L"FACE"
-	LONG* m1_lHeight;			//L"SIZE"，在显示到CEdit、存入文件时，需将m1_lHeight转换为Size
-	BYTE* m2_bCharset;			//L"CHARSET"
+	//wchar_t* m0_strFace;	//L"FACE"。这样定义有问题
+	wchar_t (*m0_strFace) [32];	//L"FACE"。数组指针的定义
+	LONG* m1_lHeight;		//L"SIZE"，在显示到CEdit、存入文件时，需将m1_lHeight转换为Size
+	BYTE* m2_bCharset;		//L"CHARSET"
 };
 
 class CPreset		//class Preset
@@ -146,35 +153,47 @@ public:
 		vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
 
 		//为已创建的mapRCN元素赋值
-		mapRCN[vecRCN1[0]].m0_strFace = metrics.lfCaptionFont.lfFaceName;
-		mapRCN[vecRCN1[0]].m1_lHeight = &metrics.lfCaptionFont.lfHeight;
-		mapRCN[vecRCN1[0]].m2_bCharset = &metrics.lfCaptionFont.lfCharSet;
+		//error C2440: '=': cannot convert from 'WCHAR (*)[32]' to 'wchar_t *'
+		//WCHAR(*p)[32];
+		//p = &metrics.lfCaptionFont.lfFaceName;
 
-		mapRCN[vecRCN1[1]].m0_strFace = iconFont.lfFaceName;
-		mapRCN[vecRCN1[1]].m1_lHeight = &iconFont.lfHeight;
-		mapRCN[vecRCN1[1]].m2_bCharset = &iconFont.lfCharSet;
+		//m_vecTagSetUser[i].initmapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
+		//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
+		initmapRCN();
+	}
 
-		mapRCN[vecRCN1[2]].m0_strFace = metrics.lfMenuFont.lfFaceName;
-		mapRCN[vecRCN1[2]].m1_lHeight = &metrics.lfMenuFont.lfHeight;
-		mapRCN[vecRCN1[2]].m2_bCharset = &metrics.lfMenuFont.lfCharSet;
-
-		mapRCN[vecRCN1[3]].m0_strFace = metrics.lfMessageFont.lfFaceName;
-		mapRCN[vecRCN1[3]].m1_lHeight = &metrics.lfMessageFont.lfHeight;
-		mapRCN[vecRCN1[3]].m2_bCharset = &metrics.lfMessageFont.lfCharSet;
-
-		mapRCN[vecRCN1[4]].m0_strFace = metrics.lfSmCaptionFont.lfFaceName;
-		mapRCN[vecRCN1[4]].m1_lHeight = &metrics.lfSmCaptionFont.lfHeight;
-		mapRCN[vecRCN1[4]].m2_bCharset = &metrics.lfSmCaptionFont.lfCharSet;
-
-		mapRCN[vecRCN1[5]].m0_strFace = metrics.lfStatusFont.lfFaceName;
-		mapRCN[vecRCN1[5]].m1_lHeight = &metrics.lfStatusFont.lfHeight;
-		mapRCN[vecRCN1[5]].m2_bCharset = &metrics.lfStatusFont.lfCharSet;
-
+	// 将菜单字体的信息应用于其他字体的信息。
+	void initmapRCN()
+	{
 		FillMemory(&metrics, sizeof(NONCLIENTMETRICSW), 0x00);
 		FillMemory(&metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
 		FillMemory(&iconFont, sizeof(LOGFONTW), 0x00);
 		FillMemory(&iconFontAll, sizeof(LOGFONTW), 0x00);
 		tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
+
+		mapRCN[vecRCN1[0]].m0_strFace = &metrics.lfCaptionFont.lfFaceName;
+		mapRCN[vecRCN1[0]].m1_lHeight = &metrics.lfCaptionFont.lfHeight;
+		mapRCN[vecRCN1[0]].m2_bCharset = &metrics.lfCaptionFont.lfCharSet;
+
+		mapRCN[vecRCN1[1]].m0_strFace = &iconFont.lfFaceName;
+		mapRCN[vecRCN1[1]].m1_lHeight = &iconFont.lfHeight;
+		mapRCN[vecRCN1[1]].m2_bCharset = &iconFont.lfCharSet;
+
+		mapRCN[vecRCN1[2]].m0_strFace = &metrics.lfMenuFont.lfFaceName;
+		mapRCN[vecRCN1[2]].m1_lHeight = &metrics.lfMenuFont.lfHeight;
+		mapRCN[vecRCN1[2]].m2_bCharset = &metrics.lfMenuFont.lfCharSet;
+
+		mapRCN[vecRCN1[3]].m0_strFace = &metrics.lfMessageFont.lfFaceName;
+		mapRCN[vecRCN1[3]].m1_lHeight = &metrics.lfMessageFont.lfHeight;
+		mapRCN[vecRCN1[3]].m2_bCharset = &metrics.lfMessageFont.lfCharSet;
+
+		mapRCN[vecRCN1[4]].m0_strFace = &metrics.lfSmCaptionFont.lfFaceName;
+		mapRCN[vecRCN1[4]].m1_lHeight = &metrics.lfSmCaptionFont.lfHeight;
+		mapRCN[vecRCN1[4]].m2_bCharset = &metrics.lfSmCaptionFont.lfCharSet;
+
+		mapRCN[vecRCN1[5]].m0_strFace = &metrics.lfStatusFont.lfFaceName;
+		mapRCN[vecRCN1[5]].m1_lHeight = &metrics.lfStatusFont.lfHeight;
+		mapRCN[vecRCN1[5]].m2_bCharset = &metrics.lfStatusFont.lfCharSet;
 	}
 
 	// 将菜单字体的信息应用于其他字体的信息。
@@ -242,7 +261,7 @@ public:
 			for (auto& rcn1 : vecRCN1) {
 				str = rcn1 + L"_" + rcn2 + L"_" + strRCN3;
 				if (rcn2 == vecRCN2[0]) {		// 字体名称容器赋值
-					wcscpy_s(mapRCN[rcn1].m0_strFace, min(mapRCNx[str].GetLength() + 1, 32), mapRCNx[str].GetBuffer(0));
+					wcscpy_s(*mapRCN[rcn1].m0_strFace, min(mapRCNx[str].GetLength() + 1, 32), mapRCNx[str].GetBuffer(0));
 				}
 				else if (rcn2 == vecRCN2[1]) {	// 字体大小循环赋值
 					iRet = _wtoi(mapRCNx[str]);
