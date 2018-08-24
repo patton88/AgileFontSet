@@ -10,6 +10,8 @@
 #include "AgileFontSet.h"
 
 CAppModule _Module;
+HWND hwndPP1;
+
 CString g_strVerInfo = L"—∏Ω›◊÷ÃÂ…Ë÷√≥Ã–Úv1.0 - ybmj@vip.163.com 20180825";
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrCmdLine, int nCmdShow)

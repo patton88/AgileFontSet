@@ -182,8 +182,6 @@ public:
 	LRESULT OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 	// DDX variables
-	CString m_strChrome;
-	CEditImpl m_editChrome;
 	BOOL m_bReInit;
 
 	//Windows内建控件CSpinButtonCtrl的WTL封装类为：CUpDownCtrl

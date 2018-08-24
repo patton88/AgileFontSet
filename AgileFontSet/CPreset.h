@@ -8,6 +8,8 @@
 #include <map>
 using std::vector; using std::map;
 
+extern HWND hwndPP1;
+
 struct TagIS			//tag of Icon Spacing
 {
 	TagIS& operator =(const TagIS& tag)		//重载赋值运算符
@@ -82,6 +84,52 @@ public:
 		L"ICON_VERTICAL_SPACING"
 	};
 
+	vector<CString> vecWin8xPreSet{
+		"Segoe UI",
+		"Segoe UI",
+		"Segoe UI",
+		"Segoe UI",
+		"Segoe UI",
+		"Segoe UI",
+		"11",
+		"9",
+		"9",
+		"9",
+		"11",
+		"9",
+		"1",
+		"1",
+		"1",
+		"1",
+		"1",
+		"1",
+		"77",
+		"47"
+	};
+
+	vector<CString> vecWin10PreSet{
+		"Segoe UI",
+		"Segoe UI",
+		"Segoe UI",
+		"Segoe UI",
+		"Segoe UI",
+		"Segoe UI",
+		"9",
+		"9",
+		"9",
+		"9",
+		"9",
+		"9",
+		"1",
+		"1",
+		"1",
+		"1",
+		"1",
+		"1",
+		"75",
+		"45"
+	};
+
 	//用于循环处理的关键数据结构mapRCN
 	map<CString, tagFontInfo> mapRCN;
 
@@ -139,5 +187,84 @@ public:
 		metricsAll.lfMessageFont = metricsAll.lfMenuFont;
 		metricsAll.lfSmCaptionFont = metricsAll.lfMenuFont;
 		metricsAll.lfStatusFont = metricsAll.lfMenuFont;
+	}
+
+	int getDPI(void)
+	{
+		int dpiY = 96;
+		CClientDC dc(hwndPP1);
+
+		if (dc) { dpiY = GetDeviceCaps(dc, LOGPIXELSY); }
+		return dpiY;
+	}
+
+	//从字体高度获取字体大小。
+	int getFontSize(LONG lFontHight)
+	{
+		//获得字体大小。从字体高度H到字体大小S需要进行换算，
+		//H = -(S * dpiY / 72)
+		//S = -(H * 72 / dpiY)
+		//MulDiv(a, b, c) 就是计算 a * b / c，结果四舍五入
+		//m_metrics.lfCaptionFont.lfHeight = -MulDiv(fontSizes8[0], dpiY, 72);
+
+		int dpiY = getDPI();		//获取DPI。
+		int iSzie = -(lFontHight * 72 / dpiY);
+		return iSzie;
+	}
+
+	//从字体大小获取字体高度。
+	LONG getFontHight(int lFontSize)
+	{
+		//获得字体大小。从字体高度H到字体大小S需要进行换算，
+		//H = -(S * dpiY / 72)
+		//S = -(H * 72 / dpiY)
+		//MulDiv(a, b, c) 就是计算 a * b / c，结果四舍五入
+		//m_metrics.lfCaptionFont.lfHeight = -MulDiv(fontSizes8[0], dpiY, 72);
+
+		int dpiY = getDPI();		//获取DPI。
+		int lFontHight = -(lFontSize * dpiY / 72);
+		return lFontHight;
+	}
+
+	// 生成预设配置数据结构
+	int getPreset(vector<CString>& vecDataX)
+	{
+		//生成一种配置所包含的字符标识容器数组mapRCNx
+		map<CString, CString> mapRCNx;
+		for (unsigned i = 0; i < vecDataX.size(); i++) {
+			mapRCNx[vecRCN[i]] = vecDataX[i];
+		}
+
+		// 读取字体容器循环赋值
+		CString str;
+		int iRet;
+		for (auto& rcn2 : vecRCN2) {
+			for (auto& rcn1 : vecRCN1) {
+				str = rcn1 + L"_" + rcn2 + L"_" + strRCN3;
+				if (rcn2 == vecRCN2[0]) {		// 字体名称容器赋值
+					wcscpy_s(mapRCN[rcn1].m0_strFace, min(mapRCNx[str].GetLength() + 1, 32), mapRCNx[str].GetBuffer(0));
+				}
+				else if (rcn2 == vecRCN2[1]) {	// 字体大小循环赋值
+					iRet = _wtoi(mapRCNx[str]);
+					*mapRCN[rcn1].m1_lHeight = getFontHight(iRet);	//将获得的iSize转换为字体高返回
+				}
+				else if (rcn2 == vecRCN2[2]) {	// 字符集循环赋值
+					iRet = _wtoi(mapRCNx[str]);
+					*mapRCN[rcn1].m2_bCharset = iRet;
+				}
+			}
+		}
+
+		//保存所有字体信息
+		SetAllFont();
+
+		// 读取图标间距。读取不成功，使用默认值
+		tagIS.nHS = iRet = _wtoi(mapRCNx[vecIS[0]]);
+		if (0 == iRet) { tagIS.nHS = 80; }
+
+		tagIS.nVS = iRet = _wtoi(mapRCNx[vecIS[1]]);
+		if (0 == iRet) { tagIS.nVS = 48; }
+
+		return 1;
 	}
 };

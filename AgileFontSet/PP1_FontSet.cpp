@@ -9,6 +9,7 @@
 
 extern DWORD GetWinOsName(CString& strOsName);
 extern CString itos(int i);
+extern HWND hwndPP1;
 
 //用全局变量 g_ThreadParam[11] 代替 new ThreadParam。避免在子线程异常时造成无法delete lpParameter;
 //ThreadParam g_ThreadParam[11];
@@ -57,7 +58,7 @@ PP1_FontSet::PP1_FontSet() : m_bReInit(FALSE)
 
 BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 {
-	m_strChrome.Empty();
+	hwndPP1 = m_hWnd;
 
 	//替换RadminMinfo类的IDC_EDIT_README的窗口过程。当在IDC_EDIT_README的窗口中按回车，便关闭属性表单对话框
 	//if (NULL == winproc_prev_My2)
@@ -1706,12 +1707,16 @@ void PP1_FontSet::initializeLocale(void)
 
 	CString langPath;
 
-	langPath = getCurDir(1);		//g:\MyVC2017\noMeiryoUI235\Debug		//末尾无斜杠
-	langPath = langPath.Left(langPath.ReverseFind(L'\\') + 1);	//g:\MyVC2017\noMeiryoUI235\ //末尾含斜杠
-	langPath = langPath + L"lang\\" + L"English.lng";	//L"G:\\MyVC2017\\noMeiryoUI235\\lang\\English.lng"
+	//langPath = getCurDir(1);		//g:\MyVC2017\noMeiryoUI235\Debug		//末尾无斜杠
+	//langPath = langPath.Left(langPath.ReverseFind(L'\\') + 1);	//g:\MyVC2017\noMeiryoUI235\ //末尾含斜杠
+	//langPath = langPath + L"lang\\" + L"English.lng";	//L"G:\\MyVC2017\\noMeiryoUI235\\lang\\English.lng"
 
-	if (0 == readFontResource(langPath, m_tagSetWin8)) { has8Preset = false; }
-	if (0 == readFontResource(langPath, m_tagSetWin10)) { has10Preset = false; }
+	//if (0 == readFontResource(langPath, m_tagSetWin8)) { has8Preset = false; }
+	//if (0 == readFontResource(langPath, m_tagSetWin10)) { has10Preset = false; }
+
+	//内部自动预设配置
+	if (0 == m_tagSetWin8.getPreset(m_tagSetWin8.vecWin8xPreSet)) { has8Preset = false; }
+	if (0 == m_tagSetWin10.getPreset(m_tagSetWin10.vecWin10PreSet)) { has10Preset = false; }
 
 	//设置Win7兼容风格度量菜单是否可用
 	//warning C4996: 'GetVersion': was declared deprecated
