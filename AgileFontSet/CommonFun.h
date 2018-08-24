@@ -859,3 +859,65 @@ Set porperty->configuration properties->manifest tool->embed manifest  To Yes
 
 //获取Windows系统版本-End
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//ini文件处理函数-Begin
+//private 供getSectionCount和getAllSections调用
+void myGetPrivateProfileSectionNames(wchar_t** buf, int bufLen, CString& iniFilePath)
+{
+	DWORD dwRes = GetPrivateProfileSectionNames(*buf, bufLen, iniFilePath);
+	//缓冲区过小,重新设置缓冲区
+	while (dwRes == bufLen - 2)
+	{
+		delete[]buf;
+		bufLen += 1024;
+		*buf = new wchar_t[bufLen];
+		dwRes = GetPrivateProfileSectionNames(*buf, bufLen, iniFilePath);
+	}
+}
+
+//获取所有的section名
+void getAllSections(vector<CString>& vecSections, CString& iniFilePath)
+{
+	int _bufLen = 1024;
+	vecSections.clear();
+
+	wchar_t* buf = new wchar_t[_bufLen];
+	myGetPrivateProfileSectionNames(&buf, _bufLen, iniFilePath);
+
+	/*
+	**通过string来取出每个section的依据
+	**GetPrivateProfileSectionNames取出的sections以\0间隔，存于buf中
+	**string遇见\0就终止
+	*/
+	wchar_t* p = buf;
+	CString strName = p;
+	while (strName.GetLength() != 0)
+	{
+		vecSections.push_back(strName);
+		p += strName.GetLength() + 1;
+		strName = p;
+	}
+
+	delete[]buf;
+}
+
+//判断是否存在指定的section
+bool isSectionExists(CString sectionName, CString& iniFilePath)
+{
+	vector<CString> vec;
+	getAllSections(vec, iniFilePath);
+
+	int count = vec.size();
+	for (int i = 0; i < count; i++)
+	{
+		if (vec[i] == sectionName)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+//ini文件处理函数-End
+//////////////////////////////////////////////////////////////////////////

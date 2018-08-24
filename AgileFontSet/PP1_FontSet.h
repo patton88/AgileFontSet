@@ -302,6 +302,7 @@ public:
 	CPreset m_tagSetLast{ L"LAST" };		//1 …œ“ª¥Œ≈‰÷√
 	CPreset m_tagSetWin8{ L"8" };		//2 Win8.x≈‰÷√
 	CPreset m_tagSetWin10{ L"10" };		//3 Win10≈‰÷√
+	vector<CPreset> m_vecTagSetUser;		//4-x User≈‰÷√ UserPreset1-UserPreset100
 
 	map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
 	

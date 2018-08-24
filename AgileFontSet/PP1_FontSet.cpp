@@ -1091,6 +1091,16 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 	m_metrics.lfSmCaptionFont = smCaptionFont;
 	m_metrics.lfStatusFont = statusFont;
 
+	//检测ini文件中是否存在某个段名
+	BOOL b = isSectionExists(L"UserPreset1", filename);
+
+	//vector<CPreset> m_vecTagSetUser;		//4-x User配置 UserPreset1-UserPreset100
+	//加载可能存在的用户配置UserPreset1-UserPreset100
+	for (int i = 1; i < 101; i++)
+	{
+	}
+
+
 	return TRUE;
 }
 
