@@ -371,30 +371,42 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 {
 	// TODO : Add Code for control notification handler.
 	m_nComboCurSel = m_comboPreSet.GetCurSel();	//组合框选择
-	switch (m_nComboCurSel)
+
+	//处理选择系统自带配置
+	if (m_nComboCurSel > 0 && m_nComboCurSel < 4)
 	{
-	case 0:		//0 进入程序时的旧有配置
-		mySetFont(m_metrics, m_iconFont, m_tagSetOld);
-		theUpdateDisplay();
-		break;
-	case 1:		//1 上一次配置
-		//tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
-		if (-1 != m_tagSetLast.tagIS.nHS) {
-			m_tagSetCur = m_tagSetLast;	//在mySetFont2()中，将会把当前配置写入m_tagSetLast，所以这里先保存
-			mySetFont(m_metrics, m_iconFont, m_tagSetCur);
+		switch (m_nComboCurSel)
+		{
+		case 0:		//0 进入程序时的旧有配置
+			mySetFont(m_metrics, m_iconFont, m_tagSetOld);
 			theUpdateDisplay();
+			break;
+		case 1:		//1 上一次配置
+			//tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
+			if (-1 != m_tagSetLast.tagIS.nHS) {
+				m_tagSetCur = m_tagSetLast;	//在mySetFont2()中，将会把当前配置写入m_tagSetLast，所以这里先保存
+				mySetFont(m_metrics, m_iconFont, m_tagSetCur);
+				theUpdateDisplay();
+			}
+			break;
+		case 2:		//2 Win8.x配置
+			mySetFont(m_metrics, m_iconFont, m_tagSetWin8);
+			theUpdateDisplay();
+			break;
+		case 3:		//3 Win10配置
+			mySetFont(m_metrics, m_iconFont, m_tagSetWin10);
+			theUpdateDisplay();
+			break;
+		default:
+			break;
 		}
-		break;
-	case 2:		//2 Win8.x配置
-		mySetFont(m_metrics, m_iconFont, m_tagSetWin8);
+	}
+
+	//处理选择用户加载配置
+	if (m_nComboCurSel > 3)
+	{
+		mySetFont(m_metrics, m_iconFont, m_vecTagSetUser[m_nComboCurSel - 3]);
 		theUpdateDisplay();
-		break;
-	case 3:		//3 Win10配置
-		mySetFont(m_metrics, m_iconFont, m_tagSetWin10);
-		theUpdateDisplay();
-		break;
-	default:
-		break;
 	}
 
 	return 0;
@@ -1092,14 +1104,26 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 	m_metrics.lfStatusFont = statusFont;
 
 	//检测ini文件中是否存在某个段名
-	BOOL b = isSectionExists(L"UserPreset1", filename);
+	//BOOL b = isSectionExists(L"UserPreset1", filename);
 
 	//vector<CPreset> m_vecTagSetUser;		//4-x User配置 UserPreset1-UserPreset100
 	//加载可能存在的用户配置UserPreset1-UserPreset100
+	CString strSec0 = L"UserPreset", strSec, strSuf;
+	m_vecTagSetUser.clear();		//先清空
+	m_vecTagSetUser.emplace_back(CPreset(L"U0"));	//为从U1开始，所以先存放一个未用的填充元素
 	for (int i = 1; i < 101; i++)
 	{
+		strSec = strSec0 + itos(i);		//段名
+		strSuf = L"U" + itos(i);			//后缀
+		if (isSectionExists(strSec, filename))
+		{
+			m_vecTagSetUser.emplace_back(CPreset(strSuf));
+			readFontResource(filename, strSec, m_vecTagSetUser[i]);
+			m_comboPreSet.AddString(L"用户配置" + itos(i));	//3 + i
+		}
+		else {
+			break; }
 	}
-
 
 	return TRUE;
 }
@@ -1870,7 +1894,7 @@ void PP1_FontSet::readResourceFile(CString file)
 }
 
 //加载预设资源
-int PP1_FontSet::readFontResource(CString file, CPreset& tagSet)
+int PP1_FontSet::readFontResource(CString filename, CString sectionName, CPreset& tagSet)
 {
 	// 读取字体容器循环赋值
 	CString str;
@@ -1879,16 +1903,16 @@ int PP1_FontSet::readFontResource(CString file, CPreset& tagSet)
 		for (auto& rcn1 : tagSet.vecRCN1) {
 			str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
 			if (rcn2 == tagSet.vecRCN2[0]) {			// 字体名称容器赋值
-				iRet = GetPrivateProfileString(L"PRESET", str, L"", tagSet.mapRCN[rcn1].m0_strFace, 255, file);
+				iRet = GetPrivateProfileString(sectionName, str, L"", tagSet.mapRCN[rcn1].m0_strFace, 255, filename);
 				if (0 == iRet) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[1]) {	// 字体大小循环赋值
-				iRet = GetPrivateProfileInt(L"PRESET", str, 0, file);
+				iRet = GetPrivateProfileInt(sectionName, str, 0, filename);
 				if (0 == iRet) { return 0; }
 				*tagSet.mapRCN[rcn1].m1_lHeight = getFontHight(iRet);	//将获得的iSize转换为字体高返回
 			}
 			else if (rcn2 == tagSet.vecRCN2[2]) {	// 字符集循环赋值
-				iRet = GetPrivateProfileInt(L"PRESET", str, 0, file);
+				iRet = GetPrivateProfileInt(sectionName, str, 0, filename);
 				if (0 == iRet) { return 0; }
 				*tagSet.mapRCN[rcn1].m2_bCharset = iRet;
 			}
@@ -1899,10 +1923,10 @@ int PP1_FontSet::readFontResource(CString file, CPreset& tagSet)
 	tagSet.SetAllFont();
 
 	// 读取图标间距。读取不成功，使用默认值
-	tagSet.tagIS.nHS = iRet = GetPrivateProfileInt(L"PRESET", tagSet.vecIS[0] + L"_" + tagSet.strRCN3, 0, file);
+	tagSet.tagIS.nHS = iRet = GetPrivateProfileInt(sectionName, tagSet.vecIS[0] + L"_" + tagSet.strRCN3, 0, filename);
 	if (0 == iRet) { tagSet.tagIS.nHS = 80; }
 
-	tagSet.tagIS.nVS = iRet = GetPrivateProfileInt(L"PRESET", tagSet.vecIS[1] + L"_" + tagSet.strRCN3, 0, file);
+	tagSet.tagIS.nVS = iRet = GetPrivateProfileInt(sectionName, tagSet.vecIS[1] + L"_" + tagSet.strRCN3, 0, filename);
 	if (0 == iRet) { tagSet.tagIS.nVS = 48; }
 
 	return 0;

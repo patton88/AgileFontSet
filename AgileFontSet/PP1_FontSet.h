@@ -261,7 +261,7 @@ public:
 
 	//必须放在TagFont定义之后。已有前置申明
 	//加载预设资源
-	int readFontResource(CString file, CPreset& tagSet);
+	int readFontResource(CString filename, CString sectionName, CPreset& tagSet);
 	// 将菜单字体的信息应用于其他字体的信息。
 	void SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont);
 	// 将当前显示配置保存到tagSet中
