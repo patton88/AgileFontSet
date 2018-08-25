@@ -144,6 +144,7 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	m_tagSetLast.RefreshMapRCN();
 	m_tagSetWin8.RefreshMapRCN();
 	m_tagSetWin10.RefreshMapRCN();
+	m_tagSetTemp.RefreshMapRCN();
 
 	//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
 	initializeLocale();
@@ -380,7 +381,7 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 	m_nComboCurSel = m_comboPreSet.GetCurSel();	//组合框选择
 
 	//处理选择系统自带配置
-	if (m_nComboCurSel > 0 && m_nComboCurSel < 4)
+	if (m_nComboCurSel >= 0 && m_nComboCurSel < 4)
 	{
 		switch (m_nComboCurSel)
 		{
@@ -391,8 +392,8 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 		case 1:		//1 上一次配置
 			//tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
 			if (-1 != m_tagSetLast.tagIS.nHS) {
-				m_tagSetCur = m_tagSetLast;	//在mySetFont2()中，将会把当前配置写入m_tagSetLast，所以这里先保存
-				mySetFont(m_metrics, m_iconFont, m_tagSetCur);
+				m_tagSetTemp = m_tagSetLast;	//在mySetFont2()中，将会把当前配置写入m_tagSetLast，所以这里先保存
+				mySetFont(m_metrics, m_iconFont, m_tagSetTemp);
 				theUpdateDisplay();
 			}
 			break;
@@ -564,6 +565,14 @@ void PP1_FontSet::SaveCurSet(CPreset& tagSet)
 	//tagSet::metrics.lfHeight中都统一保存字号；PP1_FontSet::m_metrics.lfHeight中都统一保存字高
 	//二者之间在赋值时，调用getFontHight()、getFontSize()进行转换。
 	//临时使用可生成一个NONCLIENTMETRICSW临时变量
+
+	//保存之前初始化tagSet
+	FillMemory(&tagSet.metrics, sizeof(NONCLIENTMETRICSW), 0x00);
+	FillMemory(&tagSet.metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
+	FillMemory(&tagSet.iconFont, sizeof(LOGFONTW), 0x00);
+	FillMemory(&tagSet.iconFontAll, sizeof(LOGFONTW), 0x00);
+	tagSet.tagIS.nHS = tagSet.tagIS.nVS = -1;		//未存入配置的标志
+	tagSet.RefreshMapRCN();
 
 	//保存当前显示配置，需要保存以下成员
 	tagSet.metrics = m_metrics;
@@ -1669,6 +1678,8 @@ int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPres
 {
 	//应用新配置前，保存当前显示配置到m_tagSetLast
 	SaveCurSet(m_tagSetLast);
+	//将tagSet保存为当前配置。尽量不要使用SaveCurSet()保存配置，有字高到字号的转换误差
+	m_tagSetCur = tagSet;
 
 	//为了保持除字体之外的NONCLIENTMETRICS的当前值，检索NONCLIENTMETRICS的内容。
 	FillMemory(&metrics, sizeof(NONCLIENTMETRICS), 0x00);
@@ -1684,9 +1695,6 @@ int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPres
 
 	m_tagIScur.nHS = tagSet.tagIS.nHS;
 	m_tagIScur.nVS = tagSet.tagIS.nVS;
-
-	//应用新配置前，将新配置保存为当前显示配置
-	SaveCurSet(m_tagSetCur);
 
 	return 0;
 }
