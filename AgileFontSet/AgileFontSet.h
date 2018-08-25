@@ -9,6 +9,7 @@
 extern CString g_strVerInfo;
 extern CString StrToLower(const CString& str);
 extern int CStringSplitN(vector<CString>& vecResult, const CString& str, CString strSep);	//返回字段数
+extern CString getCurDir(int iFlag);
 
 bool SetIconSpacing0()
 {
@@ -186,132 +187,112 @@ int APIENTRY VS2013_Win32App_wWinMain(
 	// 删除前后空白符
 	strCmdLine = CTrimQ(strCmdLine);
 
+	CString strErroe = L"  给定的参数不合法。\r\n\
+  \r\n\
+  可以不带参数直接启动窗口界面；\r\n\
+  可给定ini配置文件路径(含空格的路径必须以双引号包围)，比如：D:\\mySet.ini\r\n\
+  可给定ini配置文件路径和 -hide 参数进行后台设置，比如：D:\\myFontSet.ini -hide\r\n\
+  可给定 -? 参数查看帮助信息，比如：AgileFontSet.exe -?\r\n\
+  所有参数都不分大小写\r\n";
 
 	// 处理命令行参数
 	vector<CString> vecCmdLine;
-	vector<unsigned> vecUnIS(2, -1);	//(vecIntIconSpacing)初始化了2个默认值为-1的元素。避免出错时误设置
 	PP0_PropertySheet progsheet(g_strVerInfo.GetBuffer(0), 0);
 	g_strVerInfo.ReleaseBuffer();
 
 	//用CStringSplitS分割 v -h3 时出错。所以用CStringSplitN
 	iSeg = CStringSplitN(vecCmdLine, strCmdLine, ' ');	//strCmdLine中的参数段可不分先后次序
 
-														//这样处理更清晰、易于理解和管理，不容易出错
-														// (vecStrIconSpacing)，初始化为5个L""，0-4单元分别用于存放：-Hxxx、-Vxxx、-N、-R、-?
-	vector<CString> vecStrIS(5, L"");
+	//这样处理更清晰、易于理解和管理，不容易出错
+	//初始化为3个L""，0-1单元分别用于存放：-hide、path、-?
+	vector<CString> vecStrIS(3, L"");
 
 	//遍历vecCmdLine中的参数段：
-	//	取出L"-n"设置bRefresh；
-	//	取出L"-?"设置bHelp；
-	//	取出L"-h"、L"-v"存入vecIS[0]、vecIS[1]
 	for (auto str : vecCmdLine)
 	{
-		//错误做法：删除vecCmdLine所有元素中的空格，这将在有空格的地方存入0、切断后面的字符
-		//str.Replace(' ', NULL);
-		//str.Replace(' ', '');	//提示错误：空字符常量
-		str.Replace(L" ", L"");	//正确做法：删除vecCmdLine所有元素中的空格
+		CTrimQ(str);		//去除str两段空格
 
-								//C++ switch (x) 语句句后面的表达式x可以是整型、字符型、枚举型。
-								//WTL的 switch (x) 语句的表达式x，必须是整型或枚举类型，字符型报错
-
-								//switch (str.GetBuffer(0)) {default: break; }
-								//iconspacing.h(210) : error C2450 : switch expression of type 'wchar_t *' is illegal
-								//iconspacing.h(210) : note: Integral expression required
-
-								//switch (str) {default: break; }
-								//iconspacing.h(214) : error C2450 : switch expression of type 'ATL::CStringT<wchar_t,ATL::StrTraitATL<wchar_t,ATL::ChTraitsCRT<wchar_t>>>' is illegal
-								//iconspacing.h(214) : note: No user - defined - conversion operator available that can perform this conversion, or the operator cannot be called
-
-		if (L"-h" == StrToLower(str.Left(2)))
-		{	//当有两个L"-h"参数时，只用前面一个参数
-			if (L"" == vecStrIS[0]) vecStrIS[0] = str;
+		if (L".ini" == StrToLower(str.Right(4)) || L".ini\"" == StrToLower(str.Right(5)))
+		{	//当有两个L".ini"参数时，只用前面一个参数
+			if (L"" == vecStrIS[0]) {
+				if(L'\"' == str[0]){
+					str.Replace(L"\"", L"");		//正确做法：删除str中的双引号
+					CTrimQ(str);
+				}
+				vecStrIS[0] = str;
+			}
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
-		else if (L"-v" == StrToLower(str.Left(2)))
-		{	//当有两个L"-v"参数时，只用前面一个参数
+		else if (L"-hide" == StrToLower(str))
+		{	//当有两个L"-hide"参数时，只用前面一个参数
 			if (L"" == vecStrIS[1]) vecStrIS[1] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
-		else if (L"-n" == StrToLower(str))
+		else if (L"-?" == str)
 		{
 			if (L"" == vecStrIS[2]) vecStrIS[2] = str;
-			else { iSeg = -1; break; }	//同样参数出现两次
-		}
-		else if (L"-r" == StrToLower(str))
-		{
-			if (L"" == vecStrIS[3]) vecStrIS[3] = str;
-			else { iSeg = -1; break; }	//同样参数出现两次
-		}
-		else if (L"-?" == StrToLower(str))
-		{
-			if (L"" == vecStrIS[4]) vecStrIS[4] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
 		else
 		{
 			iSeg = -1; break;
-		}			//出现不属于上面的5种合法参数，报错。并跳出for循环
+		}	//出现不属于上面的几种合法参数，报错。并跳出for循环
 	}
-
-	// (vecStrIconSpacing)，初始化为5个L""，0-4单元分别用于存放：-Hxxx、-Vxxx、-N、-R、-?
-	//vector<CString> vecStrIS(5, L"");
 
 	//这样处理更清晰、易于理解和管理，不容易出错
 	if (-1 == iSeg)
-	{	//参数非法、或参数越界报错
-		MessageBox(NULL, L"  给定的参数不合法，或者图标间距超出0-150的范围。\r\n\
-  图标间距是0到150之间的3位正整数(Win7风格度量单位)。\r\n\
-  \r\n\
-  请运行 \"IconSpacing.exe -?\" 获得帮助信息.\r\n",
-			L"参数非法或图标间距超出范围", MB_OK | MB_ICONINFORMATION);
+	{	//参数非法
+		MessageBox(NULL, strErroe, L"参数非法", MB_OK | MB_ICONINFORMATION);
 	}
 	else if (0 == iSeg)
 	{	// 参数为空，显示设置对话框和帮助信息(当前选项卡)
 		nRet = progsheet.DoModal();
 	}
-	else if (1 == iSeg && L"-?" == vecStrIS[4])	//本可以放在后面处理，提前处理提高效率
+	else if (1 == iSeg && L"-?" == vecStrIS[2])	//本可以放在后面处理，提前处理提高效率
 	{	// 参数为一段且为 L"-?" ，显示设置对话框(当前选项卡)和帮助信息
 		progsheet.SetActivePage(1);	//设置属性表单出现时的当前选项卡
 		nRet = progsheet.DoModal();
 	}
-	else if (1 == iSeg || 2 == iSeg || 3 == iSeg)// 参数为1到3段
+	else if (1 == iSeg || 2 == iSeg)// 参数为1段path、或者2段path -hide
 	{
 		int iState = 0;	//iState = 0 表示参数非法或越界
 
-		if (L"-r" == StrToLower(vecStrIS[3].Left(3)))
-		{	//只有L"-r"，只刷新桌面
-			//bRefresh = TRUE;	//前面定义时已付默认初值TRUE
-			if (1 == iSeg)		//L"-r"必须是独立参数
-			{
-				iState = progsheet.m_pp1FontSet.GetIconSpacingOld(vecUnIS);		//获取当前图标间距
-			}
-		}
-		else if (L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"" == vecStrIS[1])
-		{	//只有L"-h"、[L"-n"]。此时vecIntIS[0]、vecIntIS[1]都为-1
-			progsheet.m_pp1FontSet.GetIconSpacingOld(vecUnIS);		//获取当前图标间距
-			iState = GetDataEx(vecStrIS, vecUnIS, L"-h");
-		}
-		else if (L"-v" == StrToLower(vecStrIS[1].Left(2)) && L"" == vecStrIS[0])
-		{	//只有L"-v"、[L"-n"]
-			progsheet.m_pp1FontSet.GetIconSpacingOld(vecUnIS);		//获取当前图标间距
-			iState = GetDataEx(vecStrIS, vecUnIS, L"-v");
-		}
-		else if (L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"-v" == StrToLower(vecStrIS[1].Left(2)))
-		{	//同时有L"-h"、L"-v"、[L"-n"]
-			iState = GetDataEx(vecStrIS, vecUnIS, L"");
+		// 7of9. 增加 chrome.exe 文件存在的检测，不存在提示并提前退出
+		if (L':' != vecStrIS[0][1])		//判断Path第2个字符非L':'，便非绝对路径，加上m_strCurrentDir
+			vecStrIS[0] = getCurDir(2) + vecStrIS[0];
+
+		//用_waccess(需包含io.h)代替fopen判断文件是否存在，用fopen若文件不可读会误判
+		if (-1 == _waccess(vecStrIS[0], 0))	//文件存在_waccess返回0，否则返回-1
+		{
+			::MessageBox(NULL, vecStrIS[0] + L" 文件不存在。", L"文件不存在", MB_OK | MB_ICONINFORMATION);
+			return false;
 		}
 
-		if (1 == iState)
-		{	//应用设置，刷新桌面
-			progsheet.m_pp1FontSet.SetIconSpacing(vecUnIS[0], vecUnIS[1], L"-n" != StrToLower(vecStrIS[2].Left(2)));
+		if (1 == iSeg)
+		{
+			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrIS[0])) {
+				::MessageBox(NULL, L"无法加载字体设置", L"错误", MB_OK | MB_ICONEXCLAMATION);
+			}
+			nRet = progsheet.DoModal();
 		}
-		else
-		{	//参数非法、或参数越界报错
-			MessageBox(NULL, L"  给定的参数不合法，或者图标间距超出0-150的范围。\r\n\
-  图标间距是0到150之间的3位正整数(Win7风格度量单位)。\r\n\
-  \r\n\
-  请运行 \"IconSpacing.exe -?\" 获得帮助信息.\r\n",
-				L"参数非法或图标间距超出范围", MB_OK | MB_ICONINFORMATION);
+
+		if (2 == iSeg && L"-hide" == StrToLower(vecStrIS[1]))
+		{
+			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrIS[0])) {
+				::MessageBox(NULL, L"无法加载字体设置", L"错误", MB_OK | MB_ICONEXCLAMATION);
+			}
+			else
+			{
+				progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
+				progsheet.m_pp1FontSet.m_iCheckTitle = 1;
+				progsheet.m_pp1FontSet.m_iCheckIcon = 1;
+				progsheet.m_pp1FontSet.m_iCheckMenu = 1;
+				progsheet.m_pp1FontSet.m_iCheckMessage = 1;
+				progsheet.m_pp1FontSet.m_iCheckPalette = 1;
+				progsheet.m_pp1FontSet.m_iCheckTip = 1;
+
+				progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
+			}
 		}
 	}
 	else
@@ -319,34 +300,6 @@ int APIENTRY VS2013_Win32App_wWinMain(
 		progsheet.SetActivePage(1);	//设置属性表单出现时当前选项卡
 		nRet = progsheet.DoModal();
 	}
-
-	//		MessageBox(NULL, L"  IconSpacing is illegal or out of range.\r\n\
-		  //IconSpacing is 3-digit integer between 15 and 150 (Windows 7 metric).\r\n\
-  //\r\n\
-  //Please run \"IconSpacing.exe -?\" to display help message.\r\n",
-//			L"IconSpacing is illegal or out of range", MB_OK);
-
-//switch (nRet)
-//{
-//case 2:		//成功设置，直接跳出
-//	break;
-//case 4:		//参数非法、或参数越界报错
-//	MessageBox(NULL, L"  IconSpacing is illegal or out of range.\r\n\
- // IconSpacing is 3-digit integer between 15 and 150 (Windows 7 metric).\r\n\
- // \r\n\
- // Please run \"IconSpacing.exe -?\" to display help message.\r\n",
-//		L"IconSpacing is illegal or out of range", MB_OK);
-//	break;
-//default:		//处理失败和其余情况都显示Help信息
-//				//IconSpacing_Help iconSpacing_Help;
-//				//iconSpacing_Help.CenterWindow();	//该处报错终止，设置窗口属性Center为True解决
-//				//nRet = (int)iconSpacing_Help.DoModal();
-
-//	PP0_PropertySheet progsheet(L"ChromePortable.ini 设置界面 - by ybmj@vip.163.com", 0);
-//	int nRet = progsheet.DoModal();
-
-//	break;
-//}
 
 	return nRet;
 }
