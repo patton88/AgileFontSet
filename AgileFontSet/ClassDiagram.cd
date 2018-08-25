@@ -1,21 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Class Name="CButtonImpl" Collapsed="true">
-    <Position X="0.5" Y="16.25" Width="1.5" />
+    <Position X="0.5" Y="18.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAICAAAAACAACAAAAAAAAQACAgAAAAgAQAIAAA=</HashCode>
       <FileName>CButtonImpl.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CComboImpl" Collapsed="true">
-    <Position X="5" Y="16.25" Width="1.5" />
+    <Position X="5" Y="18.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAICAAAAACAACAAAABAAAAACAoAAAAgAAAIAAg=</HashCode>
       <FileName>CComboImpl.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CEditImpl" Collapsed="true">
-    <Position X="2.75" Y="16.25" Width="1.5" />
+    <Position X="2.75" Y="18.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAEAAISAAAAACAACAAAAAAAAAACAgAAAAAAAAIAAA=</HashCode>
       <FileName>CEditImpl.h</FileName>
@@ -24,7 +24,7 @@
   <Class Name="PP0_PropertySheet">
     <Position X="0.5" Y="0.5" Width="5.5" />
     <TypeIdentifier>
-      <HashCode>AgAAAACQAQAEEAAQgCIAoCAAAAAAAAEAAAQBAEBAAAA=</HashCode>
+      <HashCode>EAAAAAAQAQAEEAAQACIAoCACAAAAAAEAAAQBAEBAAAA=</HashCode>
       <FileName>PP0_PropertySheet.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -46,12 +46,12 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>3fBOYVMQDDCBxZHAXECjAjQ6tDskQS2MHX1OWIDEDUQ=</HashCode>
+      <HashCode>3bBeQVMQBDCBhZHAXECjAjQ6tDukQS0MFT1OWADEDUw=</HashCode>
       <FileName>PP1_FontSet.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PP2_Readme">
-    <Position X="0.5" Y="11" Width="6.25" />
+    <Position X="0.5" Y="13" Width="6.25" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -68,21 +68,21 @@
     </TypeIdentifier>
   </Class>
   <Class Name="CPreset">
-    <Position X="0.5" Y="5.25" Width="4.75" />
+    <Position X="0.5" Y="6.75" Width="4.75" />
     <TypeIdentifier>
-      <HashCode>AAAgAAAAIAAAgAAgAAEAAIAACEACAAAAABQgAAAAAQA=</HashCode>
+      <HashCode>AAAgAgAIIACAgAAgAAEQAIQAKEACIAAAABxiAIAEAQA=</HashCode>
       <FileName>CPreset.h</FileName>
     </TypeIdentifier>
   </Class>
   <Struct Name="TagIS">
-    <Position X="0.5" Y="9" Width="3" />
+    <Position X="0.5" Y="5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAEAAAAAAAAAAAAAAABAAAAAAgAAAAAAA=</HashCode>
       <FileName>CPreset.h</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="tagFontInfo">
-    <Position X="3.75" Y="9" Width="2" />
+    <Position X="3.75" Y="5.25" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAABAAAAAAAAAAAAAAE=</HashCode>
       <FileName>CPreset.h</FileName>
