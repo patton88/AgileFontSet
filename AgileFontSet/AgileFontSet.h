@@ -10,6 +10,8 @@ extern CString g_strVerInfo;
 extern CString StrToLower(const CString& str);
 extern int CStringSplitN(vector<CString>& vecResult, const CString& str, CString strSep);	//返回字段数
 extern CString getCurDir(int iFlag);
+extern BOOL isEngChar(wchar_t w);
+extern bool isSectionExists(CString sectionName, CString& iniFilePath);
 
 bool SetIconSpacing0()
 {
@@ -173,6 +175,20 @@ int GetDataEx(vector<CString> &vecStrIS, vector<unsigned> &vecUnIS, CString strF
 	return nRet;
 }
 
+int isLegal(CString str)
+{
+	if (L"userpreset" != str.Left(wcslen(L"userpreset")))
+	{
+		return 0;
+	}
+	int i = _wtoi(str.Right(str.GetLength() - wcslen(L"userpreset")));
+	if(i <= 0 || i > 100)
+	{
+		return 0;
+	}
+	return i;
+}
+
 //int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 int APIENTRY VS2013_Win32App_wWinMain(
 	_In_ HINSTANCE hInstance,
@@ -189,9 +205,11 @@ int APIENTRY VS2013_Win32App_wWinMain(
 
 	CString strErroe = L"  给定的参数不合法。\r\n\
   \r\n\
-  可以不带参数直接启动窗口界面；\r\n\
-  可给定ini配置文件路径(含空格的路径必须以双引号包围)，比如：D:\\mySet.ini\r\n\
+  可以不带参数直接启动窗口界面\r\n\
+  可给定ini配置文件路径(含空格的路径必须用双引号包围)，比如：D:\\myFontSet.ini\r\n\
+  可给定ini配置文件路径和 -xxx 参数选择ini文件中的xxx配置，比如：D:\\myFontSet.ini -xxx\r\n\
   可给定ini配置文件路径和 -hide 参数进行后台设置，比如：D:\\myFontSet.ini -hide\r\n\
+  可给定ini配置文件路径和 -xxx -hide 参数后台设置ini文件中的xxx配置，比如：D:\\myFontSet.ini -xxx -hide\r\n\
   可给定 -? 参数查看帮助信息，比如：AgileFontSet.exe -?\r\n\
   所有参数都不分大小写\r\n";
 
@@ -204,8 +222,8 @@ int APIENTRY VS2013_Win32App_wWinMain(
 	iSeg = CStringSplitN(vecCmdLine, strCmdLine, ' ');	//strCmdLine中的参数段可不分先后次序
 
 	//这样处理更清晰、易于理解和管理，不容易出错
-	//初始化为3个L""，0-1单元分别用于存放：-hide、path、-?
-	vector<CString> vecStrIS(3, L"");
+	//初始化为3个L""，0-3单元分别用于存放：path、-xxx、-hide、-?
+	vector<CString> vecStrCmd(4, L"");
 
 	//遍历vecCmdLine中的参数段：
 	for (auto str : vecCmdLine)
@@ -214,23 +232,28 @@ int APIENTRY VS2013_Win32App_wWinMain(
 
 		if (L".ini" == StrToLower(str.Right(4)) || L".ini\"" == StrToLower(str.Right(5)))
 		{	//当有两个L".ini"参数时，只用前面一个参数
-			if (L"" == vecStrIS[0]) {
+			if (L"" == vecStrCmd[0]) {
 				if(L'\"' == str[0]){
 					str.Replace(L"\"", L"");		//正确做法：删除str中的双引号
 					CTrimQ(str);
 				}
-				vecStrIS[0] = str;
+				vecStrCmd[0] = str;
 			}
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
 		else if (L"-hide" == StrToLower(str))
 		{	//当有两个L"-hide"参数时，只用前面一个参数
-			if (L"" == vecStrIS[1]) vecStrIS[1] = str;
+			if (L"" == vecStrCmd[2]) vecStrCmd[2] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
 		else if (L"-?" == str)
 		{
-			if (L"" == vecStrIS[2]) vecStrIS[2] = str;
+			if (L"" == vecStrCmd[3]) vecStrCmd[3] = str;
+			else { iSeg = -1; break; }	//同样参数出现两次
+		}
+		else if (str.GetLength() > 1 && L'-' == str[0] && isEngChar(str[1]))
+		{	//当有两个L"-hide"参数时，只用前面一个参数
+			if (L"" == vecStrCmd[1]) vecStrCmd[1] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
 		else
@@ -248,50 +271,118 @@ int APIENTRY VS2013_Win32App_wWinMain(
 	{	// 参数为空，显示设置对话框和帮助信息(当前选项卡)
 		nRet = progsheet.DoModal();
 	}
-	else if (1 == iSeg && L"-?" == vecStrIS[2])	//本可以放在后面处理，提前处理提高效率
+	else if (1 == iSeg && L"-?" == vecStrCmd[3])	//本可以放在后面处理，提前处理提高效率
 	{	// 参数为一段且为 L"-?" ，显示设置对话框(当前选项卡)和帮助信息
 		progsheet.SetActivePage(1);	//设置属性表单出现时的当前选项卡
 		nRet = progsheet.DoModal();
 	}
-	else if (1 == iSeg || 2 == iSeg)// 参数为1段path、或者2段path -hide
+	else if (1 == iSeg || 2 == iSeg || 3 == iSeg)// 参数为1段path、或者2段path -hide、或者2段path -xxx -hide
 	{
 		int iState = 0;	//iState = 0 表示参数非法或越界
 
-		// 7of9. 增加 chrome.exe 文件存在的检测，不存在提示并提前退出
-		if (L':' != vecStrIS[0][1])		//判断Path第2个字符非L':'，便非绝对路径，加上m_strCurrentDir
-			vecStrIS[0] = getCurDir(2) + vecStrIS[0];
+		// 增加文件存在的检测
+		if (L':' != vecStrCmd[0][1])		//判断Path第2个字符非L':'，便非绝对路径，加上m_strCurrentDir
+		{ vecStrCmd[0] = getCurDir(2) + vecStrCmd[0];	}
 
 		//用_waccess(需包含io.h)代替fopen判断文件是否存在，用fopen若文件不可读会误判
-		if (-1 == _waccess(vecStrIS[0], 0))	//文件存在_waccess返回0，否则返回-1
+		if (-1 == _waccess(vecStrCmd[0], 0))	//文件存在_waccess返回0，否则返回-1
 		{
-			::MessageBox(NULL, vecStrIS[0] + L" 文件不存在。", L"文件不存在", MB_OK | MB_ICONINFORMATION);
+			::MessageBox(NULL, vecStrCmd[0] + L" 文件不存在。", L"文件不存在", MB_OK | MB_ICONINFORMATION);
 			return false;
 		}
 
 		if (1 == iSeg)
 		{
-			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrIS[0])) {
-				::MessageBox(NULL, L"无法加载字体设置", L"错误", MB_OK | MB_ICONEXCLAMATION);
+			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0])) {
+				::MessageBox(NULL, L"无法加载字体配置文件", L"错误", MB_OK | MB_ICONEXCLAMATION);
 			}
 			nRet = progsheet.DoModal();
 		}
 
-		if (2 == iSeg && L"-hide" == StrToLower(vecStrIS[1]))
+		if (2 == iSeg)
 		{
-			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrIS[0])) {
-				::MessageBox(NULL, L"无法加载字体设置", L"错误", MB_OK | MB_ICONEXCLAMATION);
+			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0])) {
+				::MessageBox(NULL, L"无法加载字体配置文件", L"错误", MB_OK | MB_ICONEXCLAMATION);
 			}
 			else
 			{
-				progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
-				progsheet.m_pp1FontSet.m_iCheckTitle = 1;
-				progsheet.m_pp1FontSet.m_iCheckIcon = 1;
-				progsheet.m_pp1FontSet.m_iCheckMenu = 1;
-				progsheet.m_pp1FontSet.m_iCheckMessage = 1;
-				progsheet.m_pp1FontSet.m_iCheckPalette = 1;
-				progsheet.m_pp1FontSet.m_iCheckTip = 1;
+				if (L"-hide" == StrToLower(vecStrCmd[2]))
+				{
+					progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
+					progsheet.m_pp1FontSet.m_iCheckTitle = 1;
+					progsheet.m_pp1FontSet.m_iCheckIcon = 1;
+					progsheet.m_pp1FontSet.m_iCheckMenu = 1;
+					progsheet.m_pp1FontSet.m_iCheckMessage = 1;
+					progsheet.m_pp1FontSet.m_iCheckPalette = 1;
+					progsheet.m_pp1FontSet.m_iCheckTip = 1;
 
-				progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
+					progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
+				}
+				else if (vecStrCmd[1].GetLength() > 1 && L'-' == vecStrCmd[1][0] && isEngChar(vecStrCmd[1][1]))
+				{
+					if (isSectionExists(vecStrCmd[1], vecStrCmd[0]))
+					{
+						::MessageBox(NULL, vecStrCmd[0] + L"文件中不存在配置：" + vecStrCmd[1], L"错误", MB_OK | MB_ICONEXCLAMATION);
+					}
+					else
+					{
+						int i = isLegal(vecStrCmd[1]);
+						if (L"Win8xPreset" == vecStrCmd[1])
+						{
+							progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin8);
+						}
+						else if (L"Win10Preset" == vecStrCmd[1])
+						{
+							progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin10);
+						}
+						else if (i > 0)
+						{
+							progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_vecTagSetUser[i]);
+						}
+
+						nRet = progsheet.DoModal();
+					}
+				}
+			}
+		}
+
+		if (3 == iSeg && L"-hide" == StrToLower(vecStrCmd[2]))
+		{
+			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0])) {
+				::MessageBox(NULL, L"无法加载字体配置文件", L"错误", MB_OK | MB_ICONEXCLAMATION);
+			}
+			else if (vecStrCmd[1].GetLength() > 1 && L'-' == vecStrCmd[1][0] && isEngChar(vecStrCmd[1][1]))
+			{
+				if (isSectionExists(vecStrCmd[1], vecStrCmd[0]))
+				{
+					::MessageBox(NULL, vecStrCmd[0] + L"文件中不存在配置：" + vecStrCmd[1], L"错误", MB_OK | MB_ICONEXCLAMATION);
+				}
+				else
+				{
+					int i = isLegal(vecStrCmd[1]);
+					if (L"Win8xPreset" == vecStrCmd[1])
+					{
+						progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin8);
+					}
+					else if (L"Win10Preset" == vecStrCmd[1])
+					{
+						progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin10);
+					}
+					else if (i > 0)
+					{
+						progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_vecTagSetUser[i]);
+					}
+
+					progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
+					progsheet.m_pp1FontSet.m_iCheckTitle = 1;
+					progsheet.m_pp1FontSet.m_iCheckIcon = 1;
+					progsheet.m_pp1FontSet.m_iCheckMenu = 1;
+					progsheet.m_pp1FontSet.m_iCheckMessage = 1;
+					progsheet.m_pp1FontSet.m_iCheckPalette = 1;
+					progsheet.m_pp1FontSet.m_iCheckTip = 1;
+
+					progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
+				}
 			}
 		}
 	}

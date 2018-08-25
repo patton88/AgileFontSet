@@ -921,3 +921,9 @@ bool isSectionExists(CString sectionName, CString& iniFilePath)
 }
 //ini文件处理函数-End
 //////////////////////////////////////////////////////////////////////////
+BOOL isEngChar(wchar_t w) {
+	if (!(w >= 'A' && w <= 'Z') && !(w >= 'a' && w <= 'z')) {
+			return false;
+	}
+	return true;
+}
