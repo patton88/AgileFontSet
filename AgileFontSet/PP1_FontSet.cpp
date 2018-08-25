@@ -547,6 +547,7 @@ void PP1_FontSet::getActualFont(void)
 // 将菜单字体的信息应用于其他字体的信息。
 void PP1_FontSet::SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont)
 {
+	//已实验证实，NONCLIENTMETRICSW metrics对象拷贝时，能够正确拷贝字符串数组
 	m_metricsAll = metrics;
 	m_iconFontAll = iconFont;
 	m_metricsAll.lfCaptionFont = m_metricsAll.lfMenuFont;
@@ -1418,7 +1419,12 @@ BOOL PP1_FontSet::savePreset(CString filename, CString section, CPreset& tagSet)
 			}
 			else if (rcn2 == tagSet.vecRCN2[1]) {	// 写入字体大小循环
 				bRet = WritePrivateProfileString(
-					section, str, itos(getFontSize(*tagSet.mapRCN[rcn1].m1_lHeight)), filename);
+					section, str, itos(*tagSet.mapRCN[rcn1].m1_lHeight), filename);
+					//section, str, itos(getFontSize(*tagSet.mapRCN[rcn1].m1_lHeight)), filename);
+					//为避免字体和字号转换的明显误差，本项目统一规定：
+					//tagSet::metrics.lfHeight中都统一保存字号；PP1_FontSet::m_metrics.lfHeight中都统一保存字高
+					//二者之间在赋值时，调用getFontHight()、getFontSize()进行转换。
+					//临时使用可生成一个NONCLIENTMETRICSW临时变量
 				if (!bRet) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[2]) {	// 写入字符集循环
@@ -1768,7 +1774,7 @@ void PP1_FontSet::initializeLocale(void)
 	//if (0 == readFontResource(langPath, m_tagSetWin8)) { has8Preset = false; }
 	//if (0 == readFontResource(langPath, m_tagSetWin10)) { has10Preset = false; }
 
-	//内部自动预设配置
+	//用内部存放数据自动生成预设配置
 	if (0 == m_tagSetWin8.getPreset(m_tagSetWin8.vecWin8xPreSet)) { has8Preset = false; }
 	if (0 == m_tagSetWin10.getPreset(m_tagSetWin10.vecWin10PreSet)) { has10Preset = false; }
 
@@ -1929,7 +1935,11 @@ int PP1_FontSet::readFontResource(CString filename, CString sectionName, CPreset
 			else if (rcn2 == tagSet.vecRCN2[1]) {	// 字体大小循环赋值
 				iRet = GetPrivateProfileInt(sectionName, str, 0, filename);
 				if (0 == iRet) { return 0; }
-				*tagSet.mapRCN[rcn1].m1_lHeight = getFontHight(iRet);	//将获得的iSize转换为字体高返回
+				*tagSet.mapRCN[rcn1].m1_lHeight = iRet;
+				//为避免字体和字号转换的明显误差，本项目统一规定：
+				//tagSet::metrics.lfHeight中都统一保存字号；PP1_FontSet::m_metrics.lfHeight中都统一保存字高
+				//二者之间在赋值时，调用getFontHight()、getFontSize()进行转换。
+				//临时使用可生成一个NONCLIENTMETRICSW临时变量
 			}
 			else if (rcn2 == tagSet.vecRCN2[2]) {	// 字符集循环赋值
 				iRet = GetPrivateProfileInt(sectionName, str, 0, filename);

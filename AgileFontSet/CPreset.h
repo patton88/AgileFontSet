@@ -202,6 +202,7 @@ public:
 	// 将菜单字体的信息应用于其他字体的信息。
 	void SetAllFont()
 	{
+		//已实验证实，NONCLIENTMETRICSW metrics对象拷贝时，能够正确拷贝字符串数组
 		metricsAll = metrics;
 		iconFontAll = iconFont;
 		metricsAll.lfCaptionFont = metricsAll.lfMenuFont;
@@ -248,7 +249,7 @@ public:
 		return lFontHight;
 	}
 
-	// 生成预设配置数据结构
+	//用内部存放数据自动生成预设配置
 	int getPreset(vector<CString>& vecDataX)
 	{
 		//生成一种配置所包含的字符标识容器数组mapRCNx
@@ -268,7 +269,13 @@ public:
 				}
 				else if (rcn2 == vecRCN2[1]) {	// 字体大小循环赋值
 					iRet = _wtoi(mapRCNx[str]);
-					*mapRCN[rcn1].m1_lHeight = getFontHight(iRet);	//将获得的iSize转换为字体高返回
+					//将获得的iSize转换为字体高返回。字号换算为高度保存，再换算回字号，有明显误差。
+					//*mapRCN[rcn1].m1_lHeight = getFontHight(iRet);
+					*mapRCN[rcn1].m1_lHeight = iRet;
+					//为避免字体和字号转换的明显误差，本项目统一规定：
+					//tagSet::metrics.lfHeight中都统一保存字号；PP1_FontSet::m_metrics.lfHeight中都统一保存字高
+					//二者之间在赋值时，调用getFontHight()、getFontSize()进行转换。
+					//临时使用可生成一个NONCLIENTMETRICSW临时变量
 				}
 				else if (rcn2 == vecRCN2[2]) {	// 字符集循环赋值
 					iRet = _wtoi(mapRCNx[str]);
