@@ -249,6 +249,46 @@ public:
 		return lFontHight;
 	}
 
+	//将CPreset中所有xxxFont.lfHeight的值从字高转换为字号
+	int lfHeightToSize()
+	{
+		metrics.lfCaptionFont.lfHeight = getFontSize(metrics.lfCaptionFont.lfHeight);
+		iconFont.lfHeight = getFontSize(iconFont.lfHeight);
+		metrics.lfMenuFont.lfHeight = getFontSize(metrics.lfMenuFont.lfHeight);
+		metrics.lfMessageFont.lfHeight = getFontSize(metrics.lfMessageFont.lfHeight);
+		metrics.lfSmCaptionFont.lfHeight = getFontSize(metrics.lfSmCaptionFont.lfHeight);
+		metrics.lfStatusFont.lfHeight = getFontSize(metrics.lfStatusFont.lfHeight);
+
+		metricsAll.lfCaptionFont.lfHeight = getFontSize(metricsAll.lfCaptionFont.lfHeight);
+		iconFontAll.lfHeight = getFontSize(iconFontAll.lfHeight);
+		metricsAll.lfMenuFont.lfHeight = getFontSize(metricsAll.lfMenuFont.lfHeight);
+		metricsAll.lfMessageFont.lfHeight = getFontSize(metricsAll.lfMessageFont.lfHeight);
+		metricsAll.lfSmCaptionFont.lfHeight = getFontSize(metricsAll.lfSmCaptionFont.lfHeight);
+		metricsAll.lfStatusFont.lfHeight = getFontSize(metricsAll.lfStatusFont.lfHeight);
+
+		return 1;
+	}
+
+	//将CPreset中所有xxxFont.lfHeight的值从字号转换为字高
+	int lfHeightToHeight()
+	{
+		metrics.lfCaptionFont.lfHeight = getFontHight(metrics.lfCaptionFont.lfHeight);
+		iconFont.lfHeight = getFontHight(iconFont.lfHeight);
+		metrics.lfMenuFont.lfHeight = getFontHight(metrics.lfMenuFont.lfHeight);
+		metrics.lfMessageFont.lfHeight = getFontHight(metrics.lfMessageFont.lfHeight);
+		metrics.lfSmCaptionFont.lfHeight = getFontHight(metrics.lfSmCaptionFont.lfHeight);
+		metrics.lfStatusFont.lfHeight = getFontHight(metrics.lfStatusFont.lfHeight);
+
+		metricsAll.lfCaptionFont.lfHeight = getFontHight(metricsAll.lfCaptionFont.lfHeight);
+		iconFontAll.lfHeight = getFontHight(iconFontAll.lfHeight);
+		metricsAll.lfMenuFont.lfHeight = getFontHight(metricsAll.lfMenuFont.lfHeight);
+		metricsAll.lfMessageFont.lfHeight = getFontHight(metricsAll.lfMessageFont.lfHeight);
+		metricsAll.lfSmCaptionFont.lfHeight = getFontHight(metricsAll.lfSmCaptionFont.lfHeight);
+		metricsAll.lfStatusFont.lfHeight = getFontHight(metricsAll.lfStatusFont.lfHeight);
+
+		return 1;
+	}
+
 	//用内部存放数据自动生成预设配置
 	int getPreset(vector<CString>& vecDataX)
 	{

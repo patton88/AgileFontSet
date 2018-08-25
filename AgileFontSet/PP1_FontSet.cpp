@@ -560,12 +560,18 @@ void PP1_FontSet::SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont)
 // 将当前显示配置保存到tagSet中
 void PP1_FontSet::SaveCurSet(CPreset& tagSet)
 {
+	//为避免字体和字号转换的明显误差，本项目统一规定：
+	//tagSet::metrics.lfHeight中都统一保存字号；PP1_FontSet::m_metrics.lfHeight中都统一保存字高
+	//二者之间在赋值时，调用getFontHight()、getFontSize()进行转换。
+	//临时使用可生成一个NONCLIENTMETRICSW临时变量
+
 	//保存当前显示配置，需要保存以下成员
 	tagSet.metrics = m_metrics;
 	tagSet.iconFont = m_iconFont;
 	tagSet.metricsAll = m_metricsAll;
 	tagSet.iconFontAll = m_iconFontAll;
 	tagSet.tagIS = m_tagIScur;
+	tagSet.lfHeightToSize();		//将CPreset中所有xxxFont.lfHeight的值从字高转换为字号
 }
 
 /**
@@ -1652,7 +1658,7 @@ int PP1_FontSet::mySetFontItem(LOGFONTW& dstFont, LOGFONTW& srcFont)
 {
 	memset(&dstFont, 0, sizeof(LOGFONTW));
 	wcscpy_s(dstFont.lfFaceName, srcFont.lfFaceName);
-	dstFont.lfHeight = srcFont.lfHeight;
+	dstFont.lfHeight = getFontHight(srcFont.lfHeight);	//将tagSet.lfHeight中的字号转换为字高
 	dstFont.lfWeight = 400;
 	dstFont.lfCharSet = srcFont.lfCharSet;
 	dstFont.lfQuality = 5;
