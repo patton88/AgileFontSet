@@ -27,10 +27,9 @@ struct TagIS			//tag of Icon Spacing
 };
 
 //数组指针的定义
-//int(*PArrayType)[5];
+//int(*p)[5];
 //int c[5] = { 1,2,3,4,5 };
-////PArrayType pArray;
-//PArrayType = &c;
+//p = &c;
 
 struct tagFontInfo
 {
@@ -47,6 +46,7 @@ public:
 	{
 		if (this != &tag)
 		{
+			this->InitTagSet();		//保存之前初始化this TagSet
 			this->metrics = tag.metrics;
 			this->iconFont = tag.iconFont;
 			this->metricsAll = tag.metricsAll;
@@ -66,7 +66,22 @@ public:
 	NONCLIENTMETRICSW metricsAll;
 	LOGFONTW iconFontAll;
 
-	TagIS tagIS;				//存放图标间距
+	TagIS tagIS;		//存放图标间距
+
+	int iTagInitFlag;		//为尽量避免字高、字号转换的误差，尽量减少转换，设置TagSet对象数据状态标志
+	//-1：TagSet对象刚创建，还未初始化
+	// 1：在对象创建后，已经外部初始化过
+
+	int iTagHeightSizeFlag;	//为尽量避免字高、字号转换的误差，尽量减少转换，设置TagSet对象数据状态标志
+	// 基本原则是：尽量让TagSet对象保存未经转换的原始数据。必要时也尽量只进行单次转换
+	// -1：未存放数据
+	// 10：tagSet::metrics.lfHeight中保存的都是原始字高
+	// 11：tagSet::metrics.lfHeight中保存的都是从原始字号转换而来的字高
+	// 12：tagSet::metrics.lfHeight中保存的都是经多次转换而来的字高
+	// 20：tagSet::metrics.lfHeight中保存的都是原始字号
+	// 21：tagSet::metrics.lfHeight中保存的都是从原始字高转换而来的字号
+	// 22：tagSet::metrics.lfHeight中保存的都是经多次转换而来的字号
+
 
 	//C++11初始化列表。RCN1：Resource Center Name part 1
 	vector<CString> vecRCN1{
@@ -152,12 +167,6 @@ public:
 		vecRCN.push_back(vecIS[0] + L"_" + strRCN3);
 		vecRCN.push_back(vecIS[1] + L"_" + strRCN3);
 
-		FillMemory(&metrics, sizeof(NONCLIENTMETRICSW), 0x00);
-		FillMemory(&metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
-		FillMemory(&iconFont, sizeof(LOGFONTW), 0x00);
-		FillMemory(&iconFontAll, sizeof(LOGFONTW), 0x00);
-		tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
-
 		//为已创建的mapRCN元素赋值
 		//error C2440: '=': cannot convert from 'WCHAR (*)[32]' to 'wchar_t *'
 		//WCHAR(*p)[32];
@@ -165,8 +174,23 @@ public:
 
 		//m_vecTagSetUser[i].initmapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
 		//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
-		RefreshMapRCN();
+		InitTagSet();
+		iTagInitFlag = -1;			//-1：TagSet对象刚创建，还未初始化
 	}
+
+	void InitTagSet()
+	{
+		FillMemory(&metrics, sizeof(NONCLIENTMETRICSW), 0x00);
+		FillMemory(&metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
+		FillMemory(&iconFont, sizeof(LOGFONTW), 0x00);
+		FillMemory(&iconFontAll, sizeof(LOGFONTW), 0x00);
+		RefreshMapRCN();
+
+		tagIS.nHS = tagIS.nVS = -1;	//未存入配置的标志
+		iTagHeightSizeFlag = -1;		//未存入配置的标志
+		iTagInitFlag = 1;				// 1：在对象创建后，已经外部初始化过
+	}
+
 
 	//CPreset对象必须在创建后进行初始化，否则地址不对。
 	//发现在运行过程中这些地址会变化，所以每次使用之前，都需要调用该函数刷新地址。
@@ -266,8 +290,21 @@ public:
 		metricsAll.lfSmCaptionFont.lfHeight = getFontSize(metricsAll.lfSmCaptionFont.lfHeight);
 		metricsAll.lfStatusFont.lfHeight = getFontSize(metricsAll.lfStatusFont.lfHeight);
 
+		if (10 == iTagHeightSizeFlag) { iTagHeightSizeFlag = 21; }
+		else { iTagHeightSizeFlag = 22; }
+
 		return 1;
 	}
+
+	//int iTagHeightSizeFlag;	//为尽量避免字高、字号转换的误差，尽量减少转换，设置TagSet对象数据状态标志
+	// 基本原则是：尽量让TagSet对象保存未经转换的原始数据。必要时也尽量只进行单次转换
+	// -1：未存放数据
+	// 10：tagSet::metrics.lfHeight中保存的都是原始字高
+	// 11：tagSet::metrics.lfHeight中保存的都是从原始字号转换而来的字高
+	// 12：tagSet::metrics.lfHeight中保存的都是经多次转换而来的字高
+	// 20：tagSet::metrics.lfHeight中保存的都是原始字号
+	// 21：tagSet::metrics.lfHeight中保存的都是从原始字高转换而来的字号
+	// 22：tagSet::metrics.lfHeight中保存的都是经多次转换而来的字号
 
 	//将CPreset中所有xxxFont.lfHeight的值从字号转换为字高
 	int lfHeightToHeight()
@@ -285,6 +322,9 @@ public:
 		metricsAll.lfMessageFont.lfHeight = getFontHight(metricsAll.lfMessageFont.lfHeight);
 		metricsAll.lfSmCaptionFont.lfHeight = getFontHight(metricsAll.lfSmCaptionFont.lfHeight);
 		metricsAll.lfStatusFont.lfHeight = getFontHight(metricsAll.lfStatusFont.lfHeight);
+
+		if (20 == iTagHeightSizeFlag) { iTagHeightSizeFlag = 11; }
+		else { iTagHeightSizeFlag = 12; }
 
 		return 1;
 	}
@@ -313,9 +353,13 @@ public:
 					//*mapRCN[rcn1].m1_lHeight = getFontHight(iRet);
 					*mapRCN[rcn1].m1_lHeight = iRet;
 					//为避免字体和字号转换的明显误差，本项目统一规定：
-					//tagSet::metrics.lfHeight中都统一保存字号；PP1_FontSet::m_metrics.lfHeight中都统一保存字高
-					//二者之间在赋值时，调用getFontHight()、getFontSize()进行转换。
-					//临时使用可生成一个NONCLIENTMETRICSW临时变量
+					// 基本原则是：尽量让TagSet对象保存未经转换的原始数据。必要时也尽量只进行单次转换
+					if (iRet > 0) {
+						iTagHeightSizeFlag = 20;	// 20：tagSet::metrics.lfHeight中保存的都是原始字号
+					}
+					else {
+						iTagHeightSizeFlag = 10;	// 10：tagSet::metrics.lfHeight中保存的都是原始字高
+					}
 				}
 				else if (rcn2 == vecRCN2[2]) {	// 字符集循环赋值
 					iRet = _wtoi(mapRCNx[str]);

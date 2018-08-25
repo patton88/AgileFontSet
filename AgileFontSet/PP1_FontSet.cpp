@@ -541,7 +541,7 @@ void PP1_FontSet::getActualFont(void)
 	}
 
 	//保存当前显示配置，需要保存以下成员
-	SaveCurSet(m_tagSetCur);
+	SaveCurSetToTag(m_tagSetCur);
 	m_tagSetOld = m_tagSetCur;
 }
 
@@ -558,8 +558,8 @@ void PP1_FontSet::SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont)
 	m_metricsAll.lfStatusFont = m_metricsAll.lfMenuFont;
 }
 
-// 将当前显示配置保存到tagSet中
-void PP1_FontSet::SaveCurSet(CPreset& tagSet)
+//保存当前显示配置到结构体变量
+void PP1_FontSet::SaveCurSetToTag(CPreset& tagSet)
 {
 	//为避免字体和字号转换的明显误差，本项目统一规定：
 	//tagSet::metrics.lfHeight中都统一保存字号；PP1_FontSet::m_metrics.lfHeight中都统一保存字高
@@ -567,12 +567,7 @@ void PP1_FontSet::SaveCurSet(CPreset& tagSet)
 	//临时使用可生成一个NONCLIENTMETRICSW临时变量
 
 	//保存之前初始化tagSet
-	FillMemory(&tagSet.metrics, sizeof(NONCLIENTMETRICSW), 0x00);
-	FillMemory(&tagSet.metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
-	FillMemory(&tagSet.iconFont, sizeof(LOGFONTW), 0x00);
-	FillMemory(&tagSet.iconFontAll, sizeof(LOGFONTW), 0x00);
-	tagSet.tagIS.nHS = tagSet.tagIS.nVS = -1;		//未存入配置的标志
-	tagSet.RefreshMapRCN();
+	tagSet.InitTagSet();
 
 	//保存当前显示配置，需要保存以下成员
 	tagSet.metrics = m_metrics;
@@ -580,8 +575,19 @@ void PP1_FontSet::SaveCurSet(CPreset& tagSet)
 	tagSet.metricsAll = m_metricsAll;
 	tagSet.iconFontAll = m_iconFontAll;
 	tagSet.tagIS = m_tagIScur;
-	tagSet.lfHeightToSize();		//将CPreset中所有xxxFont.lfHeight的值从字高转换为字号
+
+	//tagSet.lfHeightToSize();		//将CPreset中所有xxxFont.lfHeight的值从字高转换为字号
+	tagSet.iTagHeightSizeFlag = 10;	// 10：tagSet::metrics.lfHeight中保存的都是原始字高
 }
+//int iTagHeightSizeFlag;	//为尽量避免字高、字号转换的误差，尽量减少转换，设置TagSet对象数据状态标志
+// 基本原则是：尽量让TagSet对象保存未经转换的原始数据。必要时也尽量只进行单次转换
+// -1：未存放数据
+// 10：tagSet::metrics.lfHeight中保存的都是原始字高
+// 11：tagSet::metrics.lfHeight中保存的都是从原始字号转换而来的字高
+// 12：tagSet::metrics.lfHeight中保存的都是经多次转换而来的字高
+// 20：tagSet::metrics.lfHeight中保存的都是原始字号
+// 21：tagSet::metrics.lfHeight中保存的都是从原始字高转换而来的字号
+// 22：tagSet::metrics.lfHeight中保存的都是经多次转换而来的字号
 
 /**
 * 僼僅儞僩昞帵傪峏怴偡傞丅
@@ -933,7 +939,7 @@ LRESULT PP1_FontSet::OnSelFont(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/)
 	}
 
 	//字体选择变更后，保存当前显示配置
-	SaveCurSet(m_tagSetCur);
+	SaveCurSetToTag(m_tagSetCur);
 
 	theUpdateDisplay();
 
@@ -1389,10 +1395,12 @@ BOOL PP1_FontSet::startSaveFont(CString filename)
 	if (!saveResult) {
 		return FALSE;
 	}
+
 	saveResult = saveIS(filename, L"IconSpacing", &m_tagIScur);
 	if (!saveResult) {
 		return FALSE;
 	}
+
 	saveResult = savePreset(filename, L"Win8xPreset", m_tagSetWin8);
 	if (!saveResult) {
 		return FALSE;
@@ -1424,27 +1432,25 @@ BOOL PP1_FontSet::savePreset(CString filename, CString section, CPreset& tagSet)
 
 	// 写入字体容器循环赋值
 	CString str;
+	LONG nFontSize;
 	for (auto& rcn2 : tagSet.vecRCN2) {
 		for (auto& rcn1 : tagSet.vecRCN1) {
 			str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
 			if (rcn2 == tagSet.vecRCN2[0]) {			// 写入字体名称容器
-				bRet = WritePrivateProfileString(
-					section, str, *tagSet.mapRCN[rcn1].m0_strFace, filename);
+				bRet = WritePrivateProfileString(section, str, *tagSet.mapRCN[rcn1].m0_strFace, filename);
 				if (!bRet) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[1]) {	// 写入字体大小循环
-				bRet = WritePrivateProfileString(
-					section, str, itos(*tagSet.mapRCN[rcn1].m1_lHeight), filename);
-					//section, str, itos(getFontSize(*tagSet.mapRCN[rcn1].m1_lHeight)), filename);
-					//为避免字体和字号转换的明显误差，本项目统一规定：
-					//tagSet::metrics.lfHeight中都统一保存字号；PP1_FontSet::m_metrics.lfHeight中都统一保存字高
-					//二者之间在赋值时，调用getFontHight()、getFontSize()进行转换。
-					//临时使用可生成一个NONCLIENTMETRICSW临时变量
+				//为避免字体和字号转换的明显误差，本项目统一规定：
+				// 基本原则是：尽量让TagSet对象保存未经转换的原始数据。必要时也尽量只进行单次转换
+				nFontSize = *tagSet.mapRCN[rcn1].m1_lHeight;
+				//若tagSet::metrics.lfHeight中保存的是字高则需转换
+				if (tagSet.iTagHeightSizeFlag < 20) { nFontSize = getFontSize(nFontSize); }
+				bRet = WritePrivateProfileString(section, str, itos(nFontSize), filename);
 				if (!bRet) { return 0; }
 			}
 			else if (rcn2 == tagSet.vecRCN2[2]) {	// 写入字符集循环
-				bRet = WritePrivateProfileString(
-					section, str, itos(*tagSet.mapRCN[rcn1].m2_bCharset), filename);
+				bRet = WritePrivateProfileString(section, str, itos(*tagSet.mapRCN[rcn1].m2_bCharset), filename);
 				if (!bRet) { return 0; }
 			}
 		}
@@ -1458,34 +1464,6 @@ BOOL PP1_FontSet::savePreset(CString filename, CString section, CPreset& tagSet)
 	bRet = WritePrivateProfileString(
 		section, tagSet.vecIS[1] + L"_" + tagSet.strRCN3, itos(tagSet.tagIS.nVS), filename);
 	if (!bRet) { return FALSE; }
-
-	//// 读取字体容器循环赋值
-	//CString str;
-	//for (auto& rcn2 : tagSet.vecRCN2) {
-	//	for (auto& rcn1 : tagSet.vecRCN1) {
-	//		str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;
-	//		if (rcn2 == tagSet.vecRCN2[0]) {			// 字体名称容器赋值
-	//			if (readFontFace(tagSet.mapRCN[rcn1].m0_strFace, file, str) == 0) { return 0; }
-	//		}
-	//		else if (rcn2 == tagSet.vecRCN2[1]) {	// 字体大小循环赋值
-	//			if (readFontSize(tagSet.mapRCN[rcn1].m1_lHeight, file, str) == 0) { return 0; }
-	//		}
-	//		else if (rcn2 == tagSet.vecRCN2[2]) {	// 字符集循环赋值
-	//			if (readFontCharset(tagSet.mapRCN[rcn1].m2_bCharset, file, str) == 0) { return 0; }
-	//		}
-	//	}
-	//}
-
-	////保存所有字体信息
-	//tagSet.SetAllFont();
-
-	//// 读取图标间距。读取不成功，使用默认值
-	//if (readIconSpacing(tagSet.tagIS.nHS, file, tagSet.vecIS[0] + L"_" + tagSet.strRCN3) == 0) {
-	//	tagSet.tagIS.nHS = 80;
-	//}
-	//if (readIconSpacing(tagSet.tagIS.nVS, file, tagSet.vecIS[1] + L"_" + tagSet.strRCN3) == 0) {
-	//	tagSet.tagIS.nVS = 48;
-	//}
 
 	return bRet;
 }
@@ -1663,11 +1641,13 @@ int PP1_FontSet::getDPI(void)
 }
 
 //int PP1_FontSet::mySetFontItem2(LOGFONTW& font, wchar_t const* pFaceName, LONG& lHeight, BYTE& bCharSet)
-int PP1_FontSet::mySetFontItem(LOGFONTW& dstFont, LOGFONTW& srcFont)
+int PP1_FontSet::mySetFontItem(LOGFONTW& dstFont, LOGFONTW& srcFont, int iFlag)
 {
 	memset(&dstFont, 0, sizeof(LOGFONTW));
 	wcscpy_s(dstFont.lfFaceName, srcFont.lfFaceName);
-	dstFont.lfHeight = getFontHight(srcFont.lfHeight);	//将tagSet.lfHeight中的字号转换为字高
+	if (iFlag >= 20) {	//若tagSet.lfHeight中存放的是字号，才需调用getFontHight转换为字高
+		dstFont.lfHeight = getFontHight(srcFont.lfHeight);
+	}
 	dstFont.lfWeight = 400;
 	dstFont.lfCharSet = srcFont.lfCharSet;
 	dstFont.lfQuality = 5;
@@ -1677,7 +1657,7 @@ int PP1_FontSet::mySetFontItem(LOGFONTW& dstFont, LOGFONTW& srcFont)
 int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet)
 {
 	//应用新配置前，保存当前显示配置到m_tagSetLast
-	SaveCurSet(m_tagSetLast);
+	SaveCurSetToTag(m_tagSetLast);
 	//将tagSet保存为当前配置。尽量不要使用SaveCurSet()保存配置，有字高到字号的转换误差
 	m_tagSetCur = tagSet;
 
@@ -1686,12 +1666,12 @@ int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPres
 	metrics.cbSize = sizeof(NONCLIENTMETRICS);
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &metrics, 0);
 
-	mySetFontItem(metrics.lfCaptionFont, tagSet.metrics.lfCaptionFont);
-	mySetFontItem(iconFont, tagSet.iconFont);
-	mySetFontItem(metrics.lfMenuFont, tagSet.metrics.lfMenuFont);
-	mySetFontItem(metrics.lfMessageFont, tagSet.metrics.lfMessageFont);
-	mySetFontItem(metrics.lfSmCaptionFont, tagSet.metrics.lfSmCaptionFont);
-	mySetFontItem(metrics.lfStatusFont, tagSet.metrics.lfStatusFont);
+	mySetFontItem(metrics.lfCaptionFont, tagSet.metrics.lfCaptionFont, tagSet.iTagHeightSizeFlag);
+	mySetFontItem(iconFont, tagSet.iconFont, tagSet.iTagHeightSizeFlag);
+	mySetFontItem(metrics.lfMenuFont, tagSet.metrics.lfMenuFont, tagSet.iTagHeightSizeFlag);
+	mySetFontItem(metrics.lfMessageFont, tagSet.metrics.lfMessageFont, tagSet.iTagHeightSizeFlag);
+	mySetFontItem(metrics.lfSmCaptionFont, tagSet.metrics.lfSmCaptionFont, tagSet.iTagHeightSizeFlag);
+	mySetFontItem(metrics.lfStatusFont, tagSet.metrics.lfStatusFont, tagSet.iTagHeightSizeFlag);
 
 	m_tagIScur.nHS = tagSet.tagIS.nHS;
 	m_tagIScur.nVS = tagSet.tagIS.nVS;
@@ -1951,9 +1931,13 @@ int PP1_FontSet::readFontResource(CString filename, CString sectionName, CPreset
 				if (0 == iRet) { return 0; }
 				*tagSet.mapRCN[rcn1].m1_lHeight = iRet;
 				//为避免字体和字号转换的明显误差，本项目统一规定：
-				//tagSet::metrics.lfHeight中都统一保存字号；PP1_FontSet::m_metrics.lfHeight中都统一保存字高
-				//二者之间在赋值时，调用getFontHight()、getFontSize()进行转换。
-				//临时使用可生成一个NONCLIENTMETRICSW临时变量
+				// 基本原则是：尽量让TagSet对象保存未经转换的原始数据。必要时也尽量只进行单次转换
+				if (iRet > 0) {
+					tagSet.iTagHeightSizeFlag = 20;	// 20：tagSet::metrics.lfHeight中保存的都是原始字号
+				}
+				else {
+					tagSet.iTagHeightSizeFlag = 10;	// 10：tagSet::metrics.lfHeight中保存的都是原始字高
+				}
 			}
 			else if (rcn2 == tagSet.vecRCN2[2]) {	// 字符集循环赋值
 				iRet = GetPrivateProfileInt(sectionName, str, 0, filename);
@@ -2156,14 +2140,3 @@ LRESULT PP1_FontSet::GetIconSpacingOld(vector<unsigned>& vecIS)
 	return nRet;
 }
 
-//保存当前显示配置到结构体变量
-BOOL PP1_FontSet::SaveCurSetToTag()
-{
-	return true;
-}
-
-//保存当前显示配置到文件
-BOOL PP1_FontSet::SaveCurSetToFile()
-{
-	return true;
-}

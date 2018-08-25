@@ -265,13 +265,10 @@ public:
 	// 将菜单字体的信息应用于其他字体的信息。
 	void SetAllFont(NONCLIENTMETRICSW metrics, LOGFONTW iconFont);
 	// 将当前显示配置保存到tagSet中
-	void SaveCurSet(CPreset& tagSet);
-
-	BOOL SaveCurSetToFile();		//保存当前显示配置到文件
-	BOOL SaveCurSetToTag();		//保存当前显示配置到结构体变量
+	void SaveCurSetToTag(CPreset& tagSet);	//保存当前显示配置到结构体变量
 
 	int mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPreset& tagSet);
-	int mySetFontItem(LOGFONTW& dstFont, LOGFONTW& srcFont);
+	int mySetFontItem(LOGFONTW& dstFont, LOGFONTW& srcFont, int iFlag);
 
 	enum fontType {
 		allFont,
