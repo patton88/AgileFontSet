@@ -124,9 +124,9 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	//m_comboPreSet.AddString(L"µ±«∞œ‘ æ≈‰÷√");	//£¨∏√œÓŒﬁ“‚“Â£¨À˘“‘»•≥˝
 	m_comboPreSet.AddString(L"Ω¯»Î ±≈‰÷√");		//0
 	m_comboPreSet.AddString(L"…œ“ª¥Œ≈‰÷√");		//1
-	m_comboPreSet.AddString(L"Win7≈‰÷√");		//2
-	m_comboPreSet.AddString(L"Win8.x≈‰÷√");		//3
-	m_comboPreSet.AddString(L"Win10≈‰÷√");		//4
+	m_comboPreSet.AddString(L"Win7‘§…Ë≈‰÷√");	//2
+	m_comboPreSet.AddString(L"Win8.x‘§…Ë≈‰÷√");	//3
+	m_comboPreSet.AddString(L"Win10‘§…Ë≈‰÷√");	//4
 
 	if (m_vecTagSetUser.size() > 1)
 	{
@@ -406,15 +406,15 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 				theUpdateDisplay();
 			}
 			break;
-		case 2:		//2 Win7≈‰÷√
+		case 2:		//2 Win7‘§…Ë≈‰÷√
 			mySetFont(m_metrics, m_iconFont, m_tagSetWin7);
 			theUpdateDisplay();
 			break;
-		case 3:		//3 Win8.x≈‰÷√
+		case 3:		//3 Win8.x‘§…Ë≈‰÷√
 			mySetFont(m_metrics, m_iconFont, m_tagSetWin8);
 			theUpdateDisplay();
 			break;
-		case 4:		//4 Win10≈‰÷√
+		case 4:		//4 Win10‘§…Ë≈‰÷√
 			mySetFont(m_metrics, m_iconFont, m_tagSetWin10);
 			theUpdateDisplay();
 			break;

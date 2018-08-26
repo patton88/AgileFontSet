@@ -12,7 +12,7 @@
 CAppModule _Module;
 HWND hwndPP1;
 
-CString g_strVerInfo = L"迅捷字体设置程序v1.0 - ybmj@vip.163.com 20180825";
+CString g_strVerInfo = L"迅捷字体设置程序v2.0 - ybmj@vip.163.com(20180830)";
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrCmdLine, int nCmdShow)
 {

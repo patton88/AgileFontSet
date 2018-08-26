@@ -298,9 +298,9 @@ public:
 	CPreset m_tagSetCur{ L"CUR" };		//  µ±«∞œ‘ æ≈‰÷√	
 	CPreset m_tagSetOld{ L"OLD" };		//0 Ω¯»Î≥Ã–Ú ±µƒæ…”–≈‰÷√
 	CPreset m_tagSetLast{ L"LAST" };		//1 …œ“ª¥Œ≈‰÷√
-	CPreset m_tagSetWin7{ L"7" };		//2 Win7≈‰÷√
-	CPreset m_tagSetWin8{ L"8" };		//3 Win8.x≈‰÷√
-	CPreset m_tagSetWin10{ L"10" };		//4 Win10≈‰÷√
+	CPreset m_tagSetWin7{ L"7" };		//2 Win7‘§…Ë≈‰÷√
+	CPreset m_tagSetWin8{ L"8" };		//3 Win8.x‘§…Ë≈‰÷√
+	CPreset m_tagSetWin10{ L"10" };		//4 Win10‘§…Ë≈‰÷√
 	vector<CPreset> m_vecTagSetUser;		//5-x User≈‰÷√ UserPreset1-UserPreset100
 	CPreset m_tagSetTemp{ L"TEMP" };		//T ¡Ÿ ±≈‰÷√
 

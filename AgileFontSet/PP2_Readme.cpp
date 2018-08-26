@@ -224,46 +224,46 @@ LRESULT PP2_Readme::OnCtlColorDlg(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 void PP2_Readme::GetChinsesHelp()
 {
 	m_strReadme =
-		L"  IconSpacing.exe v1.0 程序说明\r\n\
-  迅捷图标间距设置程序v1.0 - ybmj@vip.163.com 20180812\r\n\
+		L"  AgileFontSet v2.0 程序说明\r\n\
+  迅捷字体设置程序v2.0 - ybmj@vip.163.com 20180830\r\n\
 \r\n\
-  (1)、程序用途：快捷设置Windows桌面图标间距\r\n\
-  WinXP、Win7用户可在系统提供的高级外观设置里修改桌面图标间距，但是，Win8、Win10系统却没有提供这一功能。熟悉系统的用户虽然可以通过修改注册表、bat、vbs等方式调整桌面图标间距，但这些方法都需要注销后重新登录、或重启计算机才能生效。\r\n\
-  该程序 IconSpacing.exe 便是快捷设置Windows桌面图标间距的小程序，中文名为“迅捷图标间距设置程序”。该程序提供窗口界面、命令行两种使用方式。窗口界面简洁快捷、一目了然，普通用户也可轻松使用，并且，设置后无需注销或重启便可立即生效；命令行方式可用于WinPE等需要自动设置桌面图标间距的情况。\r\n\
+  (1)、程序用途：快捷设置Windows系统字体和桌面图标间距\r\n\
+  WinXP、Win7用户可在系统提供的高级外观设置里修改系统字体和桌面图标间距，但是，Win8、Win10系统却没有提供这一功能。熟悉系统的用户虽然可以通过修改注册表、bat、vbs等方式调整系统字体和桌面图标间距，但这些方法都需要注销后重新登录、或重启计算机才能生效。\r\n\
+  该程序 AgileFontSet 便是快捷设置Windows系统字体和桌面图标间距的小程序，中文名为“迅捷字体设置程序”。该程序可以加载和保存Win7Preset、Win8xPreset、Win10Preset、UserPreset1 - UserPreset100等多种用户配置。该程序提供窗口界面、命令行两种使用方式。窗口界面简洁快捷、一目了然，普通用户也可轻松使用，并且，设置后无需注销或重启便可立即生效；命令行方式可用于WinPE等需要自动设置系统字体和桌面图标间距的情况。\r\n\
 \r\n\
   (2)、使用环境\r\n\
   该程序采用VS2017 WTL10 x86编译(Windows Template Library，http://wtl.sourceforge.net/ )，程序短小精悍、可独立运行，支持32位和64位的WinXp、Vista、Win7、Win8.x、Win10及相应Windows Server版等操作系统。\r\n\
 \r\n\
-  (3)、窗口界面快捷设置桌面图标间距\r\n\
-  在Windows中直接运行 IconSpacing.exe 便可启动窗口界面，启动后会显示桌面图标间距的当前值，设置对话框简洁快捷、一目了然，普通用户也可快速方便地设置桌面图标间距，并且可以立即生效。\r\n\
+  (3)、窗口界面快捷设置系统字体和桌面图标间距\r\n\
+  在Windows中直接运行 AgileFontSet 便可启动窗口界面，启动后会显示系统字体和桌面图标间距的当前值，设置对话框简洁快捷、一目了然，普通用户也可快速方便地设置系统字体和桌面图标间距，并且可以立即生效。在窗口界面，用户可以直观地加载和保存默认配置、Win7Preset、Win8xPreset、Win10Preset、UserPreset1 - UserPreset100等多种用户配置。\r\n\
 \r\n\
-  (4)、命令行方式设置桌面图标间距\r\n\
-  在WinPE等需要自动设置桌面图标间距的时候，可以使用命令行方式。用户可按以下格式的参数启动程序，所有参数都不分大小写。更改桌面图标间距后程序将立即刷新桌面，除非添加了 -N 参数。[]加方括号的为可选参数，()加圆括号的为可选独立参数(只能单独使用)，(无参)是不带任何参数。\r\n\
-  [-Hxxx] ：将桌面图标水平间距设置为xxx，xxx是0到150之间的3位正整数(Win7风格度量单位)。只带该参数而不带[-Vxxx]参数时，便只修改桌面图标的水平间距；\r\n\
-  [-Vxxx] ：将桌面图标垂直间距设置为xxx，xxx是0到150之间的3位正整数(Win7风格度量单位)。只带该参数而不带[-Hxxx]参数时，便只修改桌面图标的垂直间距；\r\n\
-  [-N]    ：更改桌面图标间距后，不立即刷新桌面。需要重新登录、或重启计算机才能生效；\r\n\
-  (-R)    ：不改变桌面图标间距，只刷新桌面；\r\n\
-  (-?)    ：显示设置对话框和此帮助信息(当前选项卡)，可显示桌面图标间距的当前值；\r\n\
-  (无参)  ：显示设置对话框(当前选项卡)和此帮助信息，可示桌面图标间距的当前值。\r\n\
+  (4)、命令行方式设置系统字体和桌面图标间距\r\n\
+  在WinPE等需要自动设置系统字体和桌面图标间距的时候，可以使用命令行方式。用户可按以下格式的参数启动程序，所有参数都不分大小写。更改系统字体和桌面图标间距后程序将立即刷新桌面。加方括号[]的为可选参数，加圆括号()的为只能单独使用的可选独立参数，(无参)是不带任何参数。\r\n\
+  [path] ：指定加载ini配置文件的路径，启动后将显示ini配置文件中的默认配置，注意：含空格的路径必须用双引号包围；\r\n\
+  [path -xxx] ：指定加载ini配置文件的路径path，-xxx 参数选择ini文件中的xxx配置。xxx可以是：Win7Preset、Win8xPreset、Win10Preset、UserPreset1 - UserPreset100 之一；\r\n\
+  [path -hide] ：指定加载ini配置文件的路径path，-hide 参数指定后台加载ini配置文件中的默认配置；\r\n\
+  [path -xxx -hide] ：指定加载ini配置文件的路径path，-xxx 参数选择ini文件中的xxx配置，-hide 参数指定进行后台设置。3个参数组合使用，可以后台加载ini配置文件中的xxx配置；\r\n\
+  (-?) ：显示设置对话框和此帮助信息(当前选项卡)，可显示系统字体和桌面图标间距的当前值；\r\n\
+  (无参) ：显示设置对话框(当前选项卡)和此帮助信息，可显示系统字体和桌面图标间距的当前值。\r\n\
 \r\n\
   (5)、程序使用实例\r\n\
-  ＃ 将桌面图标水平间距设置为76、垂直间距设置为48，并在设置后立即刷新桌面。\r\n\
-  IconSpacing.exe -H76 -V48\r\n\
+  ＃ 指定加载ini配置文件\"D:\\Program Files\\User Data\\myFontSet.ini\"，启动后将显示ini配置文件中的默认配置，注意：含空格的路径必须用双引号包围。\r\n\
+  AgileFontSet \"D:\\Program Files\\User Data\\myFontSet.ini\"\r\n\
 \r\n\
-  ＃ 将桌面图标水平间距设置为80、垂直间距设置为50，设置后不立即刷新桌面。\r\n\
-  IconSpacing.exe -V50 -H80 -N\r\n\
+  ＃ 指定加载ini配置文件D:\\myFontSet.ini，启动后将选择ini文件中的UserPreset1配置。\r\n\
+  AgileFontSet D:\\myFontSet.ini -UserPreset1\r\n\
 \r\n\
-  ＃ 桌面图标的水平间距保持不变、垂直间距设置为56，并在设置后立即刷新桌面。\r\n\
-  IconSpacing.exe -V56\r\n\
+  ＃ 指定后台设置ini配置文件D:\\myFontSet.ini中的默认配置。\r\n\
+  AgileFontSet D:\\myFontSet.ini -hide\r\n\
 \r\n\
-  ＃ 不改变桌面图标间距，只是立即刷新桌面。\r\n\
-  IconSpacing.exe -R\r\n\
+  ＃ 指定后台设置ini配置文件D:\\myFontSet.ini中的Win10Preset配置。\r\n\
+  AgileFontSet D:\\myFontSet.ini -Win10Preset -hide\r\n\
 \r\n\
-  ＃ 显示设置对话框和此帮助信息(当前选项卡)，获取桌面图标间距的当前值。\r\n\
-  IconSpacing.exe -?\r\n\
+  ＃ 显示设置对话框和此帮助信息(当前选项卡)，获取系统字体和桌面图标间距的当前值。\r\n\
+  AgileFontSet -?\r\n\
 \r\n\
-  ＃ 显示设置对话框(当前选项卡)和此帮助信息，获取桌面图标间距的当前值。\r\n\
-  IconSpacing.exe\r\n\
+  ＃ 显示设置对话框(当前选项卡)和此帮助信息，获取系统字体和桌面图标间距的当前值。\r\n\
+  AgileFontSet\r\n\
 \r\n\
   (6)、免责申明\r\n\
   用户可自行斟酌选用该程序，若转载请注明出处。对一切后果，作者不承担任何责任！\r\n\
