@@ -177,6 +177,7 @@ int GetDataEx(vector<CString> &vecStrIS, vector<unsigned> &vecUnIS, CString strF
 
 int isLegal(CString str)
 {
+	str = StrToLower(str);
 	if (L"userpreset" != str.Left(wcslen(L"userpreset")))
 	{
 		return 0;
@@ -257,6 +258,7 @@ int APIENTRY VS2013_Win32App_wWinMain(
 		}
 		else if (str.GetLength() > 1 && L'-' == str[0] && isEngChar(str[1]))
 		{	//当有两个L"-xxx"参数时，只用前面一个参数
+			str = str.Right(str.GetLength() - 1);	//去除前面的横杠 -
 			if (L"" == vecStrCmd[1]) vecStrCmd[1] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
@@ -292,7 +294,7 @@ int APIENTRY VS2013_Win32App_wWinMain(
 			return false;
 		}
 
-		if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0])) {
+		if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0], 0)) {
 			::MessageBox(NULL, L"无法加载字体配置文件 " + vecStrCmd[0], L"错误", MB_OK | MB_ICONEXCLAMATION);
 			return false;
 		}
@@ -312,6 +314,33 @@ int APIENTRY VS2013_Win32App_wWinMain(
 			progsheet.m_pp1FontSet.m_iCheckTip = 1;
 
 			progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
+		}
+		else if (2 == iSeg && !vecStrCmd[1].IsEmpty()) // 参数为2段path -xxx
+		{
+			if (!isSectionExists(vecStrCmd[1], vecStrCmd[0]))
+			{
+				::MessageBox(NULL, vecStrCmd[0] + L" 文件中不存在配置：" + vecStrCmd[1], L"配置不存在", MB_OK | MB_ICONEXCLAMATION);
+			}
+			else
+			{
+				int i = isLegal(vecStrCmd[1]);
+				if (L"Win8xPreset" == vecStrCmd[1])
+				{
+					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin8);
+					progsheet.m_pp1FontSet.m_nComboInitSel = 2;
+				}
+				else if (L"Win10Preset" == vecStrCmd[1])
+				{
+					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin10);
+					progsheet.m_pp1FontSet.m_nComboInitSel = 3;
+				}
+				else if (i > 0)
+				{
+					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_vecTagSetUser[i]);
+					progsheet.m_pp1FontSet.m_nComboInitSel = 3 + i;
+				}
+				nRet = progsheet.DoModal();
+			}
 		}
 		else if (3 == iSeg && !vecStrCmd[1].IsEmpty() && L"-hide" == StrToLower(vecStrCmd[2])) // 参数为3段path -xxx -hide
 		{

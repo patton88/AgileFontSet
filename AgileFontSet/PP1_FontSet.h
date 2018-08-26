@@ -195,6 +195,7 @@ public:
 	CEditImpl m_edit1;
 	CComboImpl m_comboPreSet;
 	int m_nComboCurSel;
+	int m_nComboInitSel = 0;
 
 	//unsigned m_nOldHS;
 	//unsigned m_nOldVS;
@@ -235,7 +236,7 @@ public:
 	BOOL saveIS(CString filename, CString section, TagIS *tagIS);	//Save Icon Sapcing
 	BOOL savePreset(CString filename, CString section, CPreset& tagSet);//Save Windows Preset
 	BOOL loadFont(CString filename, CString section, LOGFONT* font);
-	BOOL loadFontInfo(CString filename);
+	BOOL loadFontInfo(CString filename, int iFlag = 1);
 	int getDPI(void);
 
 	//从字体高度获取字体大小。

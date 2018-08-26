@@ -126,7 +126,14 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	m_comboPreSet.AddString(L"上一次配置");		//1
 	m_comboPreSet.AddString(L"Win8.x配置");		//2
 	m_comboPreSet.AddString(L"Win10配置");		//3
-	m_comboPreSet.SetCurSel(0);
+
+	if (m_vecTagSetUser.size() > 1)
+	{
+		for(unsigned i = 1; i < m_vecTagSetUser.size(); i++)
+			m_comboPreSet.AddString(L"用户配置" + itos(i));
+	}
+
+	m_comboPreSet.SetCurSel(m_nComboInitSel);
 	//------------------------------------------------------
 
 	//noMeiryoUI235Dlg::OnInitDialog
@@ -1090,7 +1097,8 @@ LRESULT PP1_FontSet::OnLoad(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BO
 	return 0;
 }
 
-BOOL PP1_FontSet::loadFontInfo(CString filename)
+//命令行加载标志iFlag，1 默认为窗口加载，0 命令行加载
+BOOL PP1_FontSet::loadFontInfo(CString filename, int iFlag)
 {
 	BOOL loadResult;
 	LOGFONT captionFont;
@@ -1149,7 +1157,7 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 			m_vecTagSetUser.emplace_back(CPreset(strSuf));
 			m_vecTagSetUser[i].RefreshMapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
 			readFontResource(filename, strSec, m_vecTagSetUser[i]);
-			m_comboPreSet.AddString(L"用户配置" + itos(i));	//3 + i
+			if (1 == iFlag) { m_comboPreSet.AddString(L"用户配置" + itos(i)); }	//3 + i
 		}
 		else {
 			break; }
