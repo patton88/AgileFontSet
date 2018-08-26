@@ -225,7 +225,7 @@ void PP2_Readme::GetChinsesHelp()
 {
 	m_strReadme =
 		L"  AgileFontSet v2.0 程序说明\r\n\
-  迅捷字体设置程序v2.0 - ybmj@vip.163.com 20180830\r\n\
+  迅捷字体设置程序v2.0 - ybmj@vip.163.com(20180830)\r\n\
 \r\n\
   (1)、程序用途：快捷设置Windows系统字体和桌面图标间距\r\n\
   WinXP、Win7用户可在系统提供的高级外观设置里修改系统字体和桌面图标间距，但是，Win8、Win10系统却没有提供这一功能。熟悉系统的用户虽然可以通过修改注册表、bat、vbs等方式调整系统字体和桌面图标间距，但这些方法都需要注销后重新登录、或重启计算机才能生效。\r\n\
