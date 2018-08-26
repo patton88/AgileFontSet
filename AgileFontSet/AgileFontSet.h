@@ -222,7 +222,7 @@ int APIENTRY VS2013_Win32App_wWinMain(
 	iSeg = CStringSplitN(vecCmdLine, strCmdLine, ' ');	//strCmdLine中的参数段可不分先后次序
 
 	//这样处理更清晰、易于理解和管理，不容易出错
-	//初始化为3个L""，0-3单元分别用于存放：path、-xxx、-hide、-?
+	//初始化为4个L""，0-3单元分别用于存放：path、-xxx、-hide、-?
 	vector<CString> vecStrCmd(4, L"");
 
 	//遍历vecCmdLine中的参数段：
@@ -237,6 +237,10 @@ int APIENTRY VS2013_Win32App_wWinMain(
 					str.Replace(L"\"", L"");		//正确做法：删除str中的双引号
 					CTrimQ(str);
 				}
+				if (L':' != str[1])		//判断Path第2个字符非L':'，便非绝对路径，加上m_strCurrentDir
+				{
+					str = getCurDir(2) + str;
+				}
 				vecStrCmd[0] = str;
 			}
 			else { iSeg = -1; break; }	//同样参数出现两次
@@ -247,12 +251,12 @@ int APIENTRY VS2013_Win32App_wWinMain(
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
 		else if (L"-?" == str)
-		{
+		{	//当有两个L"-?"参数时，只用前面一个参数
 			if (L"" == vecStrCmd[3]) vecStrCmd[3] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
 		else if (str.GetLength() > 1 && L'-' == str[0] && isEngChar(str[1]))
-		{	//当有两个L"-hide"参数时，只用前面一个参数
+		{	//当有两个L"-xxx"参数时，只用前面一个参数
 			if (L"" == vecStrCmd[1]) vecStrCmd[1] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
@@ -276,113 +280,70 @@ int APIENTRY VS2013_Win32App_wWinMain(
 		progsheet.SetActivePage(1);	//设置属性表单出现时的当前选项卡
 		nRet = progsheet.DoModal();
 	}
-	else if (1 == iSeg || 2 == iSeg || 3 == iSeg)// 参数为1段path、或者2段path -hide、或者2段path -xxx -hide
+	// 参数为1段path、或者2段path -hide、或者3段path -xxx -hide
+	else if ((1 == iSeg || 2 == iSeg || 3 == iSeg) && !vecStrCmd[0].IsEmpty())
 	{
 		int iState = 0;	//iState = 0 表示参数非法或越界
-
-		// 增加文件存在的检测
-		if (L':' != vecStrCmd[0][1])		//判断Path第2个字符非L':'，便非绝对路径，加上m_strCurrentDir
-		{ vecStrCmd[0] = getCurDir(2) + vecStrCmd[0];	}
 
 		//用_waccess(需包含io.h)代替fopen判断文件是否存在，用fopen若文件不可读会误判
 		if (-1 == _waccess(vecStrCmd[0], 0))	//文件存在_waccess返回0，否则返回-1
 		{
-			::MessageBox(NULL, vecStrCmd[0] + L" 文件不存在。", L"文件不存在", MB_OK | MB_ICONINFORMATION);
+			::MessageBox(NULL, L"配置文件 " + vecStrCmd[0] + L" 文件不存在。", L"配置文件不存在", MB_OK | MB_ICONINFORMATION);
+			return false;
+		}
+
+		if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0])) {
+			::MessageBox(NULL, L"无法加载字体配置文件 " + vecStrCmd[0], L"错误", MB_OK | MB_ICONEXCLAMATION);
 			return false;
 		}
 
 		if (1 == iSeg)
 		{
-			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0])) {
-				::MessageBox(NULL, L"无法加载字体配置文件", L"错误", MB_OK | MB_ICONEXCLAMATION);
-			}
 			nRet = progsheet.DoModal();
 		}
-
-		if (2 == iSeg)
+		else if (2 == iSeg && (L"-hide" == StrToLower(vecStrCmd[2])))
 		{
-			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0])) {
-				::MessageBox(NULL, L"无法加载字体配置文件", L"错误", MB_OK | MB_ICONEXCLAMATION);
+			progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
+			progsheet.m_pp1FontSet.m_iCheckTitle = 1;
+			progsheet.m_pp1FontSet.m_iCheckIcon = 1;
+			progsheet.m_pp1FontSet.m_iCheckMenu = 1;
+			progsheet.m_pp1FontSet.m_iCheckMessage = 1;
+			progsheet.m_pp1FontSet.m_iCheckPalette = 1;
+			progsheet.m_pp1FontSet.m_iCheckTip = 1;
+
+			progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
+		}
+		else if (3 == iSeg && !vecStrCmd[1].IsEmpty() && L"-hide" == StrToLower(vecStrCmd[2])) // 参数为3段path -xxx -hide
+		{
+			if (isSectionExists(vecStrCmd[1], vecStrCmd[0]))
+			{
+				::MessageBox(NULL, vecStrCmd[0] + L"文件中不存在配置：" + vecStrCmd[1], L"错误", MB_OK | MB_ICONEXCLAMATION);
 			}
 			else
 			{
-				if (L"-hide" == StrToLower(vecStrCmd[2]))
+				int i = isLegal(vecStrCmd[1]);
+				if (L"Win8xPreset" == vecStrCmd[1])
 				{
-					progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
-					progsheet.m_pp1FontSet.m_iCheckTitle = 1;
-					progsheet.m_pp1FontSet.m_iCheckIcon = 1;
-					progsheet.m_pp1FontSet.m_iCheckMenu = 1;
-					progsheet.m_pp1FontSet.m_iCheckMessage = 1;
-					progsheet.m_pp1FontSet.m_iCheckPalette = 1;
-					progsheet.m_pp1FontSet.m_iCheckTip = 1;
-
-					progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
+					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin8);
 				}
-				else if (vecStrCmd[1].GetLength() > 1 && L'-' == vecStrCmd[1][0] && isEngChar(vecStrCmd[1][1]))
+				else if (L"Win10Preset" == vecStrCmd[1])
 				{
-					if (isSectionExists(vecStrCmd[1], vecStrCmd[0]))
-					{
-						::MessageBox(NULL, vecStrCmd[0] + L"文件中不存在配置：" + vecStrCmd[1], L"错误", MB_OK | MB_ICONEXCLAMATION);
-					}
-					else
-					{
-						int i = isLegal(vecStrCmd[1]);
-						if (L"Win8xPreset" == vecStrCmd[1])
-						{
-							progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin8);
-						}
-						else if (L"Win10Preset" == vecStrCmd[1])
-						{
-							progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin10);
-						}
-						else if (i > 0)
-						{
-							progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_vecTagSetUser[i]);
-						}
-
-						nRet = progsheet.DoModal();
-					}
+					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin10);
 				}
-			}
-		}
-
-		if (3 == iSeg && L"-hide" == StrToLower(vecStrCmd[2]))
-		{
-			if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0])) {
-				::MessageBox(NULL, L"无法加载字体配置文件", L"错误", MB_OK | MB_ICONEXCLAMATION);
-			}
-			else if (vecStrCmd[1].GetLength() > 1 && L'-' == vecStrCmd[1][0] && isEngChar(vecStrCmd[1][1]))
-			{
-				if (isSectionExists(vecStrCmd[1], vecStrCmd[0]))
+				else if (i > 0)
 				{
-					::MessageBox(NULL, vecStrCmd[0] + L"文件中不存在配置：" + vecStrCmd[1], L"错误", MB_OK | MB_ICONEXCLAMATION);
+					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_vecTagSetUser[i]);
 				}
-				else
-				{
-					int i = isLegal(vecStrCmd[1]);
-					if (L"Win8xPreset" == vecStrCmd[1])
-					{
-						progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin8);
-					}
-					else if (L"Win10Preset" == vecStrCmd[1])
-					{
-						progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin10);
-					}
-					else if (i > 0)
-					{
-						progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_vecTagSetUser[i]);
-					}
 
-					progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
-					progsheet.m_pp1FontSet.m_iCheckTitle = 1;
-					progsheet.m_pp1FontSet.m_iCheckIcon = 1;
-					progsheet.m_pp1FontSet.m_iCheckMenu = 1;
-					progsheet.m_pp1FontSet.m_iCheckMessage = 1;
-					progsheet.m_pp1FontSet.m_iCheckPalette = 1;
-					progsheet.m_pp1FontSet.m_iCheckTip = 1;
+				progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
+				progsheet.m_pp1FontSet.m_iCheckTitle = 1;
+				progsheet.m_pp1FontSet.m_iCheckIcon = 1;
+				progsheet.m_pp1FontSet.m_iCheckMenu = 1;
+				progsheet.m_pp1FontSet.m_iCheckMessage = 1;
+				progsheet.m_pp1FontSet.m_iCheckPalette = 1;
+				progsheet.m_pp1FontSet.m_iCheckTip = 1;
 
-					progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
-				}
+				progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
 			}
 		}
 	}
