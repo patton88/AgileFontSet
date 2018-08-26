@@ -401,7 +401,7 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 		case 1:		//1 上一次配置
 			//tagIS.nHS = tagIS.nVS = -1;		//未存入配置的标志
 			if (-1 != m_tagSetLast.tagIS.nHS) {
-				m_tagSetTemp = m_tagSetLast;	//在mySetFont2()中，将会把当前配置写入m_tagSetLast，所以这里先保存
+				m_tagSetTemp = m_tagSetLast;	//在mySetFont()中，将会把当前配置写入m_tagSetLast，所以这里先保存
 				mySetFont(m_metrics, m_iconFont, m_tagSetTemp);
 				theUpdateDisplay();
 			}
@@ -1675,6 +1675,9 @@ int PP1_FontSet::mySetFontItem(LOGFONTW& dstFont, LOGFONTW& srcFont, int iFlag)
 	wcscpy_s(dstFont.lfFaceName, srcFont.lfFaceName);
 	if (iFlag >= 20) {	//若tagSet.lfHeight中存放的是字号，才需调用getFontHight转换为字高
 		dstFont.lfHeight = getFontHight(srcFont.lfHeight);
+	}
+	else {
+		dstFont.lfHeight = srcFont.lfHeight;
 	}
 	dstFont.lfWeight = 400;
 	dstFont.lfCharSet = srcFont.lfCharSet;

@@ -51,6 +51,7 @@ public:
 			this->iconFont = tag.iconFont;
 			this->metricsAll = tag.metricsAll;
 			this->iconFontAll = tag.iconFontAll;
+			this->iTagHeightSizeFlag = tag.iTagHeightSizeFlag;
 			this->tagIS = tag.tagIS;
 		}
 		return *this;
