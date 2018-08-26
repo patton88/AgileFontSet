@@ -795,7 +795,7 @@ HFONT PP1_FontSet::createFont(LOGFONTW *font)
 //	return 0;
 //}
 
-//设定 按钮响应 IDOK
+//设定 按钮响应 IDOK。当wID 为 0xFFFF 时，为命令行处理
 LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	// TODO: Add validation code 
@@ -803,7 +803,10 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 	LOGFONTW iconFont = m_iconFont;
 	NONCLIENTMETRICSW metrics = m_metrics;
 
-	DoDataExchange(TRUE);		//控件to成员变量。缺省为FALSE-变量到控件
+	if (wID < 0xFFFF)
+	{
+		DoDataExchange(TRUE);		//控件to成员变量。缺省为FALSE-变量到控件
+	}
 
 	if (m_iCheckAllfont)
 	{
@@ -812,7 +815,10 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 		memcpy(&m_metrics, &m_metricsAll, sizeof(NONCLIENTMETRICSW));
 		memcpy(&m_iconFont, &m_iconFontAll, sizeof(LOGFONTW));
 
-		theUpdateDisplay();
+		if (wID < 0xFFFF)
+		{
+			theUpdateDisplay();
+		}
 	}
 	else if (m_iCheckTitle || m_iCheckIcon || m_iCheckMenu || m_iCheckMessage || m_iCheckPalette || m_iCheckTip)
 	{
@@ -838,7 +844,10 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 			unsigned nVS = m_spinVS.GetPos();
 			if (nVS >= 0 && nVS <= 150) m_tagIScur.nVS = nVS;
 		}
-		SetIconSpacing(m_tagIScur.nHS, m_tagIScur.nVS);
+		if (wID < 0xFFFF)
+		{
+			SetIconSpacing(m_tagIScur.nHS, m_tagIScur.nVS);
+		}
 	}
 
 	return 0;

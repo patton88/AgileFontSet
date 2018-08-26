@@ -344,7 +344,7 @@ int APIENTRY VS2013_Win32App_wWinMain(
 		}
 		else if (3 == iSeg && !vecStrCmd[1].IsEmpty() && L"-hide" == StrToLower(vecStrCmd[2])) // 参数为3段path -xxx -hide
 		{
-			if (isSectionExists(vecStrCmd[1], vecStrCmd[0]))
+			if (!isSectionExists(vecStrCmd[1], vecStrCmd[0]))
 			{
 				::MessageBox(NULL, vecStrCmd[0] + L"文件中不存在配置：" + vecStrCmd[1], L"错误", MB_OK | MB_ICONEXCLAMATION);
 			}
@@ -372,7 +372,7 @@ int APIENTRY VS2013_Win32App_wWinMain(
 				progsheet.m_pp1FontSet.m_iCheckPalette = 1;
 				progsheet.m_pp1FontSet.m_iCheckTip = 1;
 
-				progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
+				progsheet.m_pp1FontSet.OnSet(0, 0xFFFF, NULL, nCmdShow);
 			}
 		}
 	}
