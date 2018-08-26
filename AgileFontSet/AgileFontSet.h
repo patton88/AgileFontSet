@@ -129,7 +129,7 @@ int myStoi(CString str)
 //vecStrIS(vecStrIconSpacing)、vecIntIS(vecIntIconSpacing)
 int GetDataEx(vector<CString> &vecStrIS, vector<unsigned> &vecUnIS, CString strFlag)
 {
-	int nRet = 0;	//参数非法、或者转换失败
+	int nRet = 0;	//参数不合法、或者转换失败
 
 	if (L"" == strFlag && L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"-v" == StrToLower(vecStrIS[1].Left(2)))
 	{
@@ -270,8 +270,8 @@ int APIENTRY VS2013_Win32App_wWinMain(
 
 	//这样处理更清晰、易于理解和管理，不容易出错
 	if (-1 == iSeg)
-	{	//参数非法
-		MessageBox(NULL, strErroe, L"参数非法", MB_OK | MB_ICONINFORMATION);
+	{	//参数不合法
+		MessageBox(NULL, strErroe, L"参数不合法", MB_OK | MB_ICONINFORMATION);
 	}
 	else if (0 == iSeg)
 	{	// 参数为空，显示设置对话框和帮助信息(当前选项卡)
@@ -282,7 +282,7 @@ int APIENTRY VS2013_Win32App_wWinMain(
 		progsheet.SetActivePage(1);	//设置属性表单出现时的当前选项卡
 		nRet = progsheet.DoModal();
 	}
-	// 参数为1段path、或者2段path -hide、或者3段path -xxx -hide
+	// 处理有path：参数为1段path、或者2段path -hide、或者3段path -xxx -hide
 	else if ((1 == iSeg || 2 == iSeg || 3 == iSeg) && !vecStrCmd[0].IsEmpty())
 	{
 		// 1、处理加载配置文件参数 path
@@ -294,14 +294,16 @@ int APIENTRY VS2013_Win32App_wWinMain(
 		}
 
 		if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0], 0)) {
-			::MessageBox(NULL, L"无法加载字体配置文件 " + vecStrCmd[0], L"错误", MB_OK | MB_ICONEXCLAMATION);
+			::MessageBox(NULL, L"无法加载配置文件 " + vecStrCmd[0], L"配置文件无法加载", MB_OK | MB_ICONEXCLAMATION);
 			return false;
 		}
 
+		//处理参数为1段path
 		if (1 == iSeg)
 		{
 			nRet = progsheet.DoModal();
 		}
+		//处理参数为2段path -hide
 		else if (2 == iSeg && (L"-hide" == StrToLower(vecStrCmd[2])))
 		{
 			progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
@@ -314,15 +316,19 @@ int APIENTRY VS2013_Win32App_wWinMain(
 
 			progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
 		}
-		else if ((2 == iSeg || 3 == iSeg) && !vecStrCmd[1].IsEmpty()) // 参数为2段path -xxx、或者3段path -xxx -hide
+		// 处理有-xxx：参数为2段path -xxx、或者3段path -xxx -hide
+		else if ((2 == iSeg || 3 == iSeg) && !vecStrCmd[1].IsEmpty())
 		{
-			// 2、处理加载配置参数 -xxx
+			// 2.、处理加载配置参数 -xxx
+			// 2.1、检测指定配置 xxx 是否存在
 			if (!isSectionExists(vecStrCmd[1], vecStrCmd[0]))
 			{
 				::MessageBox(NULL, vecStrCmd[0] + L" 文件中不存在配置：" + vecStrCmd[1], L"配置不存在", MB_OK | MB_ICONEXCLAMATION);
+				return false;
 			}
 			else
 			{
+				// 2.2、加载指定配置 xxx
 				int i = isLegal(vecStrCmd[1]);
 				if (L"Win8xPreset" == vecStrCmd[1])
 				{
@@ -361,8 +367,9 @@ int APIENTRY VS2013_Win32App_wWinMain(
 			}
 		}
 		else
-		{	//参数非法
-			MessageBox(NULL, strErroe, L"参数非法", MB_OK | MB_ICONINFORMATION);
+		{	//参数不合法
+			MessageBox(NULL, strErroe, L"参数不合法", MB_OK | MB_ICONINFORMATION);
+			return false;
 		}
 	}
 	else
