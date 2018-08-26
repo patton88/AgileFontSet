@@ -131,7 +131,7 @@ int GetDataEx(vector<CString> &vecStrIS, vector<unsigned> &vecUnIS, CString strF
 {
 	int nRet = 0;	//参数不合法、或者转换失败
 
-	if (L"" == strFlag && L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"-v" == StrToLower(vecStrIS[1].Left(2)))
+	if (strFlag.IsEmpty() && L"-h" == StrToLower(vecStrIS[0].Left(2)) && L"-v" == StrToLower(vecStrIS[1].Left(2)))
 	{
 		CString str0 = vecStrIS[0].Right(vecStrIS[0].GetLength() - 2);	//去除前面两个字符
 		vecUnIS[0] = myStoi(str0);
@@ -175,19 +175,36 @@ int GetDataEx(vector<CString> &vecStrIS, vector<unsigned> &vecUnIS, CString strF
 	return nRet;
 }
 
+// 判断 -xxx 是否合法
+// xxx 可以是：Win8xPreset、Win10Preset、UserPreset1 - UserPreset100 之一
 int isLegal(CString str)
 {
+	//判断前面的横杠 -x
+	if (str.GetLength() < 1 || L'-' != str[0]) {
+		return 0;
+	}
+
+	int iRet;
+	str = str.Right(str.GetLength() - 1);	//去掉前面的横杠 -
 	str = StrToLower(str);
-	if (L"userpreset" != str.Left(wcslen(L"userpreset")))
-	{
-		return 0;
+
+	if (L"win8xpreset" == str) {
+		iRet = 101;
 	}
-	int i = _wtoi(str.Right(str.GetLength() - wcslen(L"userpreset")));
-	if(i <= 0 || i > 100)
-	{
-		return 0;
+	else if(L"win10preset" == str) {
+		iRet = 102;
 	}
-	return i;
+	else if (L"userpreset" == str.Left(wcslen(L"userpreset"))) {
+		iRet = _wtoi(str.Right(str.GetLength() - wcslen(L"userpreset")));
+		if (iRet <= 0 || iRet > 100) {
+			iRet = 0;
+		}
+	}
+	else {
+		iRet = 0;
+	}
+
+	return iRet;
 }
 
 //int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -208,9 +225,12 @@ int APIENTRY VS2013_Win32App_wWinMain(
   \r\n\
   可以不带参数直接启动窗口界面\r\n\
   可给定ini配置文件路径(含空格的路径必须用双引号包围)，比如：D:\\myFontSet.ini\r\n\
-  可给定ini配置文件路径和 -xxx 参数选择ini文件中的xxx配置，比如：D:\\myFontSet.ini -xxx\r\n\
+  可给定ini配置文件路径和 -xxx 参数选择ini文件中的xxx配置，\
+xxx 可以是：Win8xPreset、Win10Preset、UserPreset1 - UserPreset100 之一。\
+比如：D:\\myFontSet.ini -UserPreset1\r\n\
   可给定ini配置文件路径和 -hide 参数进行后台设置，比如：D:\\myFontSet.ini -hide\r\n\
-  可给定ini配置文件路径和 -xxx -hide 参数后台设置ini文件中的xxx配置，比如：D:\\myFontSet.ini -xxx -hide\r\n\
+  可给定ini配置文件路径和 -xxx -hide 参数后台设置ini文件中的xxx配置，\
+比如：D:\\myFontSet.ini -Win10Preset -hide\r\n\
   可给定 -? 参数查看帮助信息，比如：AgileFontSet.exe -?\r\n\
   所有参数都不分大小写\r\n";
 
@@ -233,62 +253,53 @@ int APIENTRY VS2013_Win32App_wWinMain(
 
 		if (L".ini" == StrToLower(str.Right(4)) || L".ini\"" == StrToLower(str.Right(5)))
 		{	//当有两个L".ini"参数时，只用前面一个参数
-			if (L"" == vecStrCmd[0]) {
+			if (vecStrCmd[0].IsEmpty()) {
 				if(L'\"' == str[0]){
 					str.Replace(L"\"", L"");		//正确做法：删除str中的双引号
 					CTrimQ(str);
 				}
-				if (L':' != str[1])		//判断Path第2个字符非L':'，便非绝对路径，加上m_strCurrentDir
-				{
+				if (L':' != str[1]) {	//判断Path第2个字符非L':'，便非绝对路径，加上m_strCurrentDir
 					str = getCurDir(2) + str;
 				}
 				vecStrCmd[0] = str;
 			}
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
-		else if (L"-hide" == StrToLower(str))
-		{	//当有两个L"-hide"参数时，只用前面一个参数
-			if (L"" == vecStrCmd[2]) vecStrCmd[2] = str;
+		else if (L"-hide" == StrToLower(str)) {	//当有两个L"-hide"参数时，只用前面一个参数
+			if (vecStrCmd[2].IsEmpty()) vecStrCmd[2] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
-		else if (L"-?" == str)
-		{	//当有两个L"-?"参数时，只用前面一个参数
-			if (L"" == vecStrCmd[3]) vecStrCmd[3] = str;
+		else if (L"-?" == str) {	//当有两个L"-?"参数时，只用前面一个参数
+			if (vecStrCmd[3].IsEmpty()) vecStrCmd[3] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
-		else if (str.GetLength() > 1 && L'-' == str[0] && isEngChar(str[1]))
-		{	//当有两个L"-xxx"参数时，只用前面一个参数
-			str = str.Right(str.GetLength() - 1);	//去除前面的横杠 -
-			if (L"" == vecStrCmd[1]) vecStrCmd[1] = str;
+		else if (isLegal(str) > 0) {	//当有两个L"-xxx"参数时，只用前面一个参数
+			// xxx 可以是：Win8xPreset、Win10Preset、UserPreset1 - UserPreset100 之一
+			if (vecStrCmd[1].IsEmpty()) vecStrCmd[1] = str;
 			else { iSeg = -1; break; }	//同样参数出现两次
 		}
-		else
-		{
+		else {		//出现不属于上面的几种合法参数，报错。并跳出for循环
 			iSeg = -1; break;
-		}	//出现不属于上面的几种合法参数，报错。并跳出for循环
+		}
 	}
 
 	//这样处理更清晰、易于理解和管理，不容易出错
-	if (-1 == iSeg)
-	{	//参数不合法
+	if (-1 == iSeg) {	//参数不合法
 		MessageBox(NULL, strErroe, L"参数不合法", MB_OK | MB_ICONINFORMATION);
 	}
-	else if (0 == iSeg)
-	{	// 参数为空，显示设置对话框和帮助信息(当前选项卡)
+	else if (0 == iSeg) {	// 参数为空，显示设置对话框和帮助信息(当前选项卡)
 		nRet = progsheet.DoModal();
 	}
-	else if (1 == iSeg && L"-?" == vecStrCmd[3])	//本可以放在后面处理，提前处理提高效率
-	{	// 参数为一段且为 L"-?" ，显示设置对话框(当前选项卡)和帮助信息
+	else if (1 == iSeg && L"-?" == vecStrCmd[3]) {	//本可以放在后面处理，提前处理提高效率
+		// 参数为一段且为 L"-?" ，显示设置对话框(当前选项卡)和帮助信息
 		progsheet.SetActivePage(1);	//设置属性表单出现时的当前选项卡
 		nRet = progsheet.DoModal();
 	}
 	// 处理有path：参数为1段path、或者2段path -hide、或者3段path -xxx -hide
-	else if ((1 == iSeg || 2 == iSeg || 3 == iSeg) && !vecStrCmd[0].IsEmpty())
-	{
+	else if ((1 == iSeg || 2 == iSeg || 3 == iSeg) && !vecStrCmd[0].IsEmpty()) {
 		// 1、处理加载配置文件参数 path
 		//用_waccess(需包含io.h)代替fopen判断文件是否存在，用fopen若文件不可读会误判
-		if (-1 == _waccess(vecStrCmd[0], 0))	//文件存在_waccess返回0，否则返回-1
-		{
+		if (-1 == _waccess(vecStrCmd[0], 0)) {	//文件存在_waccess返回0，否则返回-1
 			::MessageBox(NULL, L"配置文件 " + vecStrCmd[0] + L" 文件不存在。", L"配置文件不存在", MB_OK | MB_ICONINFORMATION);
 			return false;
 		}
@@ -299,13 +310,11 @@ int APIENTRY VS2013_Win32App_wWinMain(
 		}
 
 		//处理参数为1段path
-		if (1 == iSeg)
-		{
+		if (1 == iSeg) {
 			nRet = progsheet.DoModal();
 		}
 		//处理参数为2段path -hide
-		else if (2 == iSeg && (L"-hide" == StrToLower(vecStrCmd[2])))
-		{
+		else if (2 == iSeg && (L"-hide" == StrToLower(vecStrCmd[2]))) {
 			progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
 			progsheet.m_pp1FontSet.m_iCheckTitle = 1;
 			progsheet.m_pp1FontSet.m_iCheckIcon = 1;
@@ -317,43 +326,35 @@ int APIENTRY VS2013_Win32App_wWinMain(
 			progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
 		}
 		// 处理有-xxx：参数为2段path -xxx、或者3段path -xxx -hide
-		else if ((2 == iSeg || 3 == iSeg) && !vecStrCmd[1].IsEmpty())
-		{
+		else if ((2 == iSeg || 3 == iSeg) && !vecStrCmd[1].IsEmpty()) {
 			// 2.、处理加载配置参数 -xxx
 			// 2.1、检测指定配置 xxx 是否存在
-			if (!isSectionExists(vecStrCmd[1], vecStrCmd[0]))
-			{
+			if (!isSectionExists(vecStrCmd[1], vecStrCmd[0])) {
 				::MessageBox(NULL, vecStrCmd[0] + L" 文件中不存在配置：" + vecStrCmd[1], L"配置不存在", MB_OK | MB_ICONEXCLAMATION);
 				return false;
 			}
-			else
-			{
+			else {
 				// 2.2、加载指定配置 xxx
 				int i = isLegal(vecStrCmd[1]);
-				if (L"Win8xPreset" == vecStrCmd[1])
-				{
+				if (101 == i) {	//L"Win8xPreset"
 					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin8);
 					progsheet.m_pp1FontSet.m_nComboInitSel = 2;
 				}
-				else if (L"Win10Preset" == vecStrCmd[1])
-				{
+				else if (102 == i) {	//L"Win10Preset"
 					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin10);
 					progsheet.m_pp1FontSet.m_nComboInitSel = 3;
 				}
-				else if (i > 0)
-				{
+				else if (i > 0 && i <= 100) {
 					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_vecTagSetUser[i]);
 					progsheet.m_pp1FontSet.m_nComboInitSel = 3 + i;
 				}
 				
 				// 3、处理后台配置参数 -hide
-				if (2 == iSeg)
-				{
+				if (2 == iSeg) {
 					nRet = progsheet.DoModal();
 
 				}
-				else if (3 == iSeg && L"-hide" == StrToLower(vecStrCmd[2]))
-				{
+				else if (3 == iSeg && L"-hide" == StrToLower(vecStrCmd[2])) {
 					progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
 					progsheet.m_pp1FontSet.m_iCheckTitle = 1;
 					progsheet.m_pp1FontSet.m_iCheckIcon = 1;
@@ -366,14 +367,12 @@ int APIENTRY VS2013_Win32App_wWinMain(
 				}
 			}
 		}
-		else
-		{	//参数不合法
+		else {	//参数不合法
 			MessageBox(NULL, strErroe, L"参数不合法", MB_OK | MB_ICONINFORMATION);
 			return false;
 		}
 	}
-	else
-	{	//参数处理失败和其余情况，都显示设置对话框(当前选项卡)和帮助信息
+	else {	//参数处理失败和其余情况，都显示设置对话框(当前选项卡)和帮助信息
 		progsheet.SetActivePage(1);	//设置属性表单出现时当前选项卡
 		nRet = progsheet.DoModal();
 	}

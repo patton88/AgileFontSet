@@ -183,7 +183,7 @@ DWORD GetTopProcessID(CString& strProcessName)
 //优化：查找指定目录及其子目录下指定名称的文件(不分大小写)。找到返回第一次找到文件的全路径，否则返回空
 CString wstrTraveDir(const CString& strCurrDir, const CString& strFileName)
 {
-	if (L"" == strCurrDir || L"" == strFileName)	return L"";
+	if (strCurrDir.IsEmpty() || strFileName.IsEmpty())	return L"";
 	
 	static CString strResult = L"";
 	struct _wfinddata_t c_file = {0};
@@ -266,7 +266,7 @@ bool ChTerminateProcess(vector<DWORD>& vecProcessPID)
 string& CStringToStringQ(const CString& wstr, string& str)
 {
 	str = "";		//必须先清空返回变量str，否则wstr为空时会返回一些未知内容
-	if (L"" == wstr)
+	if (wstr.IsEmpty())
 		return str;
 
 	int nLen = WideCharToMultiByte(CP_ACP, 0, wstr, wstr.GetLength(), NULL, 0, NULL, NULL);
@@ -358,7 +358,7 @@ string itostln(int i, int n)
 int CStringSplitS(vector<CString>& vecResult, const CString& str, CString strSep)
 {
 	vecResult.clear();
-	if (L"" == str)
+	if (str.IsEmpty())
 		return 0;
 
 	int len = strSep.GetLength();
@@ -386,7 +386,7 @@ int CStringSplitS(vector<CString>& vecResult, const CString& str, CString strSep
 vector<CString>& CStringSplit(vector<CString>& vecResult, const CString& str, CString strSep)
 {
 	vecResult.clear();
-	if (L"" == str)
+	if (str.IsEmpty())
 		return vecResult;
 
 	int len = strSep.GetLength();
@@ -411,7 +411,7 @@ vector<CString>& CStringSplit(vector<CString>& vecResult, const CString& str, CS
 int CStringSplitN(vector<CString>& vecResult, const CString& str, CString strSep)	//返回字段数
 {
 	vecResult.clear();
-	if (L"" == str)
+	if (str.IsEmpty())
 		return 0;
 
 	int len = strSep.GetLength();
