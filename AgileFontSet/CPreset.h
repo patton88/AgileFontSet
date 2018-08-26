@@ -106,6 +106,29 @@ public:
 		L"ICON_VERTICAL_SPACING"
 	};
 
+	vector<CString> vecWin7PreSet{
+		"SimSun",
+		"SimSun",
+		"SimSun",
+		"SimSun",
+		"SimSun",
+		"SimSun",
+		"9",
+		"9",
+		"9",
+		"9",
+		"9",
+		"9",
+		"1",
+		"1",
+		"1",
+		"1",
+		"1",
+		"1",
+		"80",
+		"48"
+	};
+
 	vector<CString> vecWin8xPreSet{
 		"Segoe UI",
 		"Segoe UI",
@@ -125,8 +148,8 @@ public:
 		"1",
 		"1",
 		"1",
-		"77",
-		"47"
+		"80",
+		"48"
 	};
 
 	vector<CString> vecWin10PreSet{
@@ -148,8 +171,8 @@ public:
 		"1",
 		"1",
 		"1",
-		"75",
-		"45"
+		"80",
+		"48"
 	};
 
 	//用于循环处理的关键数据结构mapRCN

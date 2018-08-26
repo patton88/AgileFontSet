@@ -211,9 +211,9 @@ public:
 	LRESULT OnLoad(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnAbout(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnHelpTopic(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnSet7(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnSet8(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnSet10(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	LRESULT OnSetCurrent(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnCompat7(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnUniqThread(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
@@ -298,9 +298,10 @@ public:
 	CPreset m_tagSetCur{ L"CUR" };		//  当前显示配置	
 	CPreset m_tagSetOld{ L"OLD" };		//0 进入程序时的旧有配置
 	CPreset m_tagSetLast{ L"LAST" };		//1 上一次配置
-	CPreset m_tagSetWin8{ L"8" };		//2 Win8.x配置
-	CPreset m_tagSetWin10{ L"10" };		//3 Win10配置
-	vector<CPreset> m_vecTagSetUser;		//4-x User配置 UserPreset1-UserPreset100
+	CPreset m_tagSetWin7{ L"7" };		//2 Win7配置
+	CPreset m_tagSetWin8{ L"8" };		//3 Win8.x配置
+	CPreset m_tagSetWin10{ L"10" };		//4 Win10配置
+	vector<CPreset> m_vecTagSetUser;		//5-x User配置 UserPreset1-UserPreset100
 	CPreset m_tagSetTemp{ L"TEMP" };		//T 临时配置
 
 	map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
@@ -363,6 +364,7 @@ public:
 
 	bool use7Compat = true;
 	bool hasCurPreset = true;
+	bool has7Preset = true;
 	bool has8Preset = true;
 	bool has10Preset = true;
 	/**您是否使用Windows 8的字体大小计算公式？ */

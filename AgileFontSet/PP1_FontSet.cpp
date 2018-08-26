@@ -124,8 +124,9 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	//m_comboPreSet.AddString(L"当前显示配置");	//，该项无意义，所以去除
 	m_comboPreSet.AddString(L"进入时配置");		//0
 	m_comboPreSet.AddString(L"上一次配置");		//1
-	m_comboPreSet.AddString(L"Win8.x配置");		//2
-	m_comboPreSet.AddString(L"Win10配置");		//3
+	m_comboPreSet.AddString(L"Win7配置");		//2
+	m_comboPreSet.AddString(L"Win8.x配置");		//3
+	m_comboPreSet.AddString(L"Win10配置");		//4
 
 	if (m_vecTagSetUser.size() > 1)
 	{
@@ -147,8 +148,9 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	//动态创建的CPreset对象必须在创建后进行初始化，否则地址不对。成员变量好像地址正确，但保险起见还是显示初始化
 	//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
 	m_tagSetCur.RefreshMapRCN();
-	m_tagSetOld.RefreshMapRCN();
+	m_tagSetOld.RefreshMapRCN();		//进入程序时的旧有配置
 	m_tagSetLast.RefreshMapRCN();
+	m_tagSetWin7.RefreshMapRCN();
 	m_tagSetWin8.RefreshMapRCN();
 	m_tagSetWin10.RefreshMapRCN();
 	m_tagSetTemp.RefreshMapRCN();
@@ -388,7 +390,7 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 	m_nComboCurSel = m_comboPreSet.GetCurSel();	//组合框选择
 
 	//处理选择系统自带配置
-	if (m_nComboCurSel >= 0 && m_nComboCurSel < 4)
+	if (m_nComboCurSel >= 0 && m_nComboCurSel < 5)
 	{
 		switch (m_nComboCurSel)
 		{
@@ -404,11 +406,15 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 				theUpdateDisplay();
 			}
 			break;
-		case 2:		//2 Win8.x配置
+		case 2:		//2 Win7配置
+			mySetFont(m_metrics, m_iconFont, m_tagSetWin7);
+			theUpdateDisplay();
+			break;
+		case 3:		//3 Win8.x配置
 			mySetFont(m_metrics, m_iconFont, m_tagSetWin8);
 			theUpdateDisplay();
 			break;
-		case 3:		//3 Win10配置
+		case 4:		//4 Win10配置
 			mySetFont(m_metrics, m_iconFont, m_tagSetWin10);
 			theUpdateDisplay();
 			break;
@@ -418,9 +424,9 @@ LRESULT PP1_FontSet::OnSelchangeCombo(WORD wNotifyCode, WORD wID, HWND hWndCtl, 
 	}
 
 	//处理选择用户加载配置
-	if (m_nComboCurSel > 3)
+	if (m_nComboCurSel > 4)
 	{
-		mySetFont(m_metrics, m_iconFont, m_vecTagSetUser[m_nComboCurSel - 3]);
+		mySetFont(m_metrics, m_iconFont, m_vecTagSetUser[m_nComboCurSel - 4]);
 		theUpdateDisplay();
 	}
 
@@ -1142,6 +1148,7 @@ BOOL PP1_FontSet::loadFontInfo(CString filename, int iFlag)
 		return FALSE;
 	}
 
+	//加载的ini文件中的默认配置，作为当前配置显示
 	m_metrics.lfCaptionFont = captionFont;
 	m_iconFont = iconFont;
 	m_metrics.lfMenuFont = menuFont;
@@ -1166,7 +1173,7 @@ BOOL PP1_FontSet::loadFontInfo(CString filename, int iFlag)
 			m_vecTagSetUser.emplace_back(CPreset(strSuf));
 			m_vecTagSetUser[i].RefreshMapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
 			readFontResource(filename, strSec, m_vecTagSetUser[i]);
-			if (1 == iFlag) { m_comboPreSet.AddString(L"用户配置" + itos(i)); }	//3 + i
+			if (1 == iFlag) { m_comboPreSet.AddString(L"用户配置" + itos(i)); }	//4 + i
 		}
 		else {
 			break; }
@@ -1418,6 +1425,10 @@ BOOL PP1_FontSet::startSaveFont(CString filename)
 		return FALSE;
 	}
 
+	saveResult = savePreset(filename, L"Win7Preset", m_tagSetWin7);
+	if (!saveResult) {
+		return FALSE;
+	}
 	saveResult = savePreset(filename, L"Win8xPreset", m_tagSetWin8);
 	if (!saveResult) {
 		return FALSE;
@@ -1697,6 +1708,19 @@ int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPres
 }
 
 /**
+*设置Windows 7的预设值。
+*/
+LRESULT PP1_FontSet::OnSet7(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	mySetFont(m_metrics, m_iconFont, m_tagSetWin7);
+
+	// 更新显示。
+	theUpdateDisplay();
+
+	return 0;
+}
+
+/**
 *设置Windows 8 / 8.1的预设值。
 */
 LRESULT PP1_FontSet::OnSet8(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
@@ -1719,21 +1743,6 @@ LRESULT PP1_FontSet::OnSet10(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, B
 	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
 	//mySetFont(m_metrics, m_iconFont, tagFontWin10);
 	mySetFont(m_metrics, m_iconFont, m_tagSetWin10);
-
-	// 更新显示。
-	theUpdateDisplay();
-
-	return 0;
-}
-
-/**
-*设置Windows Current的预设值。
-*/
-LRESULT PP1_FontSet::OnSetCurrent(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
-	//mySetFont(m_metrics, m_iconFont, tagFontCur);
-	mySetFont(m_metrics, m_iconFont, m_tagSetCur);
 
 	// 更新显示。
 	theUpdateDisplay();
@@ -1786,6 +1795,7 @@ void PP1_FontSet::initializeLocale(void)
 	//if (0 == readFontResource(langPath, m_tagSetWin10)) { has10Preset = false; }
 
 	//用内部存放数据自动生成预设配置
+	if (0 == m_tagSetWin7.getPreset(m_tagSetWin7.vecWin7PreSet)) { has7Preset = false; }
 	if (0 == m_tagSetWin8.getPreset(m_tagSetWin8.vecWin8xPreSet)) { has8Preset = false; }
 	if (0 == m_tagSetWin10.getPreset(m_tagSetWin10.vecWin10PreSet)) { has10Preset = false; }
 

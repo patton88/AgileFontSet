@@ -188,11 +188,14 @@ int isLegal(CString str)
 	str = str.Right(str.GetLength() - 1);	//去掉前面的横杠 -
 	str = StrToLower(str);
 
-	if (L"win8xpreset" == str) {
+	if (L"win7preset" == str) {
 		iRet = 101;
 	}
-	else if(L"win10preset" == str) {
+	else if (L"win8xpreset" == str) {
 		iRet = 102;
+	}
+	else if(L"win10preset" == str) {
+		iRet = 103;
 	}
 	else if (L"userpreset" == str.Left(wcslen(L"userpreset"))) {
 		iRet = _wtoi(str.Right(str.GetLength() - wcslen(L"userpreset")));
@@ -221,18 +224,20 @@ int APIENTRY VS2013_Win32App_wWinMain(
 	// 删除前后空白符
 	strCmdLine = CTrimQ(strCmdLine);
 
-	CString strErroe = L"  给定的参数不合法。\r\n\
-  \r\n\
-  可以不带参数直接启动窗口界面\r\n\
-  可给定ini配置文件路径(含空格的路径必须用双引号包围)，比如：D:\\myFontSet.ini\r\n\
-  可给定ini配置文件路径和 -xxx 参数选择ini文件中的xxx配置，\
-xxx 可以是：Win8xPreset、Win10Preset、UserPreset1 - UserPreset100 之一。\
-比如：D:\\myFontSet.ini -UserPreset1\r\n\
-  可给定ini配置文件路径和 -hide 参数进行后台设置，比如：D:\\myFontSet.ini -hide\r\n\
-  可给定ini配置文件路径和 -xxx -hide 参数后台设置ini文件中的xxx配置，\
-比如：D:\\myFontSet.ini -Win10Preset -hide\r\n\
-  可给定 -? 参数查看帮助信息，比如：AgileFontSet.exe -?\r\n\
-  所有参数都不分大小写\r\n";
+	CString strErroe = L"  给定的参数不合法。用户可按以下格式的参数启动程序，所有参数都不分大小写。\r\n\
+\r\n\
+  A、可以不带参数直接启动窗口界面；\r\n\
+  B、可指定 -? 参数查看帮助信息，比如：AgileFontSet -? ；\r\n\
+  C、可指定加载ini配置文件的路径，启动后将显示ini配置文件中的默认配置，注意：含空格的路径必须用双引号包围，\
+比如：AgileFontSet \"D:\\Program Files\\User Data\\myFontSet.ini\" ；\r\n\
+  D、可指定加载ini配置文件的路径和 -xxx 参数，启动后将选择ini文件中的xxx配置，\
+xxx可以是：Win7Preset、Win8xPreset、Win10Preset、UserPreset1 - UserPreset100 之一。\
+比如：AgileFontSet D:\\myFontSet.ini -UserPreset1 ；\r\n\
+  E、可指定加载ini配置文件的路径和 -hide 参数，程序将后台设置ini配置文件中的默认配置，\
+比如：AgileFontSet D:\\myFontSet.ini -hide ；\r\n\
+  F、可指定加载ini配置文件的路径和 -xxx -hide 参数，程序将后台设置ini文件中的xxx配置，\
+比如：AgileFontSet D:\\myFontSet.ini -Win10Preset -hide 。\r\n\
+";
 
 	// 处理命令行参数
 	vector<CString> vecCmdLine;
@@ -336,17 +341,21 @@ xxx 可以是：Win8xPreset、Win10Preset、UserPreset1 - UserPreset100 之一。\
 			else {
 				// 2.2、加载指定配置 xxx
 				int i = isLegal(vecStrCmd[1]);
-				if (101 == i) {	//L"Win8xPreset"
-					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin8);
+				if (101 == i) {	//L"Win7Preset"
+					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin7);
 					progsheet.m_pp1FontSet.m_nComboInitSel = 2;
 				}
-				else if (102 == i) {	//L"Win10Preset"
-					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin10);
+				else if (102 == i) {	//L"Win8xPreset"
+					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin8);
 					progsheet.m_pp1FontSet.m_nComboInitSel = 3;
+				}
+				else if (103 == i) {	//L"Win10Preset"
+					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_tagSetWin10);
+					progsheet.m_pp1FontSet.m_nComboInitSel = 4;
 				}
 				else if (i > 0 && i <= 100) {
 					progsheet.m_pp1FontSet.mySetFont(progsheet.m_pp1FontSet.m_metrics, progsheet.m_pp1FontSet.m_iconFont, progsheet.m_pp1FontSet.m_vecTagSetUser[i]);
-					progsheet.m_pp1FontSet.m_nComboInitSel = 3 + i;
+					progsheet.m_pp1FontSet.m_nComboInitSel = 4 + i;
 				}
 				
 				// 3、处理后台配置参数 -hide
