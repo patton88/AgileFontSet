@@ -39,6 +39,7 @@ IDI_ICON_HS             ICON                    "res\\ICON_HS.ico"
 IDD_PP2_README DIALOGEX 0, 0, 298, 232
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "程序说明"
+MENU IDR_MENU1
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_EDIT_README,16,16,274,199,ES_MULTILINE | ES_READONLY | ES_WANTRETURN | WS_VSCROLL
@@ -131,24 +132,24 @@ END
 
 IDR_MENU1 MENU
 BEGIN
-    POPUP "文件(&F)"
+    POPUP "加载保存配置(&L)"
     BEGIN
-        MENUITEM "加载字体设定(&L)...",               IDM_LOAD
-        MENUITEM "保存字体设定(&A)...",               IDM_SAVE
+        MENUITEM "加载字体配置(&L)...",               IDM_LOAD
+        MENUITEM "保存字体配置(&A)...",               IDM_SAVE
         MENUITEM SEPARATOR
-        MENUITEM "设定并退出(&S)",                   IDM_SET_EXIT
         MENUITEM "退出(&X)",                      IDCANCEL
     END
-    POPUP "重置默认设置(&P)"
+    POPUP "预设配置(&P)"
     BEGIN
         MENUITEM "Windows Cur",                 IDM_SET_CURRENT
+        MENUITEM "Windows 7",                   ID_32785
         MENUITEM "Windows 8.x",                 IDM_SET_8
         MENUITEM "Windows 10",                  IDM_SET_10
     END
-    POPUP "工具(&T)"
+    POPUP "图标间距配置(&I)"
     BEGIN
-        MENUITEM "在独立线程中设定(&A)",                IDM_UNIQ_THREAD, CHECKED
-        MENUITEM "Windows 7兼容风格度量(&7)",         IDM_COMPAT7
+        MENUITEM "图标水平间距配置",                    ID_32786
+        MENUITEM "图标垂直间距配置",                    ID_32787
     END
     POPUP "帮助(&H)"
     BEGIN

@@ -69,13 +69,16 @@
 #define IDM_SET_8                       32782
 #define IDM_COMPAT7                     32783
 #define IDM_SET_10                      32784
+#define ID_32785                        32785
+#define ID_32786                        32786
+#define ID_32787                        32787
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        203
-#define _APS_NEXT_COMMAND_VALUE         32785
+#define _APS_NEXT_COMMAND_VALUE         32788
 #define _APS_NEXT_CONTROL_VALUE         1049
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

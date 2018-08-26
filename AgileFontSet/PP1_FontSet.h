@@ -248,8 +248,6 @@ public:
 	void initializeLocale(void);
 	//加载资源项目
 	void readResourceItem(CString file, CString key, CString fallback);
-	//加载预设资源。
-	void readResourceFile(CString file);
 	//字体容器、字体选择容器初始化。tag是结构体struct缩写的前缀
 	void initSelFont(void);
 	int ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontName, HFONT& hFont, CEditImpl& edit);
