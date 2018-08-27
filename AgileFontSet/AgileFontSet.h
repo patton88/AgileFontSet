@@ -347,8 +347,10 @@ xxxø…“‘ «£∫Win7Preset°¢Win8xPreset°¢Win10Preset°¢UserPreset1 - UserPreset100 ÷Æ“
 			progsheet.m_pp1FontSet.m_iCheckMessage = 1;
 			progsheet.m_pp1FontSet.m_iCheckPalette = 1;
 			progsheet.m_pp1FontSet.m_iCheckTip = 1;
+			progsheet.m_pp1FontSet.m_iCheckHS = 1;
+			progsheet.m_pp1FontSet.m_iCheckVS = 1;
 
-			progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
+			progsheet.m_pp1FontSet.OnSet(0, 0xFFFF, NULL, nCmdShow);	//∫ÛÃ®¥¶¿Ì±Í÷æ 0xFFFF
 		}
 		// ¥¶¿Ì”–-xxx£∫≤Œ ˝Œ™2∂Œpath -xxx°¢ªÚ’ﬂ3∂Œpath -xxx -hide
 		else if ((2 == iSeg || 3 == iSeg) && !vecStrCmd[1].IsEmpty()) {
@@ -391,11 +393,13 @@ xxxø…“‘ «£∫Win7Preset°¢Win8xPreset°¢Win10Preset°¢UserPreset1 - UserPreset100 ÷Æ“
 					progsheet.m_pp1FontSet.m_iCheckMessage = 1;
 					progsheet.m_pp1FontSet.m_iCheckPalette = 1;
 					progsheet.m_pp1FontSet.m_iCheckTip = 1;
+					progsheet.m_pp1FontSet.m_iCheckHS = 1;
+					progsheet.m_pp1FontSet.m_iCheckVS = 1;
 
 					//√¸¡Ó––-hide∫ÛÃ®¥¶¿Ì£¨∆Ù∂Ø∂¿¡¢œﬂ≥Ã…Ë∂®◊÷ÃÂªÿ≥ˆ¥Ì
-					progsheet.m_pp1FontSet.m_useUniqThread = FALSE;
+					//progsheet.m_pp1FontSet.m_useUniqThread = FALSE;
 
-					progsheet.m_pp1FontSet.OnSet(0, 0xFFFF, NULL, nCmdShow);
+					progsheet.m_pp1FontSet.OnSet(0, 0xFFFF, NULL, nCmdShow);		//∫ÛÃ®¥¶¿Ì±Í÷æ 0xFFFF
 				}
 			}
 		}

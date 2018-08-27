@@ -809,7 +809,7 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 	LOGFONTW iconFont = m_iconFont;
 	NONCLIENTMETRICSW metrics = m_metrics;
 
-	if (wID != 0xFFFF)
+	if (wID < 0xFFFF)
 	{
 		DoDataExchange(TRUE);		//控件to成员变量。缺省为FALSE-变量到控件
 	}
@@ -821,7 +821,7 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 		memcpy(&m_metrics, &m_metricsAll, sizeof(NONCLIENTMETRICSW));
 		memcpy(&m_iconFont, &m_iconFontAll, sizeof(LOGFONTW));
 
-		if (wID < 0xFFFF)
+		if (wID != 0xFFFF)
 		{
 			theUpdateDisplay();
 		}
@@ -836,24 +836,21 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 		if (m_iCheckTip) metrics.lfStatusFont = m_metrics.lfStatusFont;
 
 		//应用字体设置，刷新桌面
-		theSetFont(&metrics, &iconFont, wID != 0xFFFF);
+		theSetFont(&metrics, &iconFont);
 	}
 
 	//应用图标间距设置，刷新桌面
 	if (m_iCheckHS || m_iCheckVS)
 	{
-		if (m_iCheckHS) {
+		if (m_iCheckHS && wID != 0xFFFF) {
 			unsigned nHS = m_spinHS.GetPos();
 			if (nHS >= 0 && nHS <= 150) m_tagIScur.nHS = nHS;
 		}
-		if (m_iCheckVS) {
+		if (m_iCheckVS && wID != 0xFFFF) {
 			unsigned nVS = m_spinVS.GetPos();
 			if (nVS >= 0 && nVS <= 150) m_tagIScur.nVS = nVS;
 		}
-		if (wID < 0xFFFF)
-		{
-			SetIconSpacing(m_tagIScur.nHS, m_tagIScur.nVS);
-		}
+		SetIconSpacing(m_tagIScur.nHS, m_tagIScur.nVS);
 	}
 
 	return 0;
@@ -980,8 +977,7 @@ int PP1_FontSet::ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontN
 	return 0;
 }
 
-//bFlag = FALSE，表示是-hide后台处理
-void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFont, BOOL bFlag) {
+void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFont) {
 
 	DWORD_PTR ptr;
 	LRESULT messageResult;
@@ -1053,25 +1049,18 @@ void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFo
 			SPIF_UPDATEINIFILE); // | SPIF_SENDCHANGE);
 	}
 
-	if (bFlag)
-	{
-		//向所有活动窗口广播系统设置更新消息
-		messageResult = SendMessageTimeout(
-			HWND_BROADCAST,
-			WM_SETTINGCHANGE,
-			SPI_SETNONCLIENTMETRICS,
-			(LPARAM)L"WindowMetrics",
-			SMTO_ABORTIFHUNG,
-			//SMTO_BLOCK,
-			//SMTO_NOTIMEOUTIFNOTHUNG,
-			//SMTO_ERRORONEXIT,
-			//SMTO_NORMAL,
-			5000,
-			&ptr);
-		if (messageResult == 0) {
-			if (GetLastError() == ERROR_TIMEOUT) {
-				::MessageBox(m_hWnd, L"SendMessage timeout.", L"Information", MB_OK | MB_ICONEXCLAMATION);
-			}
+	//向所有活动窗口广播系统单位更新消息
+	messageResult = SendMessageTimeout(
+		HWND_BROADCAST,
+		WM_SETTINGCHANGE,
+		SPI_SETNONCLIENTMETRICS,
+		(LPARAM)L"WindowMetrics",
+		SMTO_ABORTIFHUNG,
+		5000,
+		&ptr);
+	if (messageResult == 0) {
+		if (GetLastError() == ERROR_TIMEOUT) {
+			::MessageBox(m_hWnd, L"SendMessage timeout.", L"Information", MB_OK | MB_ICONEXCLAMATION);
 		}
 	}
 
