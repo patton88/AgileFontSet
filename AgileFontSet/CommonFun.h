@@ -375,8 +375,11 @@ int CStringSplitS(vector<CString>& vecResult, const CString& str, CString strSep
 	//这里已是末尾字段，并未包含strSep，所以不要 > len。只要 >0，就不是空字段。
 	//如果用(str.GetLength() - next) > len，就会将长度小于len的末尾字段漏掉
 	if (it = -1 && (str.GetLength() - next) > 0)	//实质上，条件 it = -1 可省略。为便于阅读理解，可以保留
-		vecResult.push_back(CTrim(str.Right(str.GetLength() - next)));
-
+	{
+		//避免最后一段位分割字符串的情况
+		if (strSep != CTrim(str.Right(str.GetLength() - next)))
+			vecResult.push_back(CTrim(str.Right(str.GetLength() - next)));
+	}
 	return vecResult.size();
 }
 
@@ -400,8 +403,11 @@ vector<CString>& CStringSplit(vector<CString>& vecResult, const CString& str, CS
 	}
 
 	if (it = -1)	//实质上，这一句if都可以省略。为便于阅读理解，可以保留
-		vecResult.push_back(CTrim(str.Right(str.GetLength() - next)));
-
+	{
+		//避免最后一段位分割字符串的情况
+		if (strSep != CTrim(str.Right(str.GetLength() - next)))
+			vecResult.push_back(CTrim(str.Right(str.GetLength() - next)));
+	}
 	return vecResult;
 }
 
@@ -425,7 +431,11 @@ int CStringSplitN(vector<CString>& vecResult, const CString& str, CString strSep
 	}
 
 	if (it = -1)	//实质上，这一句if都可以省略。为便于阅读理解，可以保留
-		vecResult.push_back(CTrim(str.Right(str.GetLength() - next)));
+	{
+		//避免最后一段位分割字符串的情况
+		if(strSep != CTrim(str.Right(str.GetLength() - next)))
+			vecResult.push_back(CTrim(str.Right(str.GetLength() - next)));
+	}
 
 	return vecResult.size();;
 }
@@ -443,16 +453,16 @@ int CStringSplitPath(vector<CString>& vecResult, const CString& str, CString str
 	CString strFirst;
 	//CString::Find返回此CString对象中与需要的子字符串或字符匹配的第一个字符的从零开始的索引；
 	//	如果没有找到子字符串或字符则返回-1。
-	if ((iStart = strSrc.Find('\"')) > -1)
+	if ((iStart = strSrc.Find('\"')) != -1)
 	{
 		if (strSrc.GetLength() > iStart)
 		{
-			if ((iEnd = strSrc.Find('\"', iStart + 1)) > -1)
+			if ((iEnd = strSrc.Find('\"', iStart + 1)) != -1)
 			{
-				//取出双引号中的字符串，不包括双引号
-				strFirst = strSrc.Mid(iStart + 1, iEnd - iStart - 1);
+				//取出双引号中的字符串，包括双引号
+				strFirst = strSrc.Mid(iStart, iEnd - iStart + 1);
 				//删除str中双引号包围的字符串(包含双引号)
-				strSrc.Replace('\"' + strFirst + '\"', L"");
+				strSrc.Replace(strFirst, L"");
 				//str.Replace(strFirst, L""); 报错原因是str是const，不能写入
 				//error C2663: 
 				//'ATL::CStringT<wchar_t,ATL::StrTraitATL<wchar_t,ATL::ChTraitsCRT<wchar_t>>>::Replace'
@@ -466,7 +476,7 @@ int CStringSplitPath(vector<CString>& vecResult, const CString& str, CString str
 	}
 
 	vecResult.clear();
-	CStringSplitN(vecResult, strSrc, strSep);
+	CStringSplitS(vecResult, strSrc, strSep);
 	//vecResult.insert(vecResult.begin(), strFirst); //在vecResult的最前面添加一个元素。效率低
 	vecResult.push_back(strFirst);
 
