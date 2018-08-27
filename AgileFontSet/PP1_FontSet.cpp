@@ -150,6 +150,11 @@ void PP1_FontSet::initCurSetData()
 	FillMemory(&m_iconFont, sizeof(LOGFONTW), 0x00);
 	FillMemory(&m_iconFontAll, sizeof(LOGFONTW), 0x00);
 	m_tagIScur.nHS = m_tagIScur.nVS = -1;
+
+	//解决后台设置ini配置文件默认配置，只能修改图标标题字体的问题。原因是m_metrics没有初始化
+	//为了保持除字体之外的NONCLIENTMETRICS的当前值，检索NONCLIENTMETRICS的内容。
+	m_metrics.cbSize = sizeof(NONCLIENTMETRICS);
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &m_metrics, 0);
 }
 
 //发现这种思路存在逻辑错误。不用消息响应。只需增加一个按钮即可
@@ -780,6 +785,13 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 	LOGFONTW iconFont = m_iconFont;
 	NONCLIENTMETRICSW metrics = m_metrics;
 
+	//经试验，NONCLIENTMETRICSW和LOGFONTW结构体可以直接 = 赋值，也可用使用memcpy进行拷贝
+	//注意：NONCLIENTMETRICSW和LOGFONTW结构体不能直接赋值，需要使用memcpy进行拷贝
+	//LOGFONTW iconFont;
+	//NONCLIENTMETRICSW metrics;
+	//memcpy(&metrics, &m_metrics, sizeof(NONCLIENTMETRICSW));
+	//memcpy(&iconFont, &m_iconFont, sizeof(LOGFONTW));
+
 	if (!m_bHide)
 	{
 		DoDataExchange(TRUE);		//控件to成员变量。缺省为FALSE-变量到控件
@@ -948,6 +960,8 @@ int PP1_FontSet::ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontN
 	return 0;
 }
 
+//应用字体设置，刷新桌面
+//theSetFont(&metrics, &iconFont);
 void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFont) {
 
 	DWORD_PTR ptr;
@@ -978,24 +992,26 @@ void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFo
 	//命令行-hide后台处理，启动独立线程设定字体回出错
 	if (m_useUniqThread) {
 		// UI和另一个线程SystemParametersInfo(SPI_SETNONCLIENTMETRICS) 运行它
-		g_pFontMetrics = fontMetrics;	//初始化独立线程的全局参数
+		//初始化独立线程的全局参数
+		g_pFontMetrics = fontMetrics;
 
-										/*
-										typedef unsigned (__stdcall* _beginthreadex_proc_type)(void*);
+		/*
+		typedef unsigned (__stdcall* _beginthreadex_proc_type)(void*);
 
-										_Success_(return != 0)
-										_ACRTIMP uintptr_t __cdecl _beginthreadex(
-										_In_opt_  void*                    _Security,
-										_In_      unsigned                 _StackSize,
-										_In_      _beginthreadex_proc_type _StartAddress,
-										_In_opt_  void*                    _ArgList,
-										_In_      unsigned                 _InitFlag,
-										_Out_opt_ unsigned*                _ThrdAddr
-										);
-										*/
-										// setOnThread 必须定义为全局函数，不能定义为类成员函数。否则报错如下：
-										//(698): error C3867: 'PP1_FontSet::setOnThread': 
-										//	non-standard syntax; use '&' to create a pointer to member
+		_Success_(return != 0)
+		_ACRTIMP uintptr_t __cdecl _beginthreadex(
+		_In_opt_  void*                    _Security,
+		_In_      unsigned                 _StackSize,
+		_In_      _beginthreadex_proc_type _StartAddress,
+		_In_opt_  void*                    _ArgList,
+		_In_      unsigned                 _InitFlag,
+		_Out_opt_ unsigned*                _ThrdAddr
+		);
+		*/
+		// setOnThread 必须定义为全局函数，不能定义为类成员函数。否则报错如下：
+		//(698): error C3867: 'PP1_FontSet::setOnThread': 
+		//	non-standard syntax; use '&' to create a pointer to member
+
 		//启动执行字体设置的线程
 		uintptr_t startResult = _beginthreadex(NULL, 0, setOnThread, NULL, 0, NULL);
 		if (startResult != 0) {
@@ -1091,6 +1107,7 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 	LOGFONT smCaptionFont;
 	LOGFONT statusFont;
 
+	//加载默认配置
 	loadResult = loadFont(filename, L"TitleFont", &captionFont);
 	if (!loadResult) {
 		return FALSE;
@@ -1125,6 +1142,11 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 	m_metrics.lfSmCaptionFont = smCaptionFont;
 	m_metrics.lfStatusFont = statusFont;
 
+	// 读取图标间距。读取不成功，使用默认值
+	m_tagIScur.nHS = GetPrivateProfileInt(L"IconSpacing", L"IconHorizontalSpacing", 80, filename);
+	m_tagIScur.nVS = GetPrivateProfileInt(L"IconSpacing", L"IconVerticalSpacing", 48, filename);
+
+	//加载预设配置
 	initTagSetData();	//初始化PP1_FontSet类的数据结构
 
 	//检测ini文件中是否存在某个段名
@@ -1167,10 +1189,6 @@ BOOL PP1_FontSet::loadFontInfo(CString filename)
 		else {
 			break; }
 	}
-
-	// 读取图标间距。读取不成功，使用默认值
-	m_tagIScur.nHS = GetPrivateProfileInt(L"IconSpacing", L"IconHorizontalSpacing", 80, filename);
-	m_tagIScur.nVS = GetPrivateProfileInt(L"IconSpacing", L"IconVerticalSpacing", 48, filename);
 
 	return TRUE;
 }
