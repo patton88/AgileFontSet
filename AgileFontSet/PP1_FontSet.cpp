@@ -60,66 +60,27 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 {
 	hwndPP1 = m_hWnd;
 
-	//替换RadminMinfo类的IDC_EDIT_README的窗口过程。当在IDC_EDIT_README的窗口中按回车，便关闭属性表单对话框
-	//if (NULL == winproc_prev_My2)
-	//	winproc_prev_My2 = (WNDPROC)::SetWindowLong(GetDlgItem(IDC_EDIT_AllSetText), GWL_WNDPROC, (LONG)WinProc_AllSetText2);
-
 	// Init dialog resizing
 	DlgResize_Init();
-
 	DoDataExchange();
 
-	////读取Win8.x、Win10预设配置
-	//CString langPath;
-	//int nRet;
+	//初始化PP1_FontSet类的数据结构
+	initTagSetData();
 
-	//langPath = getCurDir(1);		//g:\MyVC2017\noMeiryoUI235\Debug		//末尾无斜杠
-	//langPath = langPath.Left(langPath.ReverseFind(L'\\') + 1);	//g:\MyVC2017\noMeiryoUI235\ //末尾含斜杠
-	//langPath = langPath + L"lang\\" + L"English.lng";	//L"G:\\MyVC2017\\noMeiryoUI235\\lang\\English.lng"
-
-	//readResourceFile(langPath);
-	//nRet = readFontResource8(langPath);
-	//if (!nRet) {
-	//	m_has8Preset = false;
-	//}
-	//nRet = readFontResource10(langPath);
-	//if (!nRet) {
-	//	m_has10Preset = false;
-	//}
-
-	//调用WinAPI获得当前桌面图标间距
-	//ICONMETRICSW im;
-	//im.cbSize = sizeof(ICONMETRICSW);	//这个非常重要，否则下面函数调用将返回0，即ret=0,说明函数调用失败
-	//int ret = ::SystemParametersInfo(SPI_GETICONMETRICS, sizeof(ICONMETRICSW), &im, 0);
-	//m_tagIScur.nHS = im.iHorzSpacing - 32;
-	//m_tagIScur.nVS = im.iVertSpacing - 32;
-
-	//当设置CEdit控件随对话框自动缩放后，spin控件与CEdit关联的代码放在这里OnInitDialog()中过早，会引起控件错位
-	////Windows内建控件CSpinButtonCtrl的WTL封装类为：CUpDownCtrl
-	////GetWindowRect(&rect);
-	//m_spinHS.Attach(GetDlgItem(IDC_SPIN_HS));
-	////Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
-	//m_spinHS.SetBuddy(GetDlgItem(IDC_EDIT_HS));
-	//m_spinHS.SetRange(0, 150);
-	//m_spinHS.SetPos(m_tagIScur.nHS);
-	////MoveWindow(rect.top, rect.bottom, rect.Width(), rect.Height(), true);
-
-	//m_spinVS.Attach(GetDlgItem(IDC_SPIN_VS));
-	////Spin控件绑定Edit控件后，Spin控件将占用Edit控件的宽度，若运行时编辑框太窄，可到资源管理器中调大编辑框宽度
-	//m_spinVS.SetBuddy(GetDlgItem(IDC_EDIT_VS));
-	//m_spinVS.SetRange(0, 150);
-	//m_spinVS.SetPos(m_tagIScur.nVS);
-
-	//显示Windows系统版本号
-	CString str;
-	GetWinOsName(str);
-	::SetWindowTextW(GetDlgItem(IDC_STATIC_VERNO), str);
-
+	//若没有命令行加载ini配置文件，便读取系统实际字体信息
+	if (m_strSettingFile.IsEmpty()) {
+		getActualFont();
+		//用内部存放数据自动生成预设配置
+		if (0 == m_tagSetWin7.getPreset(m_tagSetWin7.vecWin7PreSet)) { m_has7Preset = false; }
+		if (0 == m_tagSetWin8.getPreset(m_tagSetWin8.vecWin8xPreSet)) { m_has8Preset = false; }
+		if (0 == m_tagSetWin10.getPreset(m_tagSetWin10.vecWin10PreSet)) { m_has10Preset = false; }
+	}
 
 	//------------------------------------------------------
 	//处理 m_comboPreSet
 	//m_comboPreSet.Clear();			//不是清空CComboBox内容。只是删除CComboBox的编辑控件的当前选择（如果有的话）。
 	m_comboPreSet.ResetContent();	//CComboBox::ResetContent函数用于清空内容。
+		
 	//注意设置组合框属性：Type为Drop List，Sort为False
 	//m_comboPreSet.AddString(L"当前显示配置");	//，该项无意义，所以去除
 	m_comboPreSet.AddString(L"进入时配置");		//0
@@ -130,56 +91,65 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 
 	if (m_vecTagSetUser.size() > 1)
 	{
-		for(unsigned i = 1; i < m_vecTagSetUser.size(); i++)
+		for (unsigned i = 1; i < m_vecTagSetUser.size(); i++)
 			m_comboPreSet.AddString(L"用户配置" + itos(i));
 	}
 
 	m_comboPreSet.SetCurSel(m_nComboInitSel);
 	//------------------------------------------------------
+	//字体选择容器初始化。tag是结构体struct缩写的前缀
+	//map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
+	mapSelFont[IDB_SEL_ALLFONT] = make_pair(allFont, &m_metricsAll.lfMenuFont);
+	mapSelFont[IDB_SEL_TITLE] = make_pair(titleFont, &m_metrics.lfCaptionFont);
+	mapSelFont[IDB_SEL_ICON] = make_pair(iconFont, &m_iconFont);
+	mapSelFont[IDB_SEL_MENU] = make_pair(menuFont, &m_metrics.lfMenuFont);
+	mapSelFont[IDB_SEL_MESSAGE] = make_pair(messageFont, &m_metrics.lfMessageFont);
+	mapSelFont[IDB_SEL_PALETTE] = make_pair(paletteFont, &m_metrics.lfSmCaptionFont);
+	mapSelFont[IDB_SEL_TIP] = make_pair(tipFont, &m_metrics.lfStatusFont);
 
-	//noMeiryoUI235Dlg::OnInitDialog
-	//////////////////////////////////////////////////////////////////////////
-	FillMemory(&m_metrics, sizeof(NONCLIENTMETRICSW), 0x00);
-	FillMemory(&m_metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
-	FillMemory(&m_iconFont, sizeof(LOGFONTW), 0x00);
-	FillMemory(&m_iconFontAll, sizeof(LOGFONTW), 0x00);
-	m_tagIScur.nHS = m_tagIScur.nVS = -1;
+	//获得Windows系统名称和版本(支持Win95到Win10、WinNT4.0到WinSrv2016)
+	//DWORD GetWinOsName(CString& strOsName)
+	CString str;
+	DWORD dwVersion = GetWinOsName(str);
 
-	//动态创建的CPreset对象必须在创建后进行初始化，否则地址不对。成员变量好像地址正确，但保险起见还是显示初始化
-	//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
-	m_tagSetCur.RefreshMapRCN();
-	m_tagSetOld.RefreshMapRCN();		//进入程序时的旧有配置
-	m_tagSetLast.RefreshMapRCN();
-	m_tagSetWin7.RefreshMapRCN();
-	m_tagSetWin8.RefreshMapRCN();
-	m_tagSetWin10.RefreshMapRCN();
-	m_tagSetTemp.RefreshMapRCN();
-
-	//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
-	initializeLocale();
-
-	// 若没有指定命令行ini设置文件
-	if (m_strSettingFile.IsEmpty()) {
-		getActualFont();
+	DWORD major = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+	DWORD minor = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+	if (major < 6) {	// Windows XP or earlyer
+		m_WIN8_SIZE = false;
+		m_use7Compat = false;
+	}
+	else if (major == 6) {
+		if (minor < 2) {	// Windows Vista/7
+			m_WIN8_SIZE = false;
+			m_use7Compat = false;
+		}
+		else {			// Windows 8/8.1
+			m_WIN8_SIZE = true;
+			m_use7Compat = true;
+		}
+	}
+	else {				// Windows 10 or later
+		m_WIN8_SIZE = false;
+		m_use7Compat = false;
 	}
 
-	//处理菜单的禁用启用
-	//if (!m_use7Compat) {
-	//	// 在Windows 7或更早版本的情况下，无法更改字体大小的处理模式。
-	//	CheckMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_UNCHECKED);
-	//	EnableMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
-	//}
-	//CheckMenuItem(GetMenu(), IDM_UNIQ_THREAD, MF_BYCOMMAND | MF_CHECKED);
-
 	//显示Windows系统版本号
-	//CString str;
 	GetWinOsName(str);
 	::SetWindowTextW(GetDlgItem(IDC_STATIC_VERNO), str);
 
 	// 更新字体名称显示
 	theUpdateDisplay();
-	
+
 	return FALSE;
+}
+
+void PP1_FontSet::initCurSetData()
+{
+	FillMemory(&m_metrics, sizeof(NONCLIENTMETRICSW), 0x00);
+	FillMemory(&m_metricsAll, sizeof(NONCLIENTMETRICSW), 0x00);
+	FillMemory(&m_iconFont, sizeof(LOGFONTW), 0x00);
+	FillMemory(&m_iconFontAll, sizeof(LOGFONTW), 0x00);
+	m_tagIScur.nHS = m_tagIScur.nVS = -1;
 }
 
 //发现这种思路存在逻辑错误。不用消息响应。只需增加一个按钮即可
@@ -530,6 +500,7 @@ LONG PP1_FontSet::getFontHight(int lFontSize)
 //获取当前显示配置
 void PP1_FontSet::getActualFont(void)
 {
+	initCurSetData();
 	// 获取图标以外的字体信息。
 	m_metrics.cbSize = sizeof(NONCLIENTMETRICSW);
 	SystemParametersInfo(SPI_GETNONCLIENTMETRICS,
@@ -809,7 +780,7 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 	LOGFONTW iconFont = m_iconFont;
 	NONCLIENTMETRICSW metrics = m_metrics;
 
-	if (wID < 0xFFFF)
+	if (!m_bHide)
 	{
 		DoDataExchange(TRUE);		//控件to成员变量。缺省为FALSE-变量到控件
 	}
@@ -821,7 +792,7 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 		memcpy(&m_metrics, &m_metricsAll, sizeof(NONCLIENTMETRICSW));
 		memcpy(&m_iconFont, &m_iconFontAll, sizeof(LOGFONTW));
 
-		if (wID != 0xFFFF)
+		if (!m_bHide)
 		{
 			theUpdateDisplay();
 		}
@@ -842,11 +813,11 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 	//应用图标间距设置，刷新桌面
 	if (m_iCheckHS || m_iCheckVS)
 	{
-		if (m_iCheckHS && wID != 0xFFFF) {
+		if (m_iCheckHS && !m_bHide) {
 			unsigned nHS = m_spinHS.GetPos();
 			if (nHS >= 0 && nHS <= 150) m_tagIScur.nHS = nHS;
 		}
-		if (m_iCheckVS && wID != 0xFFFF) {
+		if (m_iCheckVS && !m_bHide) {
 			unsigned nVS = m_spinVS.GetPos();
 			if (nVS >= 0 && nVS <= 150) m_tagIScur.nVS = nVS;
 		}
@@ -1110,8 +1081,7 @@ LRESULT PP1_FontSet::OnLoad(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BO
 	return 0;
 }
 
-//命令行加载标志iFlag，1 默认为窗口加载，0 命令行加载
-BOOL PP1_FontSet::loadFontInfo(CString filename, int iFlag)
+BOOL PP1_FontSet::loadFontInfo(CString filename)
 {
 	BOOL loadResult;
 	LOGFONT captionFont;
@@ -1146,6 +1116,7 @@ BOOL PP1_FontSet::loadFontInfo(CString filename, int iFlag)
 		return FALSE;
 	}
 
+	initCurSetData();
 	//加载的ini文件中的默认配置，作为当前配置显示
 	m_metrics.lfCaptionFont = captionFont;
 	m_iconFont = iconFont;
@@ -1154,8 +1125,28 @@ BOOL PP1_FontSet::loadFontInfo(CString filename, int iFlag)
 	m_metrics.lfSmCaptionFont = smCaptionFont;
 	m_metrics.lfStatusFont = statusFont;
 
+	initTagSetData();	//初始化PP1_FontSet类的数据结构
+
 	//检测ini文件中是否存在某个段名
 	//BOOL b = isSectionExists(L"UserPreset1", filename);
+	if (isSectionExists(L"Win7Preset", filename)) {
+		readFontResource(filename, L"Win7Preset", m_tagSetWin7);
+	}
+	else {
+		if (0 == m_tagSetWin7.getPreset(m_tagSetWin7.vecWin7PreSet)) { m_has7Preset = false; }
+	}
+	if (isSectionExists(L"Win8xPreset", filename)) {
+		readFontResource(filename, L"Win8xPreset", m_tagSetWin8);
+	}
+	else {
+		if (0 == m_tagSetWin8.getPreset(m_tagSetWin8.vecWin8xPreSet)) { m_has8Preset = false; }
+	}
+	if (isSectionExists(L"Win10Preset", filename)) {
+		readFontResource(filename, L"Win10Preset", m_tagSetWin10);
+	}
+	else {
+		if (0 == m_tagSetWin10.getPreset(m_tagSetWin10.vecWin10PreSet)) { m_has10Preset = false; }
+	}
 
 	//vector<CPreset> m_vecTagSetUser;		//4-x User配置 UserPreset1-UserPreset100
 	//加载可能存在的用户配置UserPreset1-UserPreset100
@@ -1171,7 +1162,7 @@ BOOL PP1_FontSet::loadFontInfo(CString filename, int iFlag)
 			m_vecTagSetUser.emplace_back(CPreset(strSuf));
 			m_vecTagSetUser[i].RefreshMapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
 			readFontResource(filename, strSec, m_vecTagSetUser[i]);
-			if (1 == iFlag) { m_comboPreSet.AddString(L"用户配置" + itos(i)); }	//4 + i
+			if (!m_bHide) { m_comboPreSet.AddString(L"用户配置" + itos(i)); }	//4 + i
 		}
 		else {
 			break; }
@@ -1771,77 +1762,26 @@ LRESULT PP1_FontSet::OnUniqThread(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl
 	return 0;
 }
 
-//map<unsigned, pair<enum fontType, LPLOGFONTW>> mapSelFont;
-//字体选择容器初始化。
-void PP1_FontSet::initSelFont(void)
+//初始化PP1_FontSet类的数据结构
+void PP1_FontSet::initTagSetData(void)
 {
-	mapSelFont[IDB_SEL_ALLFONT] = make_pair(allFont, &m_metricsAll.lfMenuFont);
-	mapSelFont[IDB_SEL_TITLE] = make_pair(titleFont, &m_metrics.lfCaptionFont);
-	mapSelFont[IDB_SEL_ICON] = make_pair(iconFont, &m_iconFont);
-	mapSelFont[IDB_SEL_MENU] = make_pair(menuFont, &m_metrics.lfMenuFont);
-	mapSelFont[IDB_SEL_MESSAGE] = make_pair(messageFont, &m_metrics.lfMessageFont);
-	mapSelFont[IDB_SEL_PALETTE] = make_pair(paletteFont, &m_metrics.lfSmCaptionFont);
-	mapSelFont[IDB_SEL_TIP] = make_pair(tipFont, &m_metrics.lfStatusFont);
-}
+	m_tagSetCur.InitTagSet();
+	m_tagSetOld.InitTagSet();
+	m_tagSetLast.InitTagSet();
+	m_tagSetWin7.InitTagSet();
+	m_tagSetWin8.InitTagSet();
+	m_tagSetWin10.InitTagSet();
+	m_tagSetTemp.InitTagSet();
 
-//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
-void PP1_FontSet::initializeLocale(void)
-{
-	//字体选择容器初始化。tag是结构体struct缩写的前缀
-	initSelFont();
-
-	CString langPath;
-
-	//langPath = getCurDir(1);		//g:\MyVC2017\noMeiryoUI235\Debug		//末尾无斜杠
-	//langPath = langPath.Left(langPath.ReverseFind(L'\\') + 1);	//g:\MyVC2017\noMeiryoUI235\ //末尾含斜杠
-	//langPath = langPath + L"lang\\" + L"English.lng";	//L"G:\\MyVC2017\\noMeiryoUI235\\lang\\English.lng"
-
-	//if (0 == readFontResource(langPath, m_tagSetWin8)) { m_has8Preset = false; }
-	//if (0 == readFontResource(langPath, m_tagSetWin10)) { m_has10Preset = false; }
-
-	//用内部存放数据自动生成预设配置
-	if (0 == m_tagSetWin7.getPreset(m_tagSetWin7.vecWin7PreSet)) { m_has7Preset = false; }
-	if (0 == m_tagSetWin8.getPreset(m_tagSetWin8.vecWin8xPreSet)) { m_has8Preset = false; }
-	if (0 == m_tagSetWin10.getPreset(m_tagSetWin10.vecWin10PreSet)) { m_has10Preset = false; }
-
-	//设置Win7兼容风格度量菜单是否可用
-	//warning C4996: 'GetVersion': was declared deprecated
-	//DWORD dwVersion = GetVersion();
-	//替代
-	//BOOL VerifyVersionInfoW(
-	//	LPOSVERSIONINFOEXW lpVersionInformation,
-	//	DWORD              dwTypeMask,
-	//	DWORDLONG          dwlConditionMask
-	//);
-
-	// 获得Windows系统名称和版本(支持Win95到Win10、WinNT4.0到WinSrv2016)
-	//DWORD GetWinOsName(CString& strOsName)
-	DWORD dwVersion = GetWinOsName(CString());
-
-	DWORD major = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-	DWORD minor = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-	if (major < 6) {
-		// Windows XP or earlyer
-		m_WIN8_SIZE = false;
-		m_use7Compat = false;
-	}
-	else if (major == 6) {
-		if (minor < 2) {
-			// Windows Vista/7
-			m_WIN8_SIZE = false;
-			m_use7Compat = false;
-		}
-		else {
-			// Windows 8/8.1
-			m_WIN8_SIZE = true;
-			m_use7Compat = true;
-		}
-	}
-	else {
-		// Windows 10 or later
-		m_WIN8_SIZE = false;
-		m_use7Compat = false;
-	}
+	//动态创建的CPreset对象必须在创建后进行初始化，否则地址不对。成员变量好像地址正确，但保险起见还是显示初始化
+	//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
+	m_tagSetCur.RefreshMapRCN();
+	m_tagSetOld.RefreshMapRCN();		//进入程序时的旧有配置
+	m_tagSetLast.RefreshMapRCN();
+	m_tagSetWin7.RefreshMapRCN();
+	m_tagSetWin8.RefreshMapRCN();
+	m_tagSetWin10.RefreshMapRCN();
+	m_tagSetTemp.RefreshMapRCN();
 }
 
 /**
@@ -1872,6 +1812,7 @@ int PP1_FontSet::readFontResource(CString filename, CString sectionName, CPreset
 	// 读取字体容器循环赋值
 	CString str;
 	int iRet;
+	tagSet.InitTagSet();
 	for (auto& rcn2 : tagSet.vecRCN2) {
 		for (auto& rcn1 : tagSet.vecRCN1) {
 			str = rcn1 + L"_" + rcn2 + L"_" + tagSet.strRCN3;

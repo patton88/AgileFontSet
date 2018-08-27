@@ -169,6 +169,7 @@ public:
 	// Message handlers
 	BOOL OnInitDialog(HWND hwndFocus, LPARAM lParam);
 	BOOL OnSetActive();
+	void initCurSetData();
 	
 	//监测文本改变
 	LRESULT OnEnChangeEdit(UINT uNotifyCode, int nID, CWindow wndCtl);
@@ -236,7 +237,7 @@ public:
 	BOOL saveIS(CString filename, CString section, TagIS *tagIS);	//Save Icon Sapcing
 	BOOL savePreset(CString filename, CString section, CPreset& tagSet);//Save Windows Preset
 	BOOL loadFont(CString filename, CString section, LOGFONT* font);
-	BOOL loadFontInfo(CString filename, int iFlag = 1);
+	BOOL loadFontInfo(CString filename);
 	int getDPI(void);
 
 	//从字体高度获取字体大小。
@@ -245,11 +246,10 @@ public:
 	LONG getFontHight(int lFontSize);
 
 	//我们将对每种国家语言进行判断，并根据每种国家语言进行初始化。
-	void initializeLocale(void);
+	void initTagSetData(void);
 	//加载资源项目
 	void readResourceItem(CString file, CString key, CString fallback);
 	//字体容器、字体选择容器初始化。tag是结构体struct缩写的前缀
-	void initSelFont(void);
 	int ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontName, HFONT& hFont, CEditImpl& edit);
 
 	//应用设置，刷新桌面
@@ -370,4 +370,5 @@ public:
 	/**语言资源 */
 	vector<CString> langResource;
 	bool m_useUniqThread = true;	// 除了图标以外的字体设置。启动独立线程设定字体 UNIQ_THREAD
+	BOOL m_bHide = FALSE;
 };

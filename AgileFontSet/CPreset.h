@@ -69,10 +69,6 @@ public:
 
 	TagIS tagIS;		//存放图标间距
 
-	int iTagInitFlag;		//为尽量避免字高、字号转换的误差，尽量减少转换，设置TagSet对象数据状态标志
-	//-1：TagSet对象刚创建，还未初始化
-	// 1：在对象创建后，已经外部初始化过
-
 	int iTagHeightSizeFlag;	//为尽量避免字高、字号转换的误差，尽量减少转换，设置TagSet对象数据状态标志
 	// 基本原则是：尽量让TagSet对象保存未经转换的原始数据。必要时也尽量只进行单次转换
 	// -1：未存放数据
@@ -199,7 +195,6 @@ public:
 		//m_vecTagSetUser[i].initmapRCN();		//CPreset对象必须在创建后进行初始化，否则地址不对
 		//估计此时，变量的内存还未最终分配确定，所以此时取变量地址赋值不对。此时初始化地址不对
 		InitTagSet();
-		iTagInitFlag = -1;			//-1：TagSet对象刚创建，还未初始化
 	}
 
 	void InitTagSet()
@@ -212,7 +207,6 @@ public:
 
 		tagIS.nHS = tagIS.nVS = -1;	//未存入配置的标志
 		iTagHeightSizeFlag = -1;		//未存入配置的标志
-		iTagInitFlag = 1;				// 1：在对象创建后，已经外部初始化过
 	}
 
 

@@ -265,6 +265,8 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 	PP0_PropertySheet progsheet(g_strVerInfo.GetBuffer(0), 0);
 	g_strVerInfo.ReleaseBuffer();
 
+	//progsheet.m_pp1FontSet.OnInitDialog(NULL, -1);
+
 	//ÓÃCStringSplitS·Ö¸î v -h3 Ê±³ö´í¡£ËùÒÔÓÃCStringSplitN
 	//iSeg = CStringSplitN(vecCmdLine, strCmdLine, ' ');	//strCmdLineÖĞµÄ²ÎÊı¶Î¿É²»·ÖÏÈºó´ÎĞò
 
@@ -329,10 +331,13 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 			return false;
 		}
 
-		if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0], 0)) {
+		progsheet.m_pp1FontSet.m_bHide = TRUE;
+		if (FALSE == progsheet.m_pp1FontSet.loadFontInfo(vecStrCmd[0])) {
 			::MessageBox(NULL, L"ÎŞ·¨¼ÓÔØÅäÖÃÎÄ¼ş " + vecStrCmd[0], L"ÅäÖÃÎÄ¼şÎŞ·¨¼ÓÔØ", MB_OK | MB_ICONEXCLAMATION);
 			return false;
 		}
+		progsheet.m_pp1FontSet.m_bHide = FALSE;
+		progsheet.m_pp1FontSet.m_strSettingFile = vecStrCmd[0];
 
 		//´¦Àí²ÎÊıÎª1¶Îpath
 		if (1 == iSeg) {
@@ -350,7 +355,9 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 			progsheet.m_pp1FontSet.m_iCheckHS = 1;
 			progsheet.m_pp1FontSet.m_iCheckVS = 1;
 
-			progsheet.m_pp1FontSet.OnSet(0, 0xFFFF, NULL, nCmdShow);	//ºóÌ¨´¦Àí±êÖ¾ 0xFFFF
+			//ÉèÖÃÃüÁîĞĞ-hideºóÌ¨´¦Àí±êÖ¾m_bHide
+			progsheet.m_pp1FontSet.m_bHide = TRUE;
+			progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
 		}
 		// ´¦ÀíÓĞ-xxx£º²ÎÊıÎª2¶Îpath -xxx¡¢»òÕß3¶Îpath -xxx -hide
 		else if ((2 == iSeg || 3 == iSeg) && !vecStrCmd[1].IsEmpty()) {
@@ -383,7 +390,6 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 				// 3¡¢´¦ÀíºóÌ¨ÅäÖÃ²ÎÊı -hide
 				if (2 == iSeg) {
 					nRet = progsheet.DoModal();
-
 				}
 				else if (3 == iSeg && L"-hide" == StrToLower(vecStrCmd[2])) {
 					progsheet.m_pp1FontSet.m_iCheckAllfont = 0;
@@ -396,10 +402,9 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 					progsheet.m_pp1FontSet.m_iCheckHS = 1;
 					progsheet.m_pp1FontSet.m_iCheckVS = 1;
 
-					//ÃüÁîĞĞ-hideºóÌ¨´¦Àí£¬Æô¶¯¶ÀÁ¢Ïß³ÌÉè¶¨×ÖÌå»Ø³ö´í
-					//progsheet.m_pp1FontSet.m_useUniqThread = FALSE;
-
-					progsheet.m_pp1FontSet.OnSet(0, 0xFFFF, NULL, nCmdShow);		//ºóÌ¨´¦Àí±êÖ¾ 0xFFFF
+					//ÉèÖÃÃüÁîĞĞ-hideºóÌ¨´¦Àí±êÖ¾m_bHide
+					progsheet.m_pp1FontSet.m_bHide = TRUE;
+					progsheet.m_pp1FontSet.OnSet(0, 0, NULL, nCmdShow);
 				}
 			}
 		}
@@ -408,7 +413,7 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 			return false;
 		}
 	}
-	else {	//²ÎÊı´¦ÀíÊ§°ÜºÍÆäÓàÇé¿ö£¬¶¼ÏÔÊ¾ÉèÖÃ¶Ô»°¿ò(µ±Ç°Ñ¡Ïî¿¨)ºÍ°ïÖúĞÅÏ¢
+	else {	//²ÎÊı´¦ÀíÊ§°ÜºÍÆäÓàÇé¿ö£¬¶¼ÏÔÊ¾ÉèÖÃ¶Ô»°¿òºÍ°ïÖúĞÅÏ¢(µ±Ç°Ñ¡Ïî¿¨)
 		progsheet.SetActivePage(1);	//ÉèÖÃÊôĞÔ±íµ¥³öÏÖÊ±µ±Ç°Ñ¡Ïî¿¨
 		nRet = progsheet.DoModal();
 	}
