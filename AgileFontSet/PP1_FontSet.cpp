@@ -809,7 +809,7 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 	LOGFONTW iconFont = m_iconFont;
 	NONCLIENTMETRICSW metrics = m_metrics;
 
-	if (wID < 0xFFFF)
+	if (wID != 0xFFFF)
 	{
 		DoDataExchange(TRUE);		//控件to成员变量。缺省为FALSE-变量到控件
 	}
@@ -836,7 +836,7 @@ LRESULT PP1_FontSet::OnSet(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOO
 		if (m_iCheckTip) metrics.lfStatusFont = m_metrics.lfStatusFont;
 
 		//应用字体设置，刷新桌面
-		theSetFont(&metrics, &iconFont);
+		theSetFont(&metrics, &iconFont, wID != 0xFFFF);
 	}
 
 	//应用图标间距设置，刷新桌面
@@ -980,7 +980,8 @@ int PP1_FontSet::ChangeFont(LOGFONTW& font, LOGFONTW& fontNew, CString& strFontN
 	return 0;
 }
 
-void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFont) {
+//bFlag = FALSE，表示是-hide后台处理
+void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFont, BOOL bFlag) {
 
 	DWORD_PTR ptr;
 	LRESULT messageResult;
@@ -1052,18 +1053,25 @@ void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFo
 			SPIF_UPDATEINIFILE); // | SPIF_SENDCHANGE);
 	}
 
-	//向所有活动窗口广播系统单位更新消息
-	messageResult = SendMessageTimeout(
-		HWND_BROADCAST,
-		WM_SETTINGCHANGE,
-		SPI_SETNONCLIENTMETRICS,
-		(LPARAM)L"WindowMetrics",
-		SMTO_ABORTIFHUNG,
-		5000,
-		&ptr);
-	if (messageResult == 0) {
-		if (GetLastError() == ERROR_TIMEOUT) {
-			::MessageBox(m_hWnd, L"SendMessage timeout.", L"Information", MB_OK | MB_ICONEXCLAMATION);
+	if (bFlag)
+	{
+		//向所有活动窗口广播系统设置更新消息
+		messageResult = SendMessageTimeout(
+			HWND_BROADCAST,
+			WM_SETTINGCHANGE,
+			SPI_SETNONCLIENTMETRICS,
+			(LPARAM)L"WindowMetrics",
+			SMTO_ABORTIFHUNG,
+			//SMTO_BLOCK,
+			//SMTO_NOTIMEOUTIFNOTHUNG,
+			//SMTO_ERRORONEXIT,
+			//SMTO_NORMAL,
+			5000,
+			&ptr);
+		if (messageResult == 0) {
+			if (GetLastError() == ERROR_TIMEOUT) {
+				::MessageBox(m_hWnd, L"SendMessage timeout.", L"Information", MB_OK | MB_ICONEXCLAMATION);
+			}
 		}
 	}
 

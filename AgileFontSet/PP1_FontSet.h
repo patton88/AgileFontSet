@@ -230,7 +230,7 @@ public:
 	double getFontPoint(LOGFONTW *font, HWND hWnd);
 	HFONT createFont(LOGFONTW *font);
 	BOOL IsCtrl(HWND hWnd, CString str);
-	void theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFont);
+	void theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFont, BOOL bFlag = TRUE);
 	BOOL startSaveFont(CString filename);
 	BOOL saveFont(CString filename, CString section, LOGFONT* font);
 	BOOL saveIS(CString filename, CString section, TagIS *tagIS);	//Save Icon Sapcing
