@@ -176,17 +176,37 @@ int GetDataEx(vector<CString> &vecStrIS, vector<unsigned> &vecUnIS, CString strF
 	return nRet;
 }
 
+// Èô strFile ÊÇÏà¶ÔÂ·¾¶£¬±ãÌí¼Óµ±Ç°Ä¿Â¼¡£²¢Ìæ»»×ªÒå×Ö·û
+CString& addCurDir(CString& strFile)
+{
+	CTrimQ(strFile);
+
+	if (L'\"' == strFile[0]) {
+		strFile.Replace(L"\"", L"");		//ÕıÈ·×ö·¨£ºÉ¾³ıstrÖĞµÄË«ÒıºÅ
+		CTrimQ(strFile);
+		if (L':' != strFile[1]) {	//ÅĞ¶ÏPathµÚ2¸ö×Ö·û·ÇL':'£¬±ã·Ç¾ø¶ÔÂ·¾¶£¬¼ÓÉÏm_strCurrentDir
+			strFile = getCurDir(2) + strFile;
+		}
+		strFile = L"\"" + strFile + L"\"";	//´¦ÀíºóÔÙ¼ÓÉÏË«ÒıºÅ
+	}
+	else
+	{
+		if (L':' != strFile[1]) {	//ÅĞ¶ÏPathµÚ2¸ö×Ö·û·ÇL':'£¬±ã·Ç¾ø¶ÔÂ·¾¶£¬¼ÓÉÏm_strCurrentDir
+			strFile = getCurDir(2) + strFile;
+		}
+	}
+
+	return strFile;
+}
+
 // ÅĞ¶Ï -xxx ÊÇ·ñºÏ·¨
 // xxx ¿ÉÒÔÊÇ£ºWin8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò»
 int isLegal(CString str)
 {
-	//ÅĞ¶ÏÇ°ÃæµÄºá¸Ü -x
-	if (str.GetLength() < 1 || L'-' != str[0]) {
-		return 0;
-	}
-
 	int iRet;
-	str = str.Right(str.GetLength() - 1);	//È¥µôÇ°ÃæµÄºá¸Ü -
+	if (L'-' == str[0]) {	//ÈôÇ°ÃæÓĞL"-"ÔòÈ¥µô
+		str = str.Right(str.GetLength() - 1);
+	}
 	str = StrToLower(str);
 
 	if (L"win7preset" == str) {
@@ -258,19 +278,12 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 	//±éÀúvecCmdLineÖĞµÄ²ÎÊı¶Î£º
 	for (auto str : vecCmdLine)
 	{
-		CTrimQ(str);		//È¥³ıstrÁ½¶Î¿Õ¸ñ
+		CTrimQ(str);		//È¥³ıstrÁ½¶Ë¿Õ¸ñ
 
-		if (L".ini" == StrToLower(str.Right(4)) || L".ini\"" == StrToLower(str.Right(5)))
+		if (L".ini" == StrToLower(str.Right(4)))		//CStringSplitPath()·Ö¸îºóÒÑ²»º¬Ë«ÒıºÅ
 		{	//µ±ÓĞÁ½¸öL".ini"²ÎÊıÊ±£¬Ö»ÓÃÇ°ÃæÒ»¸ö²ÎÊı
 			if (vecStrCmd[0].IsEmpty()) {
-				if(L'\"' == str[0]){
-					str.Replace(L"\"", L"");		//ÕıÈ·×ö·¨£ºÉ¾³ıstrÖĞµÄË«ÒıºÅ
-					CTrimQ(str);
-				}
-				if (L':' != str[1]) {	//ÅĞ¶ÏPathµÚ2¸ö×Ö·û·ÇL':'£¬±ã·Ç¾ø¶ÔÂ·¾¶£¬¼ÓÉÏm_strCurrentDir
-					str = getCurDir(2) + str;
-				}
-				vecStrCmd[0] = str;
+				vecStrCmd[0] = addCurDir(str);	//¼ì²â²¢Ìí¼Óµ±Ç°Ä¿Â¼
 			}
 			else { iSeg = -1; break; }	//Í¬Ñù²ÎÊı³öÏÖÁ½´Î
 		}
@@ -282,8 +295,9 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 			if (vecStrCmd[3].IsEmpty()) vecStrCmd[3] = str;
 			else { iSeg = -1; break; }	//Í¬Ñù²ÎÊı³öÏÖÁ½´Î
 		}
-		else if (isLegal(str) > 0) {	//µ±ÓĞÁ½¸öL"-xxx"²ÎÊıÊ±£¬Ö»ÓÃÇ°ÃæÒ»¸ö²ÎÊı
+		else if (L'-' == str[0] && isLegal(str) > 0) {	//µ±ÓĞÁ½¸öL"-xxx"²ÎÊıÊ±£¬Ö»ÓÃÇ°ÃæÒ»¸ö²ÎÊı
 			// xxx ¿ÉÒÔÊÇ£ºWin8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò»
+			str = str.Right(str.GetLength() - 1);	//È¥µôÇ°ÃæµÄL"-"
 			if (vecStrCmd[1].IsEmpty()) vecStrCmd[1] = str;
 			else { iSeg = -1; break; }	//Í¬Ñù²ÎÊı³öÏÖÁ½´Î
 		}
@@ -308,6 +322,8 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 	else if ((1 == iSeg || 2 == iSeg || 3 == iSeg) && !vecStrCmd[0].IsEmpty()) {
 		// 1¡¢´¦Àí¼ÓÔØÅäÖÃÎÄ¼ş²ÎÊı path
 		//ÓÃ_waccess(Ğè°üº¬io.h)´úÌæfopenÅĞ¶ÏÎÄ¼şÊÇ·ñ´æÔÚ£¬ÓÃfopenÈôÎÄ¼ş²»¿É¶Á»áÎóÅĞ
+		//CString strT1 = L"d:\\Program Files (x86)\\NuGet\\mySysFontSet-Win4.ini";
+		//int x = _waccess(strT1, 0);	//_waccessÓÃµÄpathÒªÈ¥µôË«ÒıºÅ
 		if (-1 == _waccess(vecStrCmd[0], 0)) {	//ÎÄ¼ş´æÔÚ_waccess·µ»Ø0£¬·ñÔò·µ»Ø-1
 			::MessageBox(NULL, L"ÅäÖÃÎÄ¼ş " + vecStrCmd[0] + L" ÎÄ¼ş²»´æÔÚ¡£", L"ÅäÖÃÎÄ¼ş²»´æÔÚ", MB_OK | MB_ICONINFORMATION);
 			return false;

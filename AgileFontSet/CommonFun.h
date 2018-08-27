@@ -459,10 +459,10 @@ int CStringSplitPath(vector<CString>& vecResult, const CString& str, CString str
 		{
 			if ((iEnd = strSrc.Find('\"', iStart + 1)) != -1)
 			{
-				//取出双引号中的字符串，包括双引号
-				strFirst = strSrc.Mid(iStart, iEnd - iStart + 1);
+				//取出双引号中的字符串，不包括双引号
+				strFirst = strSrc.Mid(iStart + 1, iEnd - iStart - 1);
 				//删除str中双引号包围的字符串(包含双引号)
-				strSrc.Replace(strFirst, L"");
+				strSrc.Replace(L"\"" + strFirst + L"\"", L"");
 				//str.Replace(strFirst, L""); 报错原因是str是const，不能写入
 				//error C2663: 
 				//'ATL::CStringT<wchar_t,ATL::StrTraitATL<wchar_t,ATL::ChTraitsCRT<wchar_t>>>::Replace'
