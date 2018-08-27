@@ -1177,6 +1177,10 @@ BOOL PP1_FontSet::loadFontInfo(CString filename, int iFlag)
 			break; }
 	}
 
+	// 读取图标间距。读取不成功，使用默认值
+	m_tagIScur.nHS = GetPrivateProfileInt(L"IconSpacing", L"IconHorizontalSpacing", 80, filename);
+	m_tagIScur.nVS = GetPrivateProfileInt(L"IconSpacing", L"IconVerticalSpacing", 48, filename);
+
 	return TRUE;
 }
 
@@ -1900,11 +1904,8 @@ int PP1_FontSet::readFontResource(CString filename, CString sectionName, CPreset
 	tagSet.SetAllFont();
 
 	// 读取图标间距。读取不成功，使用默认值
-	tagSet.tagIS.nHS = iRet = GetPrivateProfileInt(sectionName, tagSet.vecIS[0] + L"_" + tagSet.strRCN3, 0, filename);
-	if (0 == iRet) { tagSet.tagIS.nHS = 80; }
-
-	tagSet.tagIS.nVS = iRet = GetPrivateProfileInt(sectionName, tagSet.vecIS[1] + L"_" + tagSet.strRCN3, 0, filename);
-	if (0 == iRet) { tagSet.tagIS.nVS = 48; }
+	tagSet.tagIS.nHS = iRet = GetPrivateProfileInt(sectionName, tagSet.vecIS[0] + L"_" + tagSet.strRCN3, 80, filename);
+	tagSet.tagIS.nVS = iRet = GetPrivateProfileInt(sectionName, tagSet.vecIS[1] + L"_" + tagSet.strRCN3, 48, filename);
 
 	return 0;
 }
