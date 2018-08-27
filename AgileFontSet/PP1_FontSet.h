@@ -360,13 +360,14 @@ public:
 	CEditImpl m_editPaletteFont;
 	CEditImpl m_editTipFont;		//提示，暗示，Tip，Tooltip，Hint。Tip更常用
 
-	bool use7Compat = true;
-	bool hasCurPreset = true;
-	bool has7Preset = true;
-	bool has8Preset = true;
-	bool has10Preset = true;
+	bool m_use7Compat = true;
+	bool m_hasCurPreset = true;
+	bool m_has7Preset = true;
+	bool m_has8Preset = true;
+	bool m_has10Preset = true;
 	/**您是否使用Windows 8的字体大小计算公式？ */
-	bool WIN8_SIZE = true;
+	bool m_WIN8_SIZE = true;
 	/**语言资源 */
 	vector<CString> langResource;
+	bool m_useUniqThread = true;	// 除了图标以外的字体设置。启动独立线程设定字体 UNIQ_THREAD
 };

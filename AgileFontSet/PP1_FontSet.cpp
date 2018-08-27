@@ -80,11 +80,11 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	//readResourceFile(langPath);
 	//nRet = readFontResource8(langPath);
 	//if (!nRet) {
-	//	has8Preset = false;
+	//	m_has8Preset = false;
 	//}
 	//nRet = readFontResource10(langPath);
 	//if (!nRet) {
-	//	has10Preset = false;
+	//	m_has10Preset = false;
 	//}
 
 	//调用WinAPI获得当前桌面图标间距
@@ -164,7 +164,7 @@ BOOL PP1_FontSet::OnInitDialog(HWND hwndFocus, LPARAM lParam)
 	}
 
 	//处理菜单的禁用启用
-	//if (!use7Compat) {
+	//if (!m_use7Compat) {
 	//	// 在Windows 7或更早版本的情况下，无法更改字体大小的处理模式。
 	//	CheckMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_UNCHECKED);
 	//	EnableMenuItem(GetMenu(), IDM_COMPAT7, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
@@ -1007,7 +1007,8 @@ void PP1_FontSet::theSetFont(NONCLIENTMETRICSW *fontMetrics, LOGFONTW *iconLogFo
 
 	// 除了图标以外的字体设置。启动独立线程设定字体
 	//if (GetMenuState(GetMenu(), IDM_UNIQ_THREAD, MF_BYCOMMAND)) {
-	if (1) {
+	//命令行-hide后台处理，启动独立线程设定字体回出错
+	if (m_useUniqThread) {
 		// UI和另一个线程SystemParametersInfo(SPI_SETNONCLIENTMETRICS) 运行它
 		g_pFontMetrics = fontMetrics;	//初始化独立线程的全局参数
 
@@ -1794,13 +1795,13 @@ void PP1_FontSet::initializeLocale(void)
 	//langPath = langPath.Left(langPath.ReverseFind(L'\\') + 1);	//g:\MyVC2017\noMeiryoUI235\ //末尾含斜杠
 	//langPath = langPath + L"lang\\" + L"English.lng";	//L"G:\\MyVC2017\\noMeiryoUI235\\lang\\English.lng"
 
-	//if (0 == readFontResource(langPath, m_tagSetWin8)) { has8Preset = false; }
-	//if (0 == readFontResource(langPath, m_tagSetWin10)) { has10Preset = false; }
+	//if (0 == readFontResource(langPath, m_tagSetWin8)) { m_has8Preset = false; }
+	//if (0 == readFontResource(langPath, m_tagSetWin10)) { m_has10Preset = false; }
 
 	//用内部存放数据自动生成预设配置
-	if (0 == m_tagSetWin7.getPreset(m_tagSetWin7.vecWin7PreSet)) { has7Preset = false; }
-	if (0 == m_tagSetWin8.getPreset(m_tagSetWin8.vecWin8xPreSet)) { has8Preset = false; }
-	if (0 == m_tagSetWin10.getPreset(m_tagSetWin10.vecWin10PreSet)) { has10Preset = false; }
+	if (0 == m_tagSetWin7.getPreset(m_tagSetWin7.vecWin7PreSet)) { m_has7Preset = false; }
+	if (0 == m_tagSetWin8.getPreset(m_tagSetWin8.vecWin8xPreSet)) { m_has8Preset = false; }
+	if (0 == m_tagSetWin10.getPreset(m_tagSetWin10.vecWin10PreSet)) { m_has10Preset = false; }
 
 	//设置Win7兼容风格度量菜单是否可用
 	//warning C4996: 'GetVersion': was declared deprecated
@@ -1820,25 +1821,25 @@ void PP1_FontSet::initializeLocale(void)
 	DWORD minor = (DWORD)(HIBYTE(LOWORD(dwVersion)));
 	if (major < 6) {
 		// Windows XP or earlyer
-		WIN8_SIZE = false;
-		use7Compat = false;
+		m_WIN8_SIZE = false;
+		m_use7Compat = false;
 	}
 	else if (major == 6) {
 		if (minor < 2) {
 			// Windows Vista/7
-			WIN8_SIZE = false;
-			use7Compat = false;
+			m_WIN8_SIZE = false;
+			m_use7Compat = false;
 		}
 		else {
 			// Windows 8/8.1
-			WIN8_SIZE = true;
-			use7Compat = true;
+			m_WIN8_SIZE = true;
+			m_use7Compat = true;
 		}
 	}
 	else {
 		// Windows 10 or later
-		WIN8_SIZE = false;
-		use7Compat = false;
+		m_WIN8_SIZE = false;
+		m_use7Compat = false;
 	}
 }
 

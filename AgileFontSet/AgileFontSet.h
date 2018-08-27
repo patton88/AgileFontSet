@@ -392,6 +392,9 @@ xxxø…“‘ «£∫Win7Preset°¢Win8xPreset°¢Win10Preset°¢UserPreset1 - UserPreset100 ÷Æ“
 					progsheet.m_pp1FontSet.m_iCheckPalette = 1;
 					progsheet.m_pp1FontSet.m_iCheckTip = 1;
 
+					//√¸¡Ó––-hide∫ÛÃ®¥¶¿Ì£¨∆Ù∂Ø∂¿¡¢œﬂ≥Ã…Ë∂®◊÷ÃÂªÿ≥ˆ¥Ì
+					progsheet.m_pp1FontSet.m_useUniqThread = FALSE;
+
 					progsheet.m_pp1FontSet.OnSet(0, 0xFFFF, NULL, nCmdShow);
 				}
 			}
