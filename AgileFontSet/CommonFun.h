@@ -430,6 +430,49 @@ int CStringSplitN(vector<CString>& vecResult, const CString& str, CString strSep
 	return vecResult.size();;
 }
 // ----------------------------------------------------------------------------------------
+//分割可能带有一段双引号包围内容的字符串(path)
+//strSep可以是多个字符。WIn32Con_UNICDOE_01-CStringSplit测试成功.
+// ----------------------------------------------------------------------------------------
+int CStringSplitPath(vector<CString>& vecResult, const CString& str, CString strSep)	//返回字段数
+{
+	if (str.IsEmpty())
+		return 0;
+
+	int iStart, iEnd;
+	CString strSrc = str;
+	CString strFirst;
+	//CString::Find返回此CString对象中与需要的子字符串或字符匹配的第一个字符的从零开始的索引；
+	//	如果没有找到子字符串或字符则返回-1。
+	if ((iStart = strSrc.Find('\"')) > -1)
+	{
+		if (strSrc.GetLength() > iStart)
+		{
+			if ((iEnd = strSrc.Find('\"', iStart + 1)) > -1)
+			{
+				//取出双引号中的字符串，不包括双引号
+				strFirst = strSrc.Mid(iStart + 1, iEnd - iStart - 1);
+				//删除str中双引号包围的字符串(包含双引号)
+				strSrc.Replace('\"' + strFirst + '\"', L"");
+				//str.Replace(strFirst, L""); 报错原因是str是const，不能写入
+				//error C2663: 
+				//'ATL::CStringT<wchar_t,ATL::StrTraitATL<wchar_t,ATL::ChTraitsCRT<wchar_t>>>::Replace'
+				//: 2 overloads have no legal conversion for 'this' pointer
+			}
+
+		}
+		else {
+			return -1;	//返回错误：只找到一个双引号
+		}
+	}
+
+	vecResult.clear();
+	CStringSplitN(vecResult, strSrc, strSep);
+	//vecResult.insert(vecResult.begin(), strFirst); //在vecResult的最前面添加一个元素。效率低
+	vecResult.push_back(strFirst);
+
+	return vecResult.size();;
+}
+// ----------------------------------------------------------------------------------------
 //取当前路径。0 返回当前全路径(含文件名)；1 返回当前目录(末尾无斜杠)；2 返回当前目录(末尾含斜杠)；3 返回当前驱动器；4 返回当前模块名
 //系统有一个函数GetCurrentDirectory();
 CString getCurDir(int iFlag)

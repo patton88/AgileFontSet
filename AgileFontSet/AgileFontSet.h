@@ -9,6 +9,7 @@
 extern CString g_strVerInfo;
 extern CString StrToLower(const CString& str);
 extern int CStringSplitN(vector<CString>& vecResult, const CString& str, CString strSep);	//·µ»Ø×Ö¶ÎÊı
+extern int CStringSplitPath(vector<CString>& vecResult, const CString& str, CString strSep);	//·µ»Ø×Ö¶ÎÊı
 extern CString getCurDir(int iFlag);
 extern BOOL isEngChar(wchar_t w);
 extern bool isSectionExists(CString sectionName, CString& iniFilePath);
@@ -245,7 +246,10 @@ xxx¿ÉÒÔÊÇ£ºWin7Preset¡¢Win8xPreset¡¢Win10Preset¡¢UserPreset1 - UserPreset100 Ö®Ò
 	g_strVerInfo.ReleaseBuffer();
 
 	//ÓÃCStringSplitS·Ö¸î v -h3 Ê±³ö´í¡£ËùÒÔÓÃCStringSplitN
-	iSeg = CStringSplitN(vecCmdLine, strCmdLine, ' ');	//strCmdLineÖĞµÄ²ÎÊı¶Î¿É²»·ÖÏÈºó´ÎĞò
+	//iSeg = CStringSplitN(vecCmdLine, strCmdLine, ' ');	//strCmdLineÖĞµÄ²ÎÊı¶Î¿É²»·ÖÏÈºó´ÎĞò
+
+	//·Ö¸î¿ÉÄÜ´øÓĞÒ»¶ÎË«ÒıºÅ°üÎ§ÄÚÈİµÄ×Ö·û´®(path)
+	iSeg = CStringSplitPath(vecCmdLine, strCmdLine, ' ');	//strCmdLineÖĞµÄ²ÎÊı¶Î¿É²»·ÖÏÈºó´ÎĞò
 
 	//ÕâÑù´¦Àí¸üÇåÎú¡¢Ò×ÓÚÀí½âºÍ¹ÜÀí£¬²»ÈİÒ×³ö´í
 	//³õÊ¼»¯Îª4¸öL""£¬0-3µ¥Ôª·Ö±ğÓÃÓÚ´æ·Å£ºpath¡¢-xxx¡¢-hide¡¢-?
