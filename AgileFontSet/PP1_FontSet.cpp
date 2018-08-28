@@ -1721,49 +1721,6 @@ int PP1_FontSet::mySetFont(NONCLIENTMETRICSW& metrics, LOGFONTW& iconFont, CPres
 	return 0;
 }
 
-/**
-*设置Windows 7的预设值。
-*/
-LRESULT PP1_FontSet::OnSet7(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	mySetFont(m_metrics, m_iconFont, m_tagSetWin7);
-
-	// 更新显示。
-	theUpdateDisplay();
-
-	return 0;
-}
-
-/**
-*设置Windows 8 / 8.1的预设值。
-*/
-LRESULT PP1_FontSet::OnSet8(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
-	//mySetFont(m_metrics, m_iconFont, tagFontWin8);
-	mySetFont(m_metrics, m_iconFont, m_tagSetWin8);
-
-	// 更新显示。
-	theUpdateDisplay();
-
-	return 0;
-}
-
-/**
-*设置Windows 10的预设值。
-*/
-LRESULT PP1_FontSet::OnSet10(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	//int PP1_FontSet::SetFont(NONCLIENTMETRICSW& metrics, LOGFONTW iconFont, TagFont& tagFont)
-	//mySetFont(m_metrics, m_iconFont, tagFontWin10);
-	mySetFont(m_metrics, m_iconFont, m_tagSetWin10);
-
-	// 更新显示。
-	theUpdateDisplay();
-
-	return 0;
-}
-
 LRESULT PP1_FontSet::OnUniqThread(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	//UISetCheck(IDM_UNIQ_THREAD, !b);	//用UISetCheck()比较麻烦

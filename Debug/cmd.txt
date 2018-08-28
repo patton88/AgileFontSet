@@ -1,0 +1,8 @@
+AgileFontSet.exe g:\mySysFontSet-Win4.ini -xxx
+AgileFontSet.exe g:\mySysFontSet-Win4.ini -UserPreset1 -hide
+AgileFontSet.exe "d:\Program Files (x86)\NuGet\mySysFontSet-Win4.ini" -hide
+AgileFontSet.exe -Win8xPreset "d:\Program Files (x86)\NuGet\mySysFontSet-Win4.ini" -hide
+AgileFontSet.exe -Win10Preset "d:\Program Files (x86)\NuGet\mySysFontSet-Win4.ini" -hide
+AgileFontSet.exe -Win7Preset "d:\Program Files (x86)\NuGet\mySysFontSet-Win4.ini" -hide
+
+
