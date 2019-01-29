@@ -329,8 +329,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,1,0,1
- PRODUCTVERSION 2,1,0,1
+ FILEVERSION 2,1,0,2
+ PRODUCTVERSION 2,1,0,2
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -347,12 +347,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "ybmj@vip.163.com"
             VALUE "FileDescription", "AgileFontSet for Set System Font and Icon Spacing"
-            VALUE "FileVersion", "2.1.0.1"
+            VALUE "FileVersion", "2.1.0.2"
             VALUE "InternalName", "AgileFontSet"
             VALUE "LegalCopyright", "Copyright 2018"
             VALUE "OriginalFilename", "AgileFontSet.exe"
             VALUE "ProductName", "AgileFontSet Module"
-            VALUE "ProductVersion", "2.1.0.1"
+            VALUE "ProductVersion", "2.1.0.2"
         END
     END
     BLOCK "VarFileInfo"

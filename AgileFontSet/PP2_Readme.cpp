@@ -232,7 +232,7 @@ void PP2_Readme::GetChinsesHelp()
   该程序 AgileFontSet 便是快捷设置Windows系统字体和桌面图标间距的小程序，中文名为“迅捷字体设置程序”。该程序可以加载和保存Win7Preset、Win8xPreset、Win10Preset、UserPreset1 - UserPreset100等多种用户配置。该程序提供窗口界面、命令行两种使用方式。窗口界面简洁快捷、一目了然，普通用户也可轻松使用，并且，设置后无需注销或重启便可立即生效；命令行方式可用于WinPE等需要自动设置系统字体和桌面图标间距的情况。\r\n\
 \r\n\
   (2)、使用环境\r\n\
-  该程序采用VS2017 WTL10 x86编译(Windows Template Library，http://wtl.sourceforge.net/ )，程序短小精悍、可独立运行，支持32位和64位的WinXp、Vista、Win7、Win8.x、Win10及相应Windows Server版等操作系统。\r\n\
+  该程序采用VS2017 WTL10 x86编译(Windows Template Library，http://wtl.sourceforge.net/ )，程序短小精悍、可独立运行，支持32位和64位的Vista、Win7、Win8.x、Win10及相应Windows Server版等操作系统。\r\n\
 \r\n\
   (3)、窗口界面快捷设置系统字体和桌面图标间距\r\n\
   在Windows中直接运行 AgileFontSet 便可启动窗口界面，启动后会显示系统字体和桌面图标间距的当前值，设置对话框简洁快捷、一目了然，普通用户也可快速方便地设置系统字体和桌面图标间距，并且可以立即生效。在窗口界面，用户可以直观地加载和保存默认配置、Win7Preset、Win8xPreset、Win10Preset、UserPreset1 - UserPreset100等多种用户配置。\r\n\
