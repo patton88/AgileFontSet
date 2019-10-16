@@ -1,4 +1,4 @@
-# AgileFontSet 快捷设置Windows系统字体和桌面图标间距
+# AgileFontSet
 
   AgileFontSet v2.1 程序说明
   迅捷字体设置程序v2.1 - ybmj@vip.163.com(20190129)
